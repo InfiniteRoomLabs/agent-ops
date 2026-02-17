@@ -1,7 +1,11 @@
 ---
 name: find-agent
-description: Search for agents, skills, and commands by tag across all installed plugins
+description: Use when searching for agents, skills, or commands by tag or keyword across all plugins
 allowed-tools: Read, Glob, Grep
+tags:
+  function: [engineering, operations, finance, research]
+  scenario: [discovery]
+  custom: [search, tags, registry]
 ---
 
 # Find Agent

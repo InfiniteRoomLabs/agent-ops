@@ -1,7 +1,11 @@
 ---
 name: new-agent
-description: Scaffold a new agent, skill, or command in the correct plugin with proper frontmatter tags
+description: Use when creating a new agent, skill, or command in the agent-ops marketplace
 allowed-tools: Read, Write, Glob, Grep
+tags:
+  function: [engineering, operations, finance, research]
+  scenario: [agent-development]
+  custom: [scaffolding, templates]
 ---
 
 # Create New Agent/Skill/Command

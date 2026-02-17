@@ -2,6 +2,35 @@
 # Convenience index for searching across all plugins by tag.
 # Update this when adding new agents, skills, or commands.
 
+agents:
+  oss-health-checker:
+    plugin: engineering
+    path: plugins/engineering/agents/oss-health-checker
+    function: [engineering]
+    scenario: [oss-readiness, release-management]
+    status: active
+
+  infra-reviewer:
+    plugin: engineering
+    path: plugins/engineering/agents/infra-reviewer
+    function: [engineering]
+    scenario: [code-review, infrastructure]
+    status: active
+
+  competitor-scanner:
+    plugin: research
+    path: plugins/research/agents/competitor-scanner
+    function: [research, executive]
+    scenario: [competitive-intelligence, market-analysis]
+    status: active
+
+  tech-evaluator:
+    plugin: research
+    path: plugins/research/agents/tech-evaluator
+    function: [research, engineering]
+    scenario: [technology-evaluation, library-selection]
+    status: active
+
 skills:
   new-agent:
     plugin: core
@@ -10,10 +39,52 @@ skills:
     scenario: [agent-development]
     status: active
 
+  project-onboard:
+    plugin: core
+    path: plugins/core/skills/project-onboard
+    function: [engineering, operations]
+    scenario: [project-setup]
+    status: active
+
+  release-prep:
+    plugin: engineering
+    path: plugins/engineering/skills/release-prep
+    function: [engineering]
+    scenario: [release-management]
+    status: active
+
+  dep-audit:
+    plugin: engineering
+    path: plugins/engineering/skills/dep-audit
+    function: [engineering]
+    scenario: [dependency-management]
+    status: active
+
+  market-scan:
+    plugin: research
+    path: plugins/research/skills/market-scan
+    function: [research, executive]
+    scenario: [market-analysis, business-planning]
+    status: active
+
 commands:
   find-agent:
     plugin: core
     path: plugins/core/commands/find-agent
     function: [engineering, operations, finance, research]
     scenario: [discovery]
+    status: active
+
+  publish-package:
+    plugin: engineering
+    path: plugins/engineering/commands/publish-package
+    function: [engineering]
+    scenario: [release-management]
+    status: active
+
+  trend-watch:
+    plugin: research
+    path: plugins/research/commands/trend-watch
+    function: [research, engineering]
+    scenario: [technology-evaluation, market-analysis]
     status: active
