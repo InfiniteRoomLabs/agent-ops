@@ -1,0 +1,35 @@
+# Agent runtime directories
+.claude/
+.codex/
+.gemini/
+.cursor/
+.qwen/
+.opencode/
+.windsurf/
+.kilocode/
+.augment/
+.roo/
+.amazonq/
+.github/copilot/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build artifacts
+__pycache__/
+*.pyc
+node_modules/
+dist/
+build/
+
+# Environment
+.env
+.env.local

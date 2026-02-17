@@ -1,0 +1,19 @@
+# Agent-Ops Registry
+# Convenience index for searching across all plugins by tag.
+# Update this when adding new agents, skills, or commands.
+
+skills:
+  new-agent:
+    plugin: core
+    path: plugins/core/skills/new-agent
+    function: [engineering, operations, finance, research]
+    scenario: [agent-development]
+    status: active
+
+commands:
+  find-agent:
+    plugin: core
+    path: plugins/core/commands/find-agent
+    function: [engineering, operations, finance, research]
+    scenario: [discovery]
+    status: active

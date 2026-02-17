@@ -1,0 +1,10 @@
+{
+  "name": "research",
+  "version": "0.1.0",
+  "description": "Market analysis, competitive intelligence, and technology evaluation",
+  "author": {
+    "name": "Infinite Room Labs"
+  },
+  "repository": "https://github.com/InfiniteRoomLabs/agent-ops",
+  "keywords": ["research", "analysis", "competitive-intel"]
+}
