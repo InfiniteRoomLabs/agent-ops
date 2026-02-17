@@ -33,3 +33,6 @@ build/
 # Environment
 .env
 .env.local
+
+# Added by Spec Kitty CLI (auto-managed)
+.kittify/.dashboard
