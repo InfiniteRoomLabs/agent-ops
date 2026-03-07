@@ -103,6 +103,40 @@ options:
     description: You can log in, navigate around, and stay logged in for 5+ minutes.
 ```
 
+### Decomposition -- "How should we group and prioritize?"
+
+Use when a compound prompt has 3+ distinct concerns. Ask this BEFORE diving into any single cluster.
+
+```yaml
+question: I identified 6 concern areas in your prompt -- which should we tackle first?
+header: Priority
+multiSelect: false
+options:
+  - label: Observability first
+    description: OTel + Grafana + Netdata. Foundation that other services report into. Unblocks monitoring for everything else.
+  - label: CI/CD first
+    description: Jenkins + pipelines. Unblocks automated deployments for everything downstream.
+  - label: Full brainstorm first
+    description: Don't prioritize yet -- explore all areas together, then sequence after.
+```
+
+### Certainty -- "How decided are you on X?"
+
+Use when the prompt mixes definite decisions with exploratory ideas.
+
+```yaml
+question: You mentioned Sentry for error tracking -- how committed are you to that choice?
+header: Certainty
+multiSelect: false
+options:
+  - label: Decided on Sentry
+    description: Self-host or free tier, but Sentry specifically.
+  - label: Exploring options
+    description: Open to alternatives like GlitchTip, Highlight.io, or Sentry.
+  - label: Just an example
+    description: Need error tracking, Sentry was the first name that came to mind.
+```
+
 ## Adaptive Thoroughness Guide
 
 | Complexity | Rounds | When |

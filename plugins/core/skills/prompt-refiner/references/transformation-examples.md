@@ -94,6 +94,74 @@ Split the 487-line UserService into 3 focused service modules following the sing
 - Do not refactor the methods themselves -- only move them
 ```
 
+## Compound Example
+
+**Raw input:**
+> Okay in our ideas we specified that we need to have some infra set up (jenkins, et al). Let's generate a plan in the infra project to get those all set up. Let's brainstorm and first identify any other services we'd need. I know other things we'll need is some kind of headless cms or static page generator for our company site... We also will need an Open Telemetry service... we'll need a grafana service... All projects should connect to the open telemetry... We can even discuss self-hosting Sentry... We need to have terraform, ansible, docker, kubernetes... There's also ideas in the ideas project... Go investigate and be thorough and brainstorm stuff with me
+
+**Here's what I understood:**
+> Plan the full infrastructure stack for the company, starting from a brainstorm. This spans the infra repo (`infinite-room-labs-infra/`) and pulls requirements from the ideas repo (`ideas/`). There are 6 concern areas: CI/CD (Jenkins), observability (OpenTelemetry + Grafana + Netdata), error tracking (Sentry or alternative), company website (headless CMS + hosting), IaC tooling structure (Terraform/Ansible/Docker/K8s), and cross-project integration (every project reports telemetry). Some decisions are firm (need observability), some are exploratory (Sentry vs alternatives, CMS approach). You want to brainstorm before committing to a plan.
+
+**Structured prompt (compound format):**
+
+```
+## Goal
+Brainstorm and plan the complete infrastructure stack for Infinite Room Labs, covering CI/CD, observability, company website hosting, and IaC structure. Research existing ideas and infra conventions before proposing a plan.
+
+## Work Streams
+
+### 1. CI/CD Pipeline
+**Goal**: Set up Jenkins (or evaluate alternatives) for automated builds, tests, and deployments.
+**Context**: Ideas repo mentions Jenkins specifically. Infra repo uses Terraform Cloud + Ansible.
+**Requirements**: Must integrate with all company projects. Docker-based builds.
+**Open questions**: Jenkins specifically, or evaluate alternatives (Woodpecker, Drone)?
+
+### 2. Observability Stack
+**Goal**: Deploy OpenTelemetry collector, Grafana dashboards, and per-node system metrics.
+**Context**: No existing observability infrastructure. All projects need to report telemetry.
+**Requirements**: OTel collector with project onboarding automation. Netdata or equivalent on every node. Grafana for visualization.
+**Open questions**: OTel project onboarding -- templated or manual? Hosted Grafana Cloud free tier vs self-hosted?
+
+### 3. Error Tracking
+**Goal**: Set up error tracking for all projects.
+**Context**: Sentry mentioned as option. Free dev tier available. Self-hosting is also possible.
+**Requirements**: All projects report errors to a central service.
+**Open questions**: Self-host Sentry, use free tier, or evaluate alternatives (GlitchTip)?
+
+### 4. Company Website
+**Goal**: Stand up company site with headless CMS and cost-effective hosting.
+**Context**: Needs an API backend. Preference for FOSS/self-hosted or free-tier hosted (Vercel, Cloudflare Workers).
+**Requirements**: Headless CMS linked to frontend. Minimal hosting cost.
+**Open questions**: CMS choice (Strapi, Directus, Payload)? Hosting platform?
+
+### 5. IaC Structure
+**Goal**: Define how Terraform, Ansible, Docker, and Kubernetes are organized in the infra project.
+**Context**: Infra repo already has `terraform/` with environments/providers hierarchy and `root.hcl` for Terragrunt.
+**Requirements**: Clear structure documented in the infra project. Each tool gets its own top-level directory.
+**Open questions**: K8s cluster setup -- managed (k3s) or cloud provider?
+
+### 6. Cross-Project Integration
+**Goal**: Ensure every project connects to observability and CI/CD automatically.
+**Context**: Need templates or automation for onboarding new projects to OTel and Jenkins.
+**Requirements**: Standardized approach so new projects get monitoring and CI from day one.
+**Open questions**: SDK integration guide? CI template repo?
+
+## Sequencing
+1. IaC Structure (defines where everything lives)
+2. CI/CD (unblocks automated deployment of subsequent services)
+3. Observability (foundation for monitoring everything else)
+4. Error Tracking (depends on observability patterns)
+5. Company Website (independent but lower priority)
+6. Cross-Project Integration (depends on 2 + 3 being operational)
+
+## Boundaries
+- Research the ideas repo before proposing -- prior thinking exists there
+- Stay within free/low-cost tiers where possible (early-stage company)
+- Use existing infra repo conventions (Terraform hierarchy, Terragrunt)
+```
+
+**Skill chain**: Execute into brainstorming skill (user said "let's brainstorm").
+
 ## Transformation Principles
 
 - Research findings become specific file paths, function names, line numbers, and commit hashes in the output
