@@ -60,6 +60,13 @@ skills:
     scenario: [dependency-management]
     status: active
 
+  prompt-refiner:
+    plugin: core
+    path: plugins/core/skills/prompt-refiner
+    function: [engineering, operations, finance, research]
+    scenario: [prompt-improvement]
+    status: active
+
   market-scan:
     plugin: research
     path: plugins/research/skills/market-scan
