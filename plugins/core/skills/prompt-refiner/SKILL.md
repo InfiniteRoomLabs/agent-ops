@@ -41,6 +41,15 @@ Read the raw prompt. Categorize:
 
 **If unclear**: Ask 1-2 high-level questions about task type and actual goal. Use `AskUserQuestion` with multiple choice.
 
+### Compound Detection
+
+After categorization, check: does the prompt contain 3+ distinct concerns, reference multiple projects, or mix definite decisions with exploratory ideas? If so, treat it as a **compound prompt**:
+
+1. Identify each concern cluster and its certainty level (decided, exploring, just an example)
+2. Note which projects/repos are referenced
+3. Proceed to Phase 2 with cross-cutting research rather than a single-category checklist
+4. In Phase 3, prioritize decomposition questions before diving into any single cluster
+
 Track loop count. Maximum 3 research-clarify loops total across Phases 2-3.
 
 ## Phase 2: Deep Research
@@ -139,6 +148,32 @@ Transform into this format (include sections only when relevant):
 [What NOT to do -- only if constraints exist or task is risky]
 ```
 
+### Compound Output Format
+
+When transforming a compound prompt, use this alternative structure:
+
+```
+## Goal
+[Overarching objective -- 1-2 sentences]
+
+## Work Streams
+
+### 1. [Stream name]
+**Goal**: [What this stream accomplishes]
+**Context**: [Relevant findings]
+**Requirements**: [Specifics]
+**Open questions**: [Things still uncertain]
+
+### 2. [Stream name]
+...
+
+## Sequencing
+[Which streams depend on others, suggested order]
+
+## Boundaries
+[Cross-cutting constraints]
+```
+
 ### Step 3: User Choice
 
 Present three options:
@@ -146,6 +181,16 @@ Present three options:
 1. **Execute** -- Run the refined prompt directly in this conversation (do NOT re-invoke prompt-refiner)
 2. **Edit** -- User modifies the prompt, then execute
 3. **Copy** -- Place the prompt on clipboard, done
+
+### Skill Chaining
+
+When the raw prompt contains phrases like "let's brainstorm," "let's plan," "generate a plan," or references a specific workflow, recognize these as implicit skill invocations. Adjust the Execute option:
+
+- "Let's brainstorm" -> Execute feeds the refined prompt into the brainstorming skill
+- "Generate a plan" -> Execute feeds into spec-kitty.plan or writing-plans
+- No skill reference -> Execute runs the refined prompt directly in conversation
+
+Note the target skill in the Execute option so the user knows what will happen.
 
 ## Transformation Principles
 

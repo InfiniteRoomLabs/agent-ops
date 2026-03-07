@@ -65,6 +65,21 @@ Each checklist targets 5-8 files/commands per round. Pick the checklist matching
 4. Check for doc generation tools (JSDoc configs, Sphinx conf.py, rustdoc)
 5. `Grep` for existing doc patterns (comment style, section headings)
 
+### Compound / Multi-Project
+
+Use when the prompt references multiple repos, contains 3+ distinct concerns, or spans exploration + planning.
+
+1. Identify all projects/repos referenced in the prompt
+2. `Read` CLAUDE.md in each referenced project for structure, conventions, and existing decisions
+3. If "ideas" repo referenced: `Glob` for relevant idea files (`ideas/*.md`), `Read` them
+4. Map which concerns belong to which project/repo
+5. For each concern cluster, run 2-3 targeted research commands (use the matching single-category checklist above)
+6. Check for existing infra/config that relates to the concerns (`Glob` for Terraform, Docker, CI configs)
+7. `git log` across referenced repos for recent related work
+8. Note certainty levels: which decisions are made vs. which are exploratory
+
+Research budget scales: allow 5-8 commands **per concern cluster** rather than per round, since compound prompts cover more ground.
+
 ## Research Budget
 
 - **Per round**: 5-8 files/commands
