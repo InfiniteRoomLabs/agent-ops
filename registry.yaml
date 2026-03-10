@@ -17,6 +17,69 @@ agents:
     scenario: [code-review, infrastructure]
     status: active
 
+  devops-cto:
+    plugin: engineering
+    path: plugins/engineering/agents/devops-cto
+    function: [engineering, executive]
+    scenario: [infrastructure, architecture, devops-team]
+    status: active
+
+  devops-vp-eng:
+    plugin: engineering
+    path: plugins/engineering/agents/devops-vp-eng
+    function: [engineering]
+    scenario: [infrastructure, standards, devops-team]
+    status: active
+
+  devops-manager:
+    plugin: engineering
+    path: plugins/engineering/agents/devops-manager
+    function: [engineering]
+    scenario: [deployment, pipeline, devops-team]
+    status: active
+
+  devops-security-lead:
+    plugin: engineering
+    path: plugins/engineering/agents/devops-security-lead
+    function: [engineering]
+    scenario: [security-review, infrastructure, devops-team]
+    status: active
+
+  devops-infra-eng:
+    plugin: engineering
+    path: plugins/engineering/agents/devops-infra-eng
+    function: [engineering]
+    scenario: [infrastructure, terraform, devops-team]
+    status: active
+
+  devops-cicd-eng:
+    plugin: engineering
+    path: plugins/engineering/agents/devops-cicd-eng
+    function: [engineering]
+    scenario: [ci-cd, pipeline, devops-team]
+    status: active
+
+  devops-platform-eng:
+    plugin: engineering
+    path: plugins/engineering/agents/devops-platform-eng
+    function: [engineering]
+    scenario: [platform, cloudflare, devops-team]
+    status: active
+
+  devops-infra-intern:
+    plugin: engineering
+    path: plugins/engineering/agents/devops-infra-intern
+    function: [engineering]
+    scenario: [infrastructure, support, devops-team]
+    status: active
+
+  devops-cicd-intern:
+    plugin: engineering
+    path: plugins/engineering/agents/devops-cicd-intern
+    function: [engineering]
+    scenario: [ci-cd, support, devops-team]
+    status: active
+
   competitor-scanner:
     plugin: research
     path: plugins/research/agents/competitor-scanner
@@ -72,6 +135,13 @@ skills:
     path: plugins/research/skills/market-scan
     function: [research, executive]
     scenario: [market-analysis, business-planning]
+    status: active
+
+  devops-team:
+    plugin: engineering
+    path: plugins/engineering/skills/devops-team
+    function: [engineering, executive]
+    scenario: [deployment, infrastructure, ci-cd, devops-team]
     status: active
 
 commands:
