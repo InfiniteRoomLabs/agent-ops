@@ -244,15 +244,16 @@ def main_callback(
 # ---------------------------------------------------------------------------
 
 
-@app.command()
-def list() -> None:
-    """List all registered agents."""
-    root = get_root()
-    registry = load_registry(root)
-    agents_section = registry.get("agents", {})
-
+def _list_from_registry(
+    root: Path, agents_section: dict, namespace: str | None
+) -> list[AgentSummary]:
+    """Build agent summaries from the registry.yaml agents section."""
     summaries: list[AgentSummary] = []
     for name, entry in agents_section.items():
+        # Apply namespace filter when requested
+        if namespace is not None and entry.get("plugin", "") != namespace:
+            continue
+
         agent_path = resolve_agent_path(root, entry, name)
         if agent_path is not None:
             detail = read_agent_file(agent_path)
@@ -274,6 +275,50 @@ def list() -> None:
             summaries.append(
                 AgentSummary(name=name, plugin=entry.get("plugin", ""))
             )
+    return summaries
+
+
+def _list_from_filesystem(
+    root: Path, namespace: str | None
+) -> list[AgentSummary]:
+    """Scan the filesystem for agent .md files and build summaries."""
+    summaries: list[AgentSummary] = []
+    namespaces = (namespace,) if namespace else KNOWN_NAMESPACES
+    for ns in namespaces:
+        agents_dir = root / "plugins" / ns / "agents"
+        if not agents_dir.is_dir():
+            continue
+        for md_file in sorted(agents_dir.glob("*.md")):
+            detail = read_agent_file(md_file)
+            if detail is not None:
+                summaries.append(
+                    AgentSummary(
+                        name=detail.name,
+                        plugin=detail.plugin,
+                        description=detail.description,
+                        model=detail.model,
+                        color=detail.color,
+                    )
+                )
+    return summaries
+
+
+@app.command()
+def list(
+    namespace: Annotated[
+        Optional[str],
+        typer.Option("--namespace", "-n", help="Filter agents by plugin namespace."),
+    ] = None,
+) -> None:
+    """List all registered agents."""
+    root = get_root()
+    registry = load_registry(root)
+    agents_section = registry.get("agents", {})
+
+    if agents_section:
+        summaries = _list_from_registry(root, agents_section, namespace)
+    else:
+        summaries = _list_from_filesystem(root, namespace)
 
     emit(ListResult(agents=summaries))
 
