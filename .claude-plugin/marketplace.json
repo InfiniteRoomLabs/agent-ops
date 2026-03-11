@@ -8,7 +8,7 @@
       "name": "core",
       "source": "./plugins/core",
       "description": "Cross-cutting utilities, shared skills, and tag-based discovery for all Infinite Room Labs agents",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "keywords": ["core", "discovery", "utilities"]
     },
     {
