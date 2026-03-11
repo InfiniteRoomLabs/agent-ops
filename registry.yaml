@@ -144,6 +144,20 @@ skills:
     scenario: [deployment, infrastructure, ci-cd, devops-team]
     status: active
 
+  load-agent:
+    plugin: core
+    path: plugins/core/skills/load-agent
+    function: [engineering, operations, finance, research, executive]
+    scenario: [agent-loading, session-management]
+    status: active
+
+  end-agent-session:
+    plugin: core
+    path: plugins/core/skills/end-agent-session
+    function: [engineering, operations, finance, research, executive]
+    scenario: [agent-loading, session-management]
+    status: active
+
 commands:
   find-agent:
     plugin: core
@@ -164,4 +178,18 @@ commands:
     path: plugins/research/commands/trend-watch
     function: [research, engineering]
     scenario: [technology-evaluation, market-analysis]
+    status: active
+
+  load-agent:
+    plugin: core
+    path: plugins/core/commands/load-agent
+    function: [engineering, operations, finance, research, executive]
+    scenario: [agent-loading, session-management]
+    status: active
+
+  end-agent-session:
+    plugin: core
+    path: plugins/core/commands/end-agent-session
+    function: [engineering, operations, finance, research, executive]
+    scenario: [agent-loading, session-management]
     status: active
