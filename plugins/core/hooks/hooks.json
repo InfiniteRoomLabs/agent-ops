@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run ${CLAUDE_PLUGIN_ROOT}/scripts/summon.py state clean --if-stale",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
