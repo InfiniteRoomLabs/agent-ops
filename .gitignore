@@ -34,5 +34,8 @@ build/
 .env
 .env.local
 
+# Worktrees
+.worktrees/
+
 # Added by Spec Kitty CLI (auto-managed)
 .kittify/.dashboard
