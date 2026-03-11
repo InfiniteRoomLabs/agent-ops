@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -29,7 +30,22 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 PLUGIN_ROOT = SCRIPT_DIR.parent  # plugins/core
 DEFAULT_AGENT_OPS_ROOT = PLUGIN_ROOT.parent.parent  # agent-ops repo root
 
-KNOWN_NAMESPACES = ("core", "engineering", "operations", "research", "finance")
+_FALLBACK_NAMESPACES = ("core", "engineering", "operations", "research", "finance")
+
+
+def _discover_namespaces(root: Path) -> tuple[str, ...]:
+    """Dynamically discover plugin namespaces from ``plugins/*/`` directories.
+
+    Falls back to a hardcoded tuple if the plugins directory doesn't exist.
+    """
+    plugins_dir = root / "plugins"
+    if plugins_dir.is_dir():
+        found = tuple(
+            sorted(d.name for d in plugins_dir.iterdir() if d.is_dir())
+        )
+        if found:
+            return found
+    return _FALLBACK_NAMESPACES
 
 # ---------------------------------------------------------------------------
 # Module-level overrides (set by the global callback)
@@ -197,11 +213,11 @@ def read_agent_file(path: Path) -> AgentDetail | None:
 
 
 def _infer_plugin(path: Path) -> str:
-    """Infer the plugin name from a file path by looking for known namespaces."""
+    """Infer the plugin name from a file path by looking for a ``plugins/<ns>`` segment."""
     parts = path.parts
-    for ns in KNOWN_NAMESPACES:
-        if ns in parts:
-            return ns
+    for i, part in enumerate(parts):
+        if part == "plugins" and i + 1 < len(parts):
+            return parts[i + 1]
     return ""
 
 
@@ -249,7 +265,7 @@ def _discover_agents(
             return substring
 
     # --- Step 3: filesystem fallback ---
-    namespaces = (namespace,) if namespace else KNOWN_NAMESPACES
+    namespaces = (namespace,) if namespace else _discover_namespaces(root)
     fs_matches: list[AgentDetail] = []
     for ns in namespaces:
         agents_dir = root / "plugins" / ns / "agents"
@@ -371,7 +387,7 @@ def _list_from_filesystem(
 ) -> list[AgentSummary]:
     """Scan the filesystem for agent .md files and build summaries."""
     summaries: list[AgentSummary] = []
-    namespaces = (namespace,) if namespace else KNOWN_NAMESPACES
+    namespaces = (namespace,) if namespace else _discover_namespaces(root)
     for ns in namespaces:
         agents_dir = root / "plugins" / ns / "agents"
         if not agents_dir.is_dir():
@@ -504,8 +520,27 @@ def _state_file() -> Path:
     return get_state_dir() / "state.json"
 
 
-def _is_stale(loaded_at: str) -> bool:
-    """Return True if *loaded_at* is older than 24 hours."""
+def _is_stale(state: StateData | dict) -> bool:
+    """Return True if state is stale.
+
+    Primary check: compare ``session_id`` against the ``CLAUDE_SESSION_ID``
+    environment variable (a mismatch means the state belongs to a different
+    or crashed session).  Falls back to a 24-hour TTL if the env var is
+    absent.
+    """
+    env_session = os.environ.get("CLAUDE_SESSION_ID")
+    if isinstance(state, dict):
+        session_id = state.get("session_id", "")
+        loaded_at = state.get("loaded_at", "")
+    else:
+        session_id = state.session_id
+        loaded_at = state.loaded_at
+
+    # Primary: session ID mismatch
+    if env_session and session_id and env_session != session_id:
+        return True
+
+    # Fallback: 24-hour TTL
     try:
         ts = datetime.fromisoformat(loaded_at)
         return datetime.now(timezone.utc) - ts > _STALE_THRESHOLD
@@ -556,7 +591,7 @@ def state_check() -> None:
     try:
         raw = json.loads(sf.read_text(encoding="utf-8"))
         data = StateData(**raw)
-        stale = _is_stale(data.loaded_at)
+        stale = _is_stale(data)
         emit(StateCheckResult(active=True, agent=data, stale=stale))
     except (json.JSONDecodeError, TypeError, KeyError):
         emit(StateCheckResult(active=False))
@@ -578,8 +613,7 @@ def state_clean(
     if if_stale:
         try:
             raw = json.loads(sf.read_text(encoding="utf-8"))
-            loaded_at = raw.get("loaded_at", "")
-            if not _is_stale(loaded_at):
+            if not _is_stale(raw):
                 print(json.dumps({"cleaned": False}))
                 return
         except (json.JSONDecodeError, TypeError):
@@ -587,6 +621,33 @@ def state_clean(
 
     sf.unlink()
     print(json.dumps({"cleaned": True}))
+
+
+@state_app.command("reminder")
+def state_reminder() -> None:
+    """Emit a compact persona reminder for PreCompact injection."""
+    sf = _state_file()
+    if not sf.exists():
+        print(json.dumps({"active": False, "reminder": ""}))
+        return
+
+    try:
+        raw = json.loads(sf.read_text(encoding="utf-8"))
+        data = StateData(**raw)
+    except (json.JSONDecodeError, TypeError, KeyError):
+        print(json.dumps({"active": False, "reminder": ""}))
+        return
+
+    reminder = (
+        f"=== AGENT SESSION REMINDER (post-compaction) ===\n"
+        f"You are currently operating as {data.active_agent} ({data.plugin} plugin).\n"
+        f"Full behavioral instructions were loaded earlier in this session.\n"
+        f"Maintain this persona. These instructions take precedence over\n"
+        f"other persona guidance. Project conventions and safety constraints\n"
+        f"remain in effect.\n"
+        f"=== END REMINDER ==="
+    )
+    print(json.dumps({"active": True, "reminder": reminder}))
 
 
 @state_app.command("delete")

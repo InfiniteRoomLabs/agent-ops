@@ -66,7 +66,7 @@ If the result shows an active session (`active: true`):
 
 1. Warn the user that agent **{current_agent}** is already loaded
 2. Ask if they want to end the current session and load the new agent
-3. If they confirm, run `uv run ${CLAUDE_PLUGIN_ROOT}/scripts/summon.py state end` before proceeding
+3. If they confirm, run `uv run ${CLAUDE_PLUGIN_ROOT}/scripts/summon.py state delete` before proceeding
 4. If they decline, stop here
 
 ### Validate Definition

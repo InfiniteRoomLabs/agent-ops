@@ -37,5 +37,8 @@ build/
 # Worktrees
 .worktrees/
 
+# SUMMON runtime state (normally under ~/.claude/ but safety net for --state-dir overrides)
+**/summon/state.json
+
 # Added by Spec Kitty CLI (auto-managed)
 .kittify/.dashboard
