@@ -12,7 +12,8 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from datetime import datetime, timezone
+import uuid
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Annotated, Optional
 
@@ -204,6 +205,93 @@ def _infer_plugin(path: Path) -> str:
     return ""
 
 
+def _discover_agents(
+    name: str, namespace: str | None, root: Path
+) -> list[AgentDetail]:
+    """Core discovery algorithm shared by ``discover`` and ``info``.
+
+    Search order:
+    1. Registry exact match (case-insensitive), filtered by namespace
+    2. Registry substring match (case-insensitive)
+    3. Filesystem fallback -- glob ``plugins/{ns-or-*}/agents/*.md``
+    """
+    registry = load_registry(root)
+    agents_section = registry.get("agents", {})
+    name_lower = name.lower()
+
+    if agents_section:
+        # --- Step 1: exact match in registry keys ---
+        exact: list[AgentDetail] = []
+        for key, entry in agents_section.items():
+            if namespace is not None and entry.get("plugin", "") != namespace:
+                continue
+            if key.lower() == name_lower:
+                agent_path = resolve_agent_path(root, entry, key)
+                if agent_path is not None:
+                    detail = read_agent_file(agent_path)
+                    if detail is not None:
+                        exact.append(detail)
+        if exact:
+            return exact
+
+        # --- Step 2: substring match in registry keys ---
+        substring: list[AgentDetail] = []
+        for key, entry in agents_section.items():
+            if namespace is not None and entry.get("plugin", "") != namespace:
+                continue
+            if name_lower in key.lower():
+                agent_path = resolve_agent_path(root, entry, key)
+                if agent_path is not None:
+                    detail = read_agent_file(agent_path)
+                    if detail is not None:
+                        substring.append(detail)
+        if substring:
+            return substring
+
+    # --- Step 3: filesystem fallback ---
+    namespaces = (namespace,) if namespace else KNOWN_NAMESPACES
+    fs_matches: list[AgentDetail] = []
+    for ns in namespaces:
+        agents_dir = root / "plugins" / ns / "agents"
+        if not agents_dir.is_dir():
+            continue
+        for md_file in sorted(agents_dir.glob("*.md")):
+            stem_lower = md_file.stem.lower()
+            if stem_lower == name_lower or name_lower in stem_lower:
+                detail = read_agent_file(md_file)
+                if detail is not None:
+                    fs_matches.append(detail)
+    return fs_matches
+
+
+def _first_paragraph(body: str) -> str:
+    """Extract the first paragraph from an agent body.
+
+    Skips heading lines (starting with ``#``) and blank lines, then
+    collects consecutive non-blank, non-heading lines.  Stops at the
+    next blank line or heading.
+    """
+    lines = body.splitlines()
+    paragraph_lines: list[str] = []
+    collecting = False
+
+    for line in lines:
+        stripped = line.strip()
+        if not collecting:
+            # Skip headings and blank lines before the paragraph
+            if not stripped or stripped.startswith("#"):
+                continue
+            collecting = True
+            paragraph_lines.append(line)
+        else:
+            # Stop at blank line or heading
+            if not stripped or stripped.startswith("#"):
+                break
+            paragraph_lines.append(line)
+
+    return "\n".join(paragraph_lines)
+
+
 # ---------------------------------------------------------------------------
 # CLI definition
 # ---------------------------------------------------------------------------
@@ -325,64 +413,191 @@ def list(
 
 @app.command()
 def discover(
-    query: Annotated[
+    name: Annotated[
+        str,
+        typer.Argument(help="Agent name or substring to search for."),
+    ],
+    namespace: Annotated[
         Optional[str],
-        typer.Argument(help="Search query to match against agents."),
+        typer.Option("--namespace", "-n", help="Filter by plugin namespace."),
     ] = None,
 ) -> None:
-    """Discover agents matching a query."""
-    emit(DiscoverResult())
+    """Discover agents matching a name query."""
+    root = get_root()
+    matches = _discover_agents(name, namespace, root)
+
+    if len(matches) == 1:
+        emit(DiscoverResult(found=True, agent=matches[0]))
+    elif len(matches) > 1:
+        emit(DiscoverResult(found=False, matches=matches))
+    else:
+        emit(DiscoverResult(found=False, matches=[]))
 
 
 @app.command()
 def info(
     name: Annotated[
-        Optional[str],
+        str,
         typer.Argument(help="Agent name to look up."),
+    ],
+    namespace: Annotated[
+        Optional[str],
+        typer.Option("--namespace", "-n", help="Filter by plugin namespace."),
     ] = None,
 ) -> None:
-    """Show detailed info for a specific agent."""
-    emit(AgentDetail())
+    """Show detailed info for a specific agent (first paragraph only)."""
+    root = get_root()
+    matches = _discover_agents(name, namespace, root)
+
+    if len(matches) == 1:
+        agent = matches[0].model_copy()
+        agent.body = _first_paragraph(agent.body)
+        emit(DiscoverResult(found=True, agent=agent))
+    elif len(matches) > 1:
+        for m in matches:
+            m.body = _first_paragraph(m.body)
+        emit(DiscoverResult(found=False, matches=matches))
+    else:
+        emit(DiscoverResult(found=False, matches=[]))
 
 
 @app.command()
-def validate() -> None:
-    """Validate registry and agent files."""
-    emit(ValidateResult())
+def validate(
+    path: Annotated[
+        str,
+        typer.Argument(help="Path to the agent .md file to validate."),
+    ],
+) -> None:
+    """Validate an agent file for required structure."""
+    errors: list[str] = []
+    file_path = Path(path)
+
+    if not file_path.exists():
+        errors.append(f"File does not exist: {path}")
+        emit(ValidateResult(valid=False, errors=errors))
+        return
+
+    content = file_path.read_text(encoding="utf-8")
+    meta, body = parse_frontmatter(content)
+
+    if not meta:
+        errors.append("Missing or invalid YAML frontmatter (must start with ---)")
+
+    if meta and "description" not in meta:
+        errors.append("Frontmatter missing required 'description' field")
+
+    if not body.strip():
+        errors.append("Body is empty (must have content after frontmatter)")
+
+    emit(ValidateResult(valid=len(errors) == 0, errors=errors))
 
 
 # ---------------------------------------------------------------------------
-# State subcommands (stubs)
+# State subcommands
 # ---------------------------------------------------------------------------
+
+_STALE_THRESHOLD = timedelta(hours=24)
+
+
+def _state_file() -> Path:
+    """Return the path to the session state file."""
+    return get_state_dir() / "state.json"
+
+
+def _is_stale(loaded_at: str) -> bool:
+    """Return True if *loaded_at* is older than 24 hours."""
+    try:
+        ts = datetime.fromisoformat(loaded_at)
+        return datetime.now(timezone.utc) - ts > _STALE_THRESHOLD
+    except (ValueError, TypeError):
+        return True
 
 
 @state_app.command("create")
 def state_create(
     agent: Annotated[
-        Optional[str],
-        typer.Argument(help="Agent name to activate."),
-    ] = None,
+        str,
+        typer.Option("--agent", help="Agent name to activate."),
+    ],
+    plugin: Annotated[
+        str,
+        typer.Option("--plugin", help="Plugin the agent belongs to."),
+    ],
+    source: Annotated[
+        str,
+        typer.Option("--source", help="Path to the agent source file."),
+    ],
 ) -> None:
     """Create a new agent session."""
-    emit(StateData())
+    sd = get_state_dir()
+    sd.mkdir(parents=True, exist_ok=True)
+
+    state = StateData(
+        active_agent=agent,
+        plugin=plugin,
+        source_file=source,
+        loaded_at=datetime.now(timezone.utc).isoformat(),
+        session_id=str(uuid.uuid4()),
+    )
+
+    sf = sd / "state.json"
+    sf.write_text(state.model_dump_json(), encoding="utf-8")
+    print(json.dumps({"created": True, "path": str(sf)}))
 
 
 @state_app.command("check")
 def state_check() -> None:
     """Check current agent session state."""
-    emit(StateCheckResult())
+    sf = _state_file()
+    if not sf.exists():
+        emit(StateCheckResult(active=False))
+        return
+
+    try:
+        raw = json.loads(sf.read_text(encoding="utf-8"))
+        data = StateData(**raw)
+        stale = _is_stale(data.loaded_at)
+        emit(StateCheckResult(active=True, agent=data, stale=stale))
+    except (json.JSONDecodeError, TypeError, KeyError):
+        emit(StateCheckResult(active=False))
 
 
 @state_app.command("clean")
-def state_clean() -> None:
+def state_clean(
+    if_stale: Annotated[
+        bool,
+        typer.Option("--if-stale", help="Only clean if state is stale (>24h)."),
+    ] = False,
+) -> None:
     """Clean up stale session state."""
-    emit(StateCheckResult())
+    sf = _state_file()
+    if not sf.exists():
+        print(json.dumps({"cleaned": False}))
+        return
+
+    if if_stale:
+        try:
+            raw = json.loads(sf.read_text(encoding="utf-8"))
+            loaded_at = raw.get("loaded_at", "")
+            if not _is_stale(loaded_at):
+                print(json.dumps({"cleaned": False}))
+                return
+        except (json.JSONDecodeError, TypeError):
+            pass  # corrupt state -> treat as stale, remove it
+
+    sf.unlink()
+    print(json.dumps({"cleaned": True}))
 
 
 @state_app.command("delete")
 def state_delete() -> None:
     """Delete the current agent session."""
-    emit(StateCheckResult())
+    sf = _state_file()
+    if sf.exists():
+        sf.unlink()
+        print(json.dumps({"deleted": True}))
+    else:
+        print(json.dumps({"deleted": False}))
 
 
 # ---------------------------------------------------------------------------
