@@ -1,195 +1,511 @@
-# Agent-Ops Registry
-# Convenience index for searching across all plugins by tag.
-# Update this when adding new agents, skills, or commands.
+# registry.yaml -- Master index for infinite-room-labs@agency plugin v1.0.0
+# Auto-generated from agents/*/*.md, skills/*/SKILL.md, commands/*.md
 
 agents:
-  oss-health-checker:
-    plugin: engineering
-    path: plugins/engineering/agents/oss-health-checker
-    function: [engineering]
-    scenario: [oss-readiness, release-management]
-    status: active
+  core:
+    - name: ceo
+      description: "Use when you need company-wide strategic leadership, cross-department coordination, hiring decisions, or conflict resolution between departments."
+      model: opus
+    - name: orchestrator
+      description: "Autonomous pipeline manager that orchestrates multi-agent development workflows from specification to delivery."
+      model: opus
+    - name: reality-checker
+      description: Final quality authority that defaults to 'NEEDS WORK'.
+      model: opus
 
-  infra-reviewer:
-    plugin: engineering
-    path: plugins/engineering/agents/infra-reviewer
-    function: [engineering]
-    scenario: [code-review, infrastructure]
-    status: active
+  engineering:
+    - name: ai-engineer
+      description: "Expert AI/ML engineer specializing in machine learning model development, deployment, and integration into production systems."
+      model: sonnet
+    - name: autonomous-optimization-architect
+      description: "Intelligent system governor that continuously shadow-tests APIs for performance while enforcing strict financial and security guardrails against runaway costs."
+      model: sonnet
+    - name: backend-architect
+      description: "Senior backend architect specializing in scalable system design, database architecture, API development, and cloud infrastructure."
+      model: sonnet
+    - name: cicd-engineer
+      description: "Use when you need GitHub Actions workflows, build pipelines, deployment automation, or CI/CD infrastructure."
+      model: sonnet
+    - name: cicd-intern
+      description: "Use for CI/CD grunt work -- linting configs, gathering documentation, running validation checks, and first-pass reviews of workflow files."
+      model: haiku
+    - name: code-reviewer
+      description: "Use when reviewing infrastructure code (Terraform/Terragrunt) or general application code for best practices, security issues, structural problems, correctness, and maintainability."
+      model: sonnet
+    - name: cto
+      description: Use when you need strategic technology leadership across all engineering operations.
+      model: opus
+    - name: data-engineer
+      description: "Expert data engineer specializing in building reliable data pipelines, lakehouse architectures, and scalable data infrastructure."
+      model: sonnet
+    - name: database-optimizer
+      description: "Expert database specialist focusing on schema design, query optimization, indexing strategies, and performance tuning for PostgreSQL, MySQL, and modern databases like Supabase and PlanetScale."
+      model: sonnet
+    - name: devops-manager
+      description: "Use when you need pipeline design, deployment coordination, and task assignment for DevOps operations."
+      model: sonnet
+    - name: embedded-firmware-engineer
+      description: "Specialist in bare-metal and RTOS firmware - ESP32/ESP-IDF, PlatformIO, Arduino, ARM Cortex-M, STM32 HAL/LL, Nordic nRF5/nRF Connect SDK, FreeRTOS, Zephyr"
+      model: sonnet
+    - name: feishu-integration-developer
+      description: "Full-stack integration expert specializing in the Feishu (Lark) Open Platform -- proficient in Feishu bots, mini programs, approval workflows, Bitable (multidimensional spreadsheets), interactive message cards, Webhooks, SSO authentication, and workflow automation, building enterprise-grade collaboration and automation solutions within the Feishu ecosystem."
+      model: sonnet
+    - name: frontend-developer
+      description: "Expert frontend developer specializing in modern web technologies, React/Vue/Angular frameworks, UI implementation, and performance optimization"
+      model: sonnet
+    - name: git-workflow-master
+      description: "Expert in Git workflows, branching strategies, and version control best practices including conventional commits, rebasing, worktrees, and CI-friendly branch management."
+      model: sonnet
+    - name: incident-response-commander
+      description: "Expert incident commander specializing in production incident management, structured response coordination, post-mortem facilitation, SLO/SLI tracking, and on-call process design for reliable engineering organizations."
+      model: sonnet
+    - name: infra-engineer
+      description: "Use when you need Terraform modules, Terragrunt configurations, state management work, infrastructure automation, or SRE practices."
+      model: sonnet
+    - name: infra-intern
+      description: "Use for infrastructure grunt work -- file scaffolding, config lookups, documentation gathering, and boilerplate generation."
+      model: haiku
+    - name: mobile-app-builder
+      description: "Specialized mobile application developer with expertise in native iOS/Android development and cross-platform frameworks"
+      model: sonnet
+    - name: oss-health-checker
+      description: "Use when analyzing a repository for open source best practices, community standards compliance, or preparing a project for public release"
+      model: sonnet
+    - name: platform-engineer
+      description: "Use when you need Cloudflare configuration, DNS management, CDN setup, or domain routing."
+      model: sonnet
+    - name: rapid-prototyper
+      description: "Specialized in ultra-fast proof-of-concept development and MVP creation using efficient tools and frameworks"
+      model: sonnet
+    - name: security-lead
+      description: "Use when you need security review of infrastructure code, deployment configs, CI/CD pipelines, or application code."
+      model: sonnet
+    - name: senior-developer
+      description: "Premium implementation specialist - Masters Laravel/Livewire/FluxUI, advanced CSS, Three.js integration"
+      model: sonnet
+    - name: solidity-smart-contract-engineer
+      description: "Expert Solidity developer specializing in EVM smart contract architecture, gas optimization, upgradeable proxy patterns, DeFi protocol development, and security-first contract design across Ethereum and L2 chains."
+      model: sonnet
+    - name: technical-writer
+      description: "Expert technical writer specializing in developer documentation, API references, README files, and tutorials."
+      model: sonnet
+    - name: threat-detection-engineer
+      description: "Expert detection engineer specializing in SIEM rule development, MITRE ATT&CK coverage mapping, threat hunting, alert tuning, and detection-as-code pipelines for security operations teams."
+      model: sonnet
+    - name: vp-engineering
+      description: "Use when you need technical standards enforcement and cross-team coordination for engineering operations."
+      model: opus
+    - name: wechat-mini-program-developer
+      description: "Expert WeChat Mini Program developer specializing in 小程序 development with WXML/WXSS/WXS, WeChat API integration, payment systems, subscription messaging, and the full WeChat ecosystem."
+      model: sonnet
 
-  devops-cto:
-    plugin: engineering
-    path: plugins/engineering/agents/devops-cto
-    function: [engineering, executive]
-    scenario: [infrastructure, architecture, devops-team]
-    status: active
+  design:
+    - name: brand-guardian
+      description: "Expert brand strategist and guardian specializing in brand identity development, consistency maintenance, and strategic brand positioning"
+      model: sonnet
+    - name: image-prompt-engineer
+      description: "Expert photography prompt engineer specializing in crafting detailed, evocative prompts for AI image generation."
+      model: sonnet
+    - name: inclusive-visuals-specialist
+      description: "Representation expert who defeats systemic AI biases to generate culturally accurate, affirming, and non-stereotypical images and video."
+      model: sonnet
+    - name: ui-designer
+      description: "Expert UI designer specializing in visual design systems, component libraries, and pixel-perfect interface creation."
+      model: sonnet
+    - name: ux-architect
+      description: "Technical architecture and UX specialist who provides developers with solid foundations, CSS systems, and clear implementation guidance"
+      model: sonnet
+    - name: ux-researcher
+      description: "Expert user experience researcher specializing in user behavior analysis, usability testing, and data-driven design insights."
+      model: sonnet
+    - name: visual-storyteller
+      description: "Expert visual communication specialist focused on creating compelling visual narratives, multimedia content, and brand storytelling through design."
+      model: sonnet
+    - name: whimsy-injector
+      description: "Expert creative specialist focused on adding personality, delight, and playful elements to brand experiences."
+      model: sonnet
 
-  devops-vp-eng:
-    plugin: engineering
-    path: plugins/engineering/agents/devops-vp-eng
-    function: [engineering]
-    scenario: [infrastructure, standards, devops-team]
-    status: active
+  marketing:
+    - name: app-store-optimizer
+      description: "Expert app store marketing specialist focused on App Store Optimization (ASO), conversion rate optimization, and app discoverability"
+      model: sonnet
+    - name: baidu-seo-specialist
+      description: "Expert Baidu search optimization specialist focused on Chinese search engine ranking, Baidu ecosystem integration, ICP compliance, Chinese keyword research, and mobile-first indexing for the China market."
+      model: sonnet
+    - name: bilibili-content-strategist
+      description: "Expert Bilibili marketing specialist focused on UP主 growth, danmaku culture mastery, B站 algorithm optimization, community building, and branded content strategy for China's leading video community platform."
+      model: sonnet
+    - name: book-co-author
+      description: "Strategic thought-leadership book collaborator for founders, experts, and operators turning voice notes, fragments, and positioning into structured first-person chapters."
+      model: sonnet
+    - name: carousel-growth-engine
+      description: Autonomous TikTok and Instagram carousel generation specialist.
+      model: sonnet
+    - name: china-ecommerce-operator
+      description: "Expert China e-commerce operations specialist covering Taobao, Tmall, Pinduoduo, and JD ecosystems with deep expertise in product listing optimization, live commerce, store operations, 618/Double 11 campaigns, and cross-platform strategy."
+      model: sonnet
+    - name: content-creator
+      description: "Expert content strategist and creator for multi-platform campaigns."
+      model: sonnet
+    - name: cross-border-ecommerce
+      description: "Full-funnel cross-border e-commerce strategist covering Amazon, Shopee, Lazada, AliExpress, Temu, and TikTok Shop operations, international logistics and overseas warehousing, compliance and taxation, multilingual listing optimization, brand globalization, and DTC independent site development."
+      model: sonnet
+    - name: douyin-strategist
+      description: "Short-video marketing expert specializing in the Douyin platform, with deep expertise in recommendation algorithm mechanics, viral video planning, livestream commerce workflows, and full-funnel brand growth through content matrix strategies."
+      model: sonnet
+    - name: growth-hacker
+      description: "Expert growth strategist specializing in rapid user acquisition through data-driven experimentation."
+      model: sonnet
+    - name: instagram-curator
+      description: "Expert Instagram marketing specialist focused on visual storytelling, community building, and multi-format content optimization."
+      model: sonnet
+    - name: kuaishou-strategist
+      description: "Expert Kuaishou marketing strategist specializing in short-video content for China's lower-tier city markets, live commerce operations, community trust building, and grassroots audience growth on 快手."
+      model: sonnet
+    - name: linkedin-content-creator
+      description: "Expert LinkedIn content strategist focused on thought leadership, personal brand building, and high-engagement professional content."
+      model: sonnet
+    - name: livestream-commerce-coach
+      description: "Veteran livestream e-commerce coach specializing in host training and live room operations across Douyin, Kuaishou, Taobao Live, and Channels, covering script design, product sequencing, paid-vs-organic traffic balancing, conversion closing techniques, and real-time data-driven optimization."
+      model: sonnet
+    - name: podcast-strategist
+      description: "Content strategy and operations expert for the Chinese podcast market, with deep expertise in Xiaoyuzhou, Ximalaya, and other major audio platforms, covering show positioning, audio production, audience growth, multi-platform distribution, and monetization to help podcast creators build sticky audio content brands."
+      model: sonnet
+    - name: private-domain-operator
+      description: "Expert in building enterprise WeChat (WeCom) private domain ecosystems, with deep expertise in SCRM systems, segmented community operations, Mini Program commerce integration, user lifecycle management, and full-funnel conversion optimization."
+      model: sonnet
+    - name: reddit-community-builder
+      description: "Expert Reddit marketing specialist focused on authentic community engagement, value-driven content creation, and long-term relationship building."
+      model: sonnet
+    - name: seo-specialist
+      description: "Expert search engine optimization strategist specializing in technical SEO, content optimization, link authority building, and organic search growth."
+      model: sonnet
+    - name: short-video-editing-coach
+      description: "Hands-on short-video editing coach covering the full post-production pipeline, with mastery of CapCut Pro, Premiere Pro, DaVinci Resolve, and Final Cut Pro across composition and camera language, color grading, audio engineering, motion graphics and VFX, subtitle design, multi-platform export optimization, editing workflow efficiency, and AI-assisted editing."
+      model: sonnet
+    - name: social-media-strategist
+      description: "Expert social media strategist for LinkedIn, Twitter, and professional platforms."
+      model: sonnet
+    - name: tiktok-strategist
+      description: "Expert TikTok marketing specialist focused on viral content creation, algorithm optimization, and community building."
+      model: sonnet
+    - name: twitter-engager
+      description: "Expert Twitter marketing specialist focused on real-time engagement, thought leadership building, and community-driven growth."
+      model: sonnet
+    - name: wechat-official-account
+      description: "Expert WeChat Official Account (OA) strategist specializing in content marketing, subscriber engagement, and conversion optimization."
+      model: sonnet
+    - name: weibo-strategist
+      description: "Full-spectrum operations expert for Sina Weibo, with deep expertise in trending topic mechanics, Super Topic community management, public sentiment monitoring, fan economy strategies, and Weibo advertising, helping brands achieve viral reach and sustained growth on China's leading public discourse platform."
+      model: sonnet
+    - name: xiaohongshu-specialist
+      description: "Expert Xiaohongshu marketing specialist focused on lifestyle content, trend-driven strategies, and authentic community engagement."
+      model: sonnet
+    - name: zhihu-strategist
+      description: "Expert Zhihu marketing specialist focused on thought leadership, community credibility, and knowledge-driven engagement."
+      model: sonnet
 
-  devops-manager:
-    plugin: engineering
-    path: plugins/engineering/agents/devops-manager
-    function: [engineering]
-    scenario: [deployment, pipeline, devops-team]
-    status: active
+  sales:
+    - name: account-strategist
+      description: "Expert post-sale account strategist specializing in land-and-expand execution, stakeholder mapping, QBR facilitation, and net revenue retention."
+      model: sonnet
+    - name: coach
+      description: "Expert sales coaching specialist focused on rep development, pipeline review facilitation, call coaching, deal strategy, and forecast accuracy."
+      model: sonnet
+    - name: deal-strategist
+      description: "Senior deal strategist specializing in MEDDPICC qualification, competitive positioning, and win planning for complex B2B sales cycles."
+      model: sonnet
+    - name: discovery-coach
+      description: "Coaches sales teams on elite discovery methodology -- question design, current-state mapping, gap quantification, and call structure that surfaces real buying motivation."
+      model: sonnet
+    - name: engineer
+      description: "Senior pre-sales engineer specializing in technical discovery, demo engineering, POC scoping, competitive battlecards, and bridging product capabilities to business outcomes."
+      model: sonnet
+    - name: outbound-strategist
+      description: "Signal-based outbound specialist who designs multi-channel prospecting sequences, defines ICPs, and builds pipeline through research-driven personalization -- not volume."
+      model: sonnet
+    - name: pipeline-analyst
+      description: "Revenue operations analyst specializing in pipeline health diagnostics, deal velocity analysis, forecast accuracy, and data-driven sales coaching."
+      model: sonnet
+    - name: proposal-strategist
+      description: Strategic proposal architect who transforms RFPs and sales opportunities into compelling win narratives.
+      model: sonnet
 
-  devops-security-lead:
-    plugin: engineering
-    path: plugins/engineering/agents/devops-security-lead
-    function: [engineering]
-    scenario: [security-review, infrastructure, devops-team]
-    status: active
+  paid-media:
+    - name: auditor
+      description: "Comprehensive paid media auditor who systematically evaluates Google Ads, Microsoft Ads, and Meta accounts across 200+ checkpoints spanning account structure, tracking, bidding, creative, audiences, and competitive positioning."
+      model: sonnet
+    - name: creative-strategist
+      description: "Paid media creative specialist focused on ad copywriting, RSA optimization, asset group design, and creative testing frameworks across Google, Meta, Microsoft, and programmatic platforms."
+      model: sonnet
+    - name: paid-social-strategist
+      description: "Cross-platform paid social advertising specialist covering Meta (Facebook/Instagram), LinkedIn, TikTok, Pinterest, X, and Snapchat."
+      model: sonnet
+    - name: ppc-strategist
+      description: "Senior paid media strategist specializing in large-scale search, shopping, and performance max campaign architecture across Google, Microsoft, and Amazon ad platforms."
+      model: sonnet
+    - name: programmatic-buyer
+      description: "Display advertising and programmatic media buying specialist covering managed placements, Google Display Network, DV360, trade desk platforms, partner media (newsletters, sponsored content), and ABM display strategies via platforms like Demandbase and 6Sense."
+      model: sonnet
+    - name: search-query-analyst
+      description: "Specialist in search term analysis, negative keyword architecture, and query-to-intent mapping."
+      model: sonnet
+    - name: tracking-specialist
+      description: "Expert in conversion tracking architecture, tag management, and attribution modeling across Google Tag Manager, GA4, Google Ads, Meta CAPI, LinkedIn Insight Tag, and server-side implementations."
+      model: sonnet
 
-  devops-infra-eng:
-    plugin: engineering
-    path: plugins/engineering/agents/devops-infra-eng
-    function: [engineering]
-    scenario: [infrastructure, terraform, devops-team]
-    status: active
+  product:
+    - name: behavioral-nudge-engine
+      description: Behavioral psychology specialist that adapts software interaction cadences and styles to maximize user motivation and success.
+      model: sonnet
+    - name: feedback-synthesizer
+      description: "Expert in collecting, analyzing, and synthesizing user feedback from multiple channels to extract actionable product insights."
+      model: sonnet
+    - name: sprint-prioritizer
+      description: "Expert product manager specializing in agile sprint planning, feature prioritization, and resource allocation."
+      model: sonnet
 
-  devops-cicd-eng:
-    plugin: engineering
-    path: plugins/engineering/agents/devops-cicd-eng
-    function: [engineering]
-    scenario: [ci-cd, pipeline, devops-team]
-    status: active
+  project-management:
+    - name: experiment-tracker
+      description: "Expert project manager specializing in experiment design, execution tracking, and data-driven decision making."
+      model: sonnet
+    - name: jira-workflow-steward
+      description: "Expert delivery operations specialist who enforces Jira-linked Git workflows, traceable commits, structured pull requests, and release-safe branch strategy across software teams."
+      model: sonnet
+    - name: project-shepherd
+      description: "Expert project manager specializing in cross-functional project coordination, timeline management, and stakeholder alignment."
+      model: sonnet
+    - name: studio-operations
+      description: "Expert operations manager specializing in day-to-day studio efficiency, process optimization, and resource coordination."
+      model: sonnet
+    - name: studio-producer
+      description: "Senior strategic leader specializing in high-level creative and technical project orchestration, resource allocation, and multi-project portfolio management."
+      model: sonnet
 
-  devops-platform-eng:
-    plugin: engineering
-    path: plugins/engineering/agents/devops-platform-eng
-    function: [engineering]
-    scenario: [platform, cloudflare, devops-team]
-    status: active
+  testing:
+    - name: accessibility-auditor
+      description: "Expert accessibility specialist who audits interfaces against WCAG standards, tests with assistive technologies, and ensures inclusive design."
+      model: sonnet
+    - name: api-tester
+      description: "Expert API testing specialist focused on comprehensive API validation, performance testing, and quality assurance across all systems and third-party integrations"
+      model: sonnet
+    - name: evidence-collector
+      description: "Screenshot-obsessed, fantasy-allergic QA specialist - Default to finding 3-5 issues, requires visual proof for everything"
+      model: sonnet
+    - name: performance-benchmarker
+      description: "Expert performance testing and optimization specialist focused on measuring, analyzing, and improving system performance across all applications and infrastructure"
+      model: sonnet
+    - name: test-results-analyzer
+      description: "Expert test analysis specialist focused on comprehensive test result evaluation, quality metrics analysis, and actionable insight generation from testing activities"
+      model: sonnet
+    - name: workflow-optimizer
+      description: "Expert process improvement specialist focused on analyzing, optimizing, and automating workflows across all business functions for maximum productivity and efficiency"
+      model: sonnet
 
-  devops-infra-intern:
-    plugin: engineering
-    path: plugins/engineering/agents/devops-infra-intern
-    function: [engineering]
-    scenario: [infrastructure, support, devops-team]
-    status: active
+  support:
+    - name: analytics-reporter
+      description: Expert data analyst transforming raw data into actionable business insights.
+      model: sonnet
+    - name: executive-summary-generator
+      description: "Consultant-grade AI specialist trained to think and communicate like a senior strategy consultant."
+      model: sonnet
+    - name: finance-tracker
+      description: "Expert financial analyst and controller specializing in financial planning, budget management, and business performance analysis."
+      model: sonnet
+    - name: infrastructure-maintainer
+      description: "Expert infrastructure specialist focused on system reliability, performance optimization, and technical operations management."
+      model: sonnet
+    - name: legal-compliance-checker
+      description: "Expert legal and compliance specialist ensuring business operations, data handling, and content creation comply with relevant laws, regulations, and industry standards across multiple jurisdictions."
+      model: sonnet
+    - name: support-responder
+      description: "Expert customer support specialist delivering exceptional customer service, issue resolution, and user experience optimization."
+      model: sonnet
 
-  devops-cicd-intern:
-    plugin: engineering
-    path: plugins/engineering/agents/devops-cicd-intern
-    function: [engineering]
-    scenario: [ci-cd, support, devops-team]
-    status: active
+  research:
+    - name: competitor-scanner
+      description: "Use when researching competitors in a given market, product category, or industry segment."
+      model: sonnet
+    - name: tech-evaluator
+      description: "Use when evaluating, comparing, or selecting technologies, libraries, frameworks, or tools for business use and productivity optimization"
+      model: sonnet
 
-  competitor-scanner:
-    plugin: research
-    path: plugins/research/agents/competitor-scanner
-    function: [research, executive]
-    scenario: [competitive-intelligence, market-analysis]
-    status: active
+  spatial-computing:
+    - name: macos-spatial-metal-engineer
+      description: "Native Swift and Metal specialist building high-performance 3D rendering systems and spatial computing experiences for macOS and Vision Pro"
+      model: sonnet
+    - name: terminal-integration-specialist
+      description: "Terminal emulation, text rendering optimization, and SwiftTerm integration for modern Swift applications"
+      model: sonnet
+    - name: visionos-spatial-engineer
+      description: "Native visionOS spatial computing, SwiftUI volumetric interfaces, and Liquid Glass design implementation"
+      model: sonnet
+    - name: xr-cockpit-interaction-specialist
+      description: "Specialist in designing and developing immersive cockpit-based control systems for XR environments"
+      model: sonnet
+    - name: xr-immersive-developer
+      description: "Expert WebXR and immersive technology developer with specialization in browser-based AR/VR/XR applications"
+      model: sonnet
+    - name: xr-interface-architect
+      description: Spatial interaction designer and interface strategist for immersive AR/VR/XR environments
+      model: sonnet
 
-  tech-evaluator:
-    plugin: research
-    path: plugins/research/agents/tech-evaluator
-    function: [research, engineering]
-    scenario: [technology-evaluation, library-selection]
-    status: active
+  game-development:
+    - name: audio-engineer
+      description: "Interactive audio specialist - Masters FMOD/Wwise integration, adaptive music systems, spatial audio, and audio performance budgeting across all game engines"
+      model: sonnet
+    - name: designer
+      description: "Systems and mechanics architect - Masters GDD authorship, player psychology, economy balancing, and gameplay loop design across all engines and genres"
+      model: sonnet
+    - name: godot-gameplay-scripter
+      description: "Composition and signal integrity specialist - Masters GDScript 2.0, C# integration, node-based architecture, and type-safe signal design for Godot 4 projects"
+      model: sonnet
+    - name: godot-multiplayer-engineer
+      description: "Godot 4 networking specialist - Masters the MultiplayerAPI, scene replication, ENet/WebRTC transport, RPCs, and authority models for real-time multiplayer games"
+      model: sonnet
+    - name: godot-shader-developer
+      description: "Godot 4 visual effects specialist - Masters the Godot Shading Language (GLSL-like), VisualShader editor, CanvasItem and Spatial shaders, post-processing, and performance optimization for 2D/3D effects"
+      model: sonnet
+    - name: level-designer
+      description: "Spatial storytelling and flow specialist - Masters layout theory, pacing architecture, encounter design, and environmental narrative across all game engines"
+      model: sonnet
+    - name: narrative-designer
+      description: "Story systems and dialogue architect - Masters GDD-aligned narrative design, branching dialogue, lore architecture, and environmental storytelling across all game engines"
+      model: sonnet
+    - name: roblox-avatar-creator
+      description: "Roblox UGC and avatar pipeline specialist - Masters Roblox's avatar system, UGC item creation, accessory rigging, texture standards, and the Creator Marketplace submission pipeline"
+      model: sonnet
+    - name: roblox-experience-designer
+      description: "Roblox platform UX and monetization specialist - Masters engagement loop design, DataStore-driven progression, Roblox monetization systems (Passes, Developer Products, UGC), and player retention for Roblox experiences"
+      model: sonnet
+    - name: roblox-systems-scripter
+      description: "Roblox platform engineering specialist - Masters Luau, the client-server security model, RemoteEvents/RemoteFunctions, DataStore, and module architecture for scalable Roblox experiences"
+      model: sonnet
+    - name: technical-artist
+      description: "Art-to-engine pipeline specialist - Masters shaders, VFX systems, LOD pipelines, performance budgeting, and cross-engine asset optimization"
+      model: sonnet
+    - name: unity-architect
+      description: "Data-driven modularity specialist - Masters ScriptableObjects, decoupled systems, and single-responsibility component design for scalable Unity projects"
+      model: sonnet
+    - name: unity-editor-tool-developer
+      description: "Unity editor automation specialist - Masters custom EditorWindows, PropertyDrawers, AssetPostprocessors, ScriptedImporters, and pipeline automation that saves teams hours per week"
+      model: sonnet
+    - name: unity-multiplayer-engineer
+      description: "Networked gameplay specialist - Masters Netcode for GameObjects, Unity Gaming Services (Relay/Lobby), client-server authority, lag compensation, and state synchronization"
+      model: sonnet
+    - name: unity-shader-graph-artist
+      description: "Visual effects and material specialist - Masters Unity Shader Graph, HLSL, URP/HDRP rendering pipelines, and custom pass authoring for real-time visual effects"
+      model: sonnet
+    - name: unreal-multiplayer-architect
+      description: "Unreal Engine networking specialist - Masters Actor replication, GameMode/GameState architecture, server-authoritative gameplay, network prediction, and dedicated server setup for UE5"
+      model: sonnet
+    - name: unreal-systems-engineer
+      description: "Performance and hybrid architecture specialist - Masters C++/Blueprint continuum, Nanite geometry, Lumen GI, and Gameplay Ability System for AAA-grade Unreal Engine projects"
+      model: sonnet
+    - name: unreal-technical-artist
+      description: "Unreal Engine visual pipeline specialist - Masters the Material Editor, Niagara VFX, Procedural Content Generation, and the art-to-engine pipeline for UE5 projects"
+      model: sonnet
+    - name: unreal-world-builder
+      description: "Open-world and environment specialist - Masters UE5 World Partition, Landscape, procedural foliage, HLOD, and large-scale level streaming for seamless open-world experiences"
+      model: sonnet
+
+  specialized:
+    - name: accounts-payable-agent
+      description: "Autonomous payment processing specialist that executes vendor payments, contractor invoices, and recurring bills across any payment rail -- crypto, fiat, stablecoins."
+      model: sonnet
+    - name: agentic-identity-trust
+      description: "Designs identity, authentication, and trust verification systems for autonomous AI agents operating in multi-agent environments."
+      model: sonnet
+    - name: blockchain-security-auditor
+      description: "Expert smart contract security auditor specializing in vulnerability detection, formal verification, exploit analysis, and comprehensive audit report writing for DeFi protocols and blockchain applications."
+      model: sonnet
+    - name: compliance-auditor
+      description: "Expert technical compliance auditor specializing in SOC 2, ISO 27001, HIPAA, and PCI-DSS audits -- from readiness assessment through evidence collection to certification."
+      model: sonnet
+    - name: corporate-training-designer
+      description: "Expert in enterprise training system design and curriculum development -- proficient in training needs analysis, instructional design methodology, blended learning program design, internal trainer development, leadership programs, and training effectiveness evaluation and continuous optimization."
+      model: sonnet
+    - name: cultural-intelligence-strategist
+      description: "CQ specialist that detects invisible exclusion, researches global context, and ensures software resonates authentically across intersectional identities."
+      model: sonnet
+    - name: data-consolidation-agent
+      description: "AI agent that consolidates extracted sales data into live reporting dashboards with territory, rep, and pipeline summaries"
+      model: sonnet
+    - name: developer-advocate
+      description: "Expert developer advocate specializing in building developer communities, creating compelling technical content, optimizing developer experience (DX), and driving platform adoption through authentic engineering engagement."
+      model: sonnet
+    - name: document-generator
+      description: "Expert document creation specialist who generates professional PDF, PPTX, DOCX, and XLSX files using code-based approaches with proper formatting, charts, and data visualization."
+      model: sonnet
+    - name: government-digital-presales-consultant
+      description: "Presales expert for China's government digital transformation market (ToG), proficient in policy interpretation, solution design, bid document preparation, POC validation, compliance requirements (classified protection/cryptographic assessment/Xinchuang domestic IT), and stakeholder management -- helping technical teams efficiently win government IT projects."
+      model: sonnet
+    - name: healthcare-marketing-compliance
+      description: "Expert in healthcare marketing compliance in China, proficient in the Advertising Law, Medical Advertisement Management Measures, Drug Administration Law, and related regulations -- covering pharmaceuticals, medical devices, medical aesthetics, health supplements, and internet healthcare across content review, risk control, platform rule interpretation, and patient privacy protection, helping enterprises conduct effective health marketing within legal boundaries."
+      model: sonnet
+    - name: identity-graph-operator
+      description: Operates a shared identity graph that multiple AI agents resolve against.
+      model: sonnet
+    - name: lsp-index-engineer
+      description: Language Server Protocol specialist building unified code intelligence systems through LSP client orchestration and semantic indexing
+      model: sonnet
+    - name: mcp-builder
+      description: "Expert Model Context Protocol developer who designs, builds, and tests MCP servers that extend AI agent capabilities with custom tools, resources, and prompts."
+      model: sonnet
+    - name: model-qa
+      description: "Independent model QA expert who audits ML and statistical models end-to-end - from documentation review and data reconstruction to replication, calibration testing, interpretability analysis, performance monitoring, and audit-grade reporting."
+      model: sonnet
+    - name: recruitment-specialist
+      description: "Expert recruitment operations and talent acquisition specialist -- skilled in China's major hiring platforms, talent assessment frameworks, and labor law compliance."
+      model: sonnet
+    - name: report-distribution-agent
+      description: AI agent that automates distribution of consolidated sales reports to representatives based on territorial parameters
+      model: sonnet
+    - name: sales-data-extraction-agent
+      description: "AI agent specialized in monitoring Excel files and extracting key sales metrics (MTD, YTD, Year End) for internal live reporting"
+      model: sonnet
+    - name: study-abroad-advisor
+      description: "Full-spectrum study abroad planning expert covering the US, UK, Canada, Australia, Europe, Hong Kong, and Singapore -- proficient in undergraduate, master's, and PhD application strategy, school selection, essay coaching, profile enhancement, standardized test planning, visa preparation, and overseas life adaptation, helping Chinese students craft personalized end-to-end study abroad plans."
+      model: sonnet
+    - name: supply-chain-strategist
+      description: "Expert supply chain management and procurement strategy specialist -- skilled in supplier development, strategic sourcing, quality control, and supply chain digitalization."
+      model: sonnet
+    - name: zk-steward
+      description: "Knowledge-base steward in the spirit of Niklas Luhmann's Zettelkasten."
+      model: sonnet
 
 skills:
-  new-agent:
-    plugin: core
-    path: plugins/core/skills/new-agent
-    function: [engineering, operations, finance, research]
-    scenario: [agent-development]
-    status: active
-
-  project-onboard:
-    plugin: core
-    path: plugins/core/skills/project-onboard
-    function: [engineering, operations]
-    scenario: [project-setup]
-    status: active
-
-  release-prep:
-    plugin: engineering
-    path: plugins/engineering/skills/release-prep
-    function: [engineering]
-    scenario: [release-management]
-    status: active
-
-  dep-audit:
-    plugin: engineering
-    path: plugins/engineering/skills/dep-audit
-    function: [engineering]
-    scenario: [dependency-management]
-    status: active
-
-  prompt-refiner:
-    plugin: core
-    path: plugins/core/skills/prompt-refiner
-    function: [engineering, operations, finance, research]
-    scenario: [prompt-improvement]
-    status: active
-
-  market-scan:
-    plugin: research
-    path: plugins/research/skills/market-scan
-    function: [research, executive]
-    scenario: [market-analysis, business-planning]
-    status: active
-
-  devops-team:
-    plugin: engineering
-    path: plugins/engineering/skills/devops-team
-    function: [engineering, executive]
-    scenario: [deployment, infrastructure, ci-cd, devops-team]
-    status: active
-
-  load-agent:
-    plugin: core
-    path: plugins/core/skills/load-agent
-    function: [engineering, operations, finance, research, executive]
-    scenario: [agent-loading, session-management]
-    status: active
-
-  end-agent-session:
-    plugin: core
-    path: plugins/core/skills/end-agent-session
-    function: [engineering, operations, finance, research, executive]
-    scenario: [agent-loading, session-management]
-    status: active
+  - name: dep-audit
+    description: "Use when auditing project dependencies for license, security, or staleness issues"
+  - name: end-agent-session
+    description: Use when the user wants to unload a currently active agent persona and return to the default orchestrator.
+  - name: load-agent
+    description: "Use when the user wants to load an agent-ops agent as the primary session persona."
+  - name: market-scan
+    description: "Use when analyzing a market segment, identifying competitors, or evaluating business opportunities"
+  - name: new-agent
+    description: "Use when creating a new agent, skill, or command in the agent-ops marketplace"
+  - name: nexus
+    description: "Use when you need coordinated multi-agent orchestration for any project."
+  - name: nexus-micro
+    description: "Use for quick 1-5 day tasks with pre-built runbooks."
+  - name: nexus-sprint
+    description: "Use when you need to build a feature or MVP with a focused team of 15-25 agents over 2-6 weeks."
+  - name: project-onboard
+    description: Use when setting up a new repository or project with Infinite Room Labs conventions and marketplace integration
+  - name: prompt-refiner
+    description: "Use when the user asks to refine, improve, restructure, or clarify a prompt for Claude Code."
+  - name: release-prep
+    description: Use when preparing a new version release of a library or project
 
 commands:
-  find-agent:
-    plugin: core
-    path: plugins/core/commands/find-agent
-    function: [engineering, operations, finance, research]
-    scenario: [discovery]
-    status: active
-
-  publish-package:
-    plugin: engineering
-    path: plugins/engineering/commands/publish-package
-    function: [engineering]
-    scenario: [release-management]
-    status: active
-
-  trend-watch:
-    plugin: research
-    path: plugins/research/commands/trend-watch
-    function: [research, engineering]
-    scenario: [technology-evaluation, market-analysis]
-    status: active
-
-  load-agent:
-    plugin: core
-    path: plugins/core/commands/load-agent
-    function: [engineering, operations, finance, research, executive]
-    scenario: [agent-loading, session-management]
-    status: active
-
-  end-agent-session:
-    plugin: core
-    path: plugins/core/commands/end-agent-session
-    function: [engineering, operations, finance, research, executive]
-    scenario: [agent-loading, session-management]
-    status: active
+  - name: end-agent-session
+    description: Unload the current agent persona and return to the default orchestrator
+  - name: find-agent
+    description: "Use when searching for agents, skills, or commands by tag or keyword across all divisions"
+  - name: load-agent
+    description: "Load an agent-ops agent as the primary session persona"
+  - name: publish-package
+    description: "Use when publishing a package to a registry (npm, packagist, PyPI, crates.io)"
+  - name: trend-watch
+    description: "Use when checking current trends, popularity, or momentum for a technology or market"
