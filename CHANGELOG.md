@@ -4,6 +4,41 @@ All notable changes to the agent-ops marketplace will be documented in this file
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [agency-1.0.0] - 2026-03-12
+
+### Changed
+- **BREAKING**: Replaced multi-plugin structure (core, engineering, operations, research, finance) with single `infinite-room-labs@agency` plugin
+- Reorganized agents into 14 division directories under `agents/` (core, engineering, design, marketing, sales, paid-media, product, project-management, testing, support, research, spatial-computing, game-development, specialized)
+- Moved scripts from `plugins/core/scripts/` and `plugins/engineering/scripts/` to `scripts/`
+- Moved skills from `plugins/*/skills/` to `skills/`
+- Moved commands from `plugins/*/commands/` to `commands/`
+- Merged hooks from multiple plugins into single `hooks/hooks.json`
+- Updated `summon.py` namespace discovery from `plugins/*/` to `agents/*/` divisions
+- Renamed "plugin" terminology to "division" in summon.py and related tools
+- Updated `find-agent` command to scan division-based structure
+
+### Added
+- **148 specialized agents** (up from 14) across 14 business divisions
+- Imported 130+ agents from Agency Agents (MIT) open-source project with IRL frontmatter
+- Merged 14 overlapping agents combining IRL governance with Agency personality depth
+- **NEXUS orchestration system** replacing `/devops-team`:
+  - `/nexus` -- Full 7-phase pipeline for complete product lifecycle
+  - `/nexus-sprint` -- Focused 2-6 week feature/MVP builds
+  - `/nexus-micro` -- Lightweight 1-5 day tasks with pre-built runbooks
+- `strategy/` directory with NEXUS reference material (doctrine, playbooks, runbooks, coordination templates)
+- New divisions: design, marketing, sales, paid-media, product, project-management, testing, support, spatial-computing, game-development, specialized
+- Core division agents: CEO (merged), Orchestrator, Reality Checker
+- PreToolUse hook for changelog-guard (commit protection on protected branches)
+- CONTRIBUTING.md with merged agent design guidelines
+- Comprehensive README.md with full agent catalog
+
+### Removed
+- `plugins/` directory structure (replaced by flat layout)
+- `.claude-plugin/marketplace.json` (replaced by single `plugin.json`)
+- Individual plugin `plugin.json` files (5 files)
+- `/devops-team` skill (replaced by `/nexus`)
+- `plugins/operations/TODO.md` and `plugins/finance/TODO.md` (operations and finance agents now in specialized/support divisions)
+
 ## [core-0.2.0] - 2026-03-11
 
 ### Added
