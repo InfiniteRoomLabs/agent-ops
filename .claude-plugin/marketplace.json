@@ -1,0 +1,15 @@
+{
+  "name": "infinite-room-labs",
+  "owner": {
+    "name": "Infinite Room Labs"
+  },
+  "plugins": [
+    {
+      "name": "agency",
+      "source": ".",
+      "description": "Infinite Room Labs AI agency - 155+ specialized agents with NEXUS orchestration",
+      "version": "1.0.0",
+      "keywords": ["agency", "agents", "orchestration", "nexus"]
+    }
+  ]
+}
