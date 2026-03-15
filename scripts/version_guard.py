@@ -94,5 +94,24 @@ def load_config(project_dir: Path) -> VersionGuardConfig:
     return config
 
 
+# -- Manifest detection --
+
+KNOWN_MANIFESTS = [
+    ManifestSpec(path="package.json", field="version"),
+    ManifestSpec(path="pyproject.toml", field="project.version"),
+    ManifestSpec(path="Cargo.toml", field="package.version"),
+    ManifestSpec(path="composer.json", field="version"),
+    ManifestSpec(path=".claude-plugin/plugin.json", field="version"),
+]
+
+
+def detect_manifests(project_dir: Path) -> list[ManifestSpec]:
+    found: list[ManifestSpec] = []
+    for spec in KNOWN_MANIFESTS:
+        if (project_dir / spec.path).is_file():
+            found.append(spec)
+    return found
+
+
 if __name__ == "__main__":
     app()
