@@ -10,9 +10,11 @@ Usage:
 
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 from typing import Annotated, Optional
 
@@ -111,6 +113,51 @@ def detect_manifests(project_dir: Path) -> list[ManifestSpec]:
         if (project_dir / spec.path).is_file():
             found.append(spec)
     return found
+
+
+# -- Version reading --
+
+def _traverse(data: dict, dotted_field: str) -> str | None:
+    keys = dotted_field.split(".")
+    current = data
+    for key in keys:
+        if not isinstance(current, dict) or key not in current:
+            return None
+        current = current[key]
+    return str(current) if current is not None else None
+
+def read_manifest_version(project_dir: Path, spec: ManifestSpec) -> str | None:
+    filepath = project_dir / spec.path
+    if not filepath.is_file():
+        return None
+    text = filepath.read_text()
+    if spec.field is None:
+        return text.strip() or None
+    if spec.path.endswith(".toml"):
+        data = tomllib.loads(text)
+    elif spec.path.endswith(".json"):
+        data = json.loads(text)
+    else:
+        return None
+    return _traverse(data, spec.field)
+
+def check_manifest_consistency(project_dir: Path, specs: list[ManifestSpec]) -> tuple[bool, str]:
+    versions: dict[str, str] = {}
+    for spec in specs:
+        v = read_manifest_version(project_dir, spec)
+        if v is not None:
+            versions[spec.path] = v
+    if len(versions) <= 1:
+        return True, "Single or no manifests found."
+    unique = set(versions.values())
+    if len(unique) == 1:
+        return True, f"All {len(versions)} manifests agree on version {unique.pop()}."
+    lines = [f"  {path}: {ver}" for path, ver in sorted(versions.items())]
+    return (
+        False,
+        "BLOCKED: Manifest versions disagree:\n" + "\n".join(lines)
+        + "\n\nAll manifest files must declare the same version.",
+    )
 
 
 if __name__ == "__main__":
