@@ -105,11 +105,22 @@ def hook() -> None:
     if not re.search(r"git\s+commit", payload.tool_input.command):
         raise typer.Exit(0)
 
+    # Reject combined add+commit in a single command — staging must be
+    # a separate step so the hook can inspect what's actually staged.
+    if re.search(r"git\s+add\b", payload.tool_input.command):
+        typer.echo(
+            "BLOCKED: Run 'git add' and 'git commit' as separate Bash calls.\n"
+            "The changelog guard needs to inspect staged files between the two steps.\n"
+            "Stage your files first, then commit in a follow-up command.",
+            err=True,
+        )
+        raise typer.Exit(2)
+
     branch = get_current_branch()
     allowed, message = evaluate(branch)
 
     if not allowed:
-        typer.echo(message)
+        typer.echo(message, err=True)
         raise typer.Exit(2)
 
     raise typer.Exit(0)
