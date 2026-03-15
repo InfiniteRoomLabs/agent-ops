@@ -1,6 +1,9 @@
 """Tests for version-guard.py."""
 
+import subprocess as sp
 from pathlib import Path
+
+import semver
 
 from version_guard import ManifestSpec
 
@@ -132,3 +135,28 @@ def test_manifest_consistency_mismatch(git_repo: Path) -> None:
     assert ok is False
     assert "1.5.0" in msg
     assert "1.4.0" in msg
+
+
+# -- Task 5: Git tag version detection --
+
+
+def test_get_latest_tag_version(tagged_repo: Path) -> None:
+    from version_guard import get_latest_tag_version
+    ver = get_latest_tag_version("v")
+    assert ver == semver.Version.parse("1.0.0")
+
+
+def test_get_latest_tag_version_no_tags(git_repo: Path) -> None:
+    from version_guard import get_latest_tag_version
+    ver = get_latest_tag_version("v")
+    assert ver is None
+
+
+def test_get_latest_tag_version_multiple(tagged_repo: Path) -> None:
+    from version_guard import get_latest_tag_version
+    (tagged_repo / "a.txt").write_text("a")
+    sp.run(["git", "add", "."], check=True, capture_output=True)
+    sp.run(["git", "commit", "-m", "feat: add a"], check=True, capture_output=True)
+    sp.run(["git", "tag", "-a", "v1.1.0", "-m", "v1.1.0"], check=True, capture_output=True)
+    ver = get_latest_tag_version("v")
+    assert ver == semver.Version.parse("1.1.0")
