@@ -513,3 +513,11 @@ commands:
     description: "Use when publishing a package to a registry (npm, packagist, PyPI, crates.io)"
   - name: trend-watch
     description: "Use when checking current trends, popularity, or momentum for a technology or market"
+
+scripts:
+  - name: version-guard
+    description: "PreToolUse hook enforcing semver consistency between manifests, tags, and CHANGELOG on protected branches"
+    tags:
+      function: [engineering]
+      scenario: [versioning, release-management]
+      custom: [semver, conventional-commits, enforcement]
