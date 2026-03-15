@@ -7,6 +7,11 @@
             "type": "command",
             "command": "uv run ${CLAUDE_PLUGIN_ROOT}/scripts/summon.py state clean --if-stale",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "uv run ${CLAUDE_PLUGIN_ROOT}/scripts/accessibility-config.py",
+            "timeout": 10
           }
         ]
       }
