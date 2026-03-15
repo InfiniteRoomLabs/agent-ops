@@ -235,5 +235,159 @@ def compute_next_version(base: semver.Version, tag_prefix: str = "v") -> semver.
     return base
 
 
+# -- Evaluation result --
+
+
+class EvalResult(BaseModel):
+    allowed: bool
+    message: str = ""
+
+
+# -- Core evaluation --
+
+
+def evaluate(
+    *,
+    config: VersionGuardConfig,
+    project_dir: Path,
+    commit_message: str,
+    is_tag: bool,
+    tag_version: str | None = None,
+) -> EvalResult:
+    """Core enforcement logic. Returns evaluation result."""
+    branch = get_current_branch()
+    protected_re = re.compile(config.protected_branches)
+
+    # Non-protected branches: exit silently
+    if not is_tag and not protected_re.match(branch):
+        return EvalResult(allowed=True, message="")
+
+    # Resolve manifests (config or auto-detect)
+    specs = config.manifests or detect_manifests(project_dir)
+
+    if not specs:
+        # No manifests found: nothing to enforce
+        return EvalResult(allowed=True, message="")
+
+    # --- Tag creation checks ---
+    if is_tag and tag_version:
+        for spec in specs:
+            manifest_ver = read_manifest_version(project_dir, spec)
+            if manifest_ver and manifest_ver != tag_version:
+                return EvalResult(
+                    allowed=False,
+                    message=(
+                        f"BLOCKED: Tag v{tag_version} does not match "
+                        f"{spec.path} version {manifest_ver}.\n\n"
+                        f"Update {spec.path} to {tag_version} before tagging, "
+                        f"or use tag v{manifest_ver} instead."
+                    ),
+                )
+        return EvalResult(allowed=True, message="")
+
+    # --- Commit checks ---
+    release_re = re.compile(config.release_pattern, re.IGNORECASE)
+    is_release = bool(release_re.match(commit_message))
+
+    # Check manifest consistency (blocks on release commits)
+    if len(specs) > 1:
+        ok, msg = check_manifest_consistency(project_dir, specs)
+        if not ok:
+            if is_release:
+                return EvalResult(allowed=False, message=msg)
+            # Advisory for regular commits
+            return EvalResult(allowed=True, message=msg)
+
+    # Read the manifest version (use first manifest as canonical)
+    manifest_version_str = None
+    for spec in specs:
+        v = read_manifest_version(project_dir, spec)
+        if v:
+            manifest_version_str = v
+            break
+
+    # Get latest tag
+    latest_tag = get_latest_tag_version(config.tag_prefix)
+
+    # No tags: advisory only, never block
+    if latest_tag is None:
+        return EvalResult(
+            allowed=True,
+            message=(
+                "[version-guard] INFO: No version tags found in this repository.\n"
+                f"Consider creating an initial tag (e.g., git tag -a {config.tag_prefix}0.1.0 "
+                f"-m 'Initial version') to enable version tracking."
+            ),
+        )
+
+    # --- Tier 2: Conventional commits analysis (opt-in) ---
+    if config.strategy == "conventional":
+        computed = compute_next_version(latest_tag, config.tag_prefix)
+
+        if is_release and manifest_version_str:
+            try:
+                manifest_ver = semver.Version.parse(manifest_version_str)
+            except ValueError:
+                return EvalResult(
+                    allowed=True,
+                    message=f"[version-guard] WARN: Could not parse manifest version '{manifest_version_str}' as semver.",
+                )
+
+            if manifest_ver < computed:
+                return EvalResult(
+                    allowed=False,
+                    message=(
+                        f"BLOCKED: Manifest version {manifest_ver} is too low.\n"
+                        f"Commits since {config.tag_prefix}{latest_tag} require at least {computed}.\n\n"
+                        f"Update your manifest(s) to {computed} or higher before releasing."
+                    ),
+                )
+
+            if manifest_ver > computed:
+                return EvalResult(
+                    allowed=True,
+                    message=(
+                        f"[version-guard] WARN: Manifest version {manifest_ver} is higher "
+                        f"than computed {computed}.\n"
+                        f"Commits since {config.tag_prefix}{latest_tag} only justify {computed}. "
+                        f"Proceeding -- ensure the higher version is intentional."
+                    ),
+                )
+
+            # Exact match
+            return EvalResult(allowed=True, message="")
+
+        # Advisory for regular commits on protected branches
+        if not is_release and computed > latest_tag:
+            return EvalResult(
+                allowed=True,
+                message=(
+                    f"[version-guard] INFO (advisory only -- no action needed):\n"
+                    f"Commits since {config.tag_prefix}{latest_tag} suggest "
+                    f"next version should be {computed}."
+                ),
+            )
+
+    # --- Tier 1: Manifest-tag consistency (always on) ---
+    if is_release and manifest_version_str:
+        try:
+            manifest_ver = semver.Version.parse(manifest_version_str)
+        except ValueError:
+            pass
+        else:
+            if manifest_ver <= latest_tag:
+                return EvalResult(
+                    allowed=False,
+                    message=(
+                        f"BLOCKED: Manifest version {manifest_ver} is not newer than "
+                        f"the latest tag {config.tag_prefix}{latest_tag}.\n\n"
+                        f"Bump the version in your manifest file(s) above {latest_tag} "
+                        f"before releasing."
+                    ),
+                )
+
+    return EvalResult(allowed=True, message="")
+
+
 if __name__ == "__main__":
     app()

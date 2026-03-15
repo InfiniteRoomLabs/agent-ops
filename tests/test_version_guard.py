@@ -224,3 +224,184 @@ def test_compute_bump_no_commits_since_tag(tagged_repo: Path) -> None:
     from version_guard import compute_next_version
     nxt = compute_next_version(semver.Version.parse("1.0.0"), "v")
     assert nxt == semver.Version.parse("1.0.0")
+
+
+# -- Task 7: Core evaluate() function --
+
+
+def test_evaluate_non_protected_branch(git_repo: Path) -> None:
+    """Non-protected branches exit silently (no output)."""
+    from version_guard import evaluate, VersionGuardConfig
+
+    sp.run(["git", "checkout", "-b", "feature/foo"], check=True, capture_output=True)
+    config = VersionGuardConfig()
+    result = evaluate(
+        config=config,
+        project_dir=git_repo,
+        commit_message="feat: something",
+        is_tag=False,
+    )
+    assert result.allowed is True
+    assert result.message == ""
+
+
+def test_evaluate_release_commit_version_match(repo_with_manifest: Path) -> None:
+    """Release commit with matching manifest version passes."""
+    from version_guard import evaluate, VersionGuardConfig, ManifestSpec
+
+    # Bump manifest to 1.1.0 and add a feat commit
+    (repo_with_manifest / "new.txt").write_text("x")
+    sp.run(["git", "add", "."], check=True, capture_output=True)
+    sp.run(["git", "commit", "-m", "feat: add new"], check=True, capture_output=True)
+    (repo_with_manifest / "package.json").write_text('{"version": "1.1.0"}')
+    sp.run(["git", "add", "."], check=True, capture_output=True)
+
+    config = VersionGuardConfig(
+        strategy="conventional",
+        manifests=[ManifestSpec(path="package.json", field="version")],
+    )
+    result = evaluate(
+        config=config,
+        project_dir=repo_with_manifest,
+        commit_message="release: v1.1.0",
+        is_tag=False,
+    )
+    assert result.allowed is True
+
+
+def test_evaluate_release_commit_version_too_low(repo_with_manifest: Path) -> None:
+    """Release commit with manifest version lower than computed blocks."""
+    from version_guard import evaluate, VersionGuardConfig, ManifestSpec
+
+    (repo_with_manifest / "new.txt").write_text("x")
+    sp.run(["git", "add", "."], check=True, capture_output=True)
+    sp.run(["git", "commit", "-m", "feat: add new"], check=True, capture_output=True)
+    # Manifest says 1.0.1 but feat commit requires at least 1.1.0
+    (repo_with_manifest / "package.json").write_text('{"version": "1.0.1"}')
+    sp.run(["git", "add", "."], check=True, capture_output=True)
+
+    config = VersionGuardConfig(
+        strategy="conventional",
+        manifests=[ManifestSpec(path="package.json", field="version")],
+    )
+    result = evaluate(
+        config=config,
+        project_dir=repo_with_manifest,
+        commit_message="release: v1.0.1",
+        is_tag=False,
+    )
+    assert result.allowed is False
+    assert "too low" in result.message.lower() or "1.1.0" in result.message
+
+
+def test_evaluate_release_commit_version_higher_warns(
+    repo_with_manifest: Path,
+) -> None:
+    """Release commit with manifest version higher than computed warns but allows."""
+    from version_guard import evaluate, VersionGuardConfig, ManifestSpec
+
+    (repo_with_manifest / "new.txt").write_text("x")
+    sp.run(["git", "add", "."], check=True, capture_output=True)
+    sp.run(["git", "commit", "-m", "fix: small fix"], check=True, capture_output=True)
+    # Manifest says 2.0.0 but fix commit only requires 1.0.1
+    (repo_with_manifest / "package.json").write_text('{"version": "2.0.0"}')
+    sp.run(["git", "add", "."], check=True, capture_output=True)
+
+    config = VersionGuardConfig(
+        strategy="conventional",
+        manifests=[ManifestSpec(path="package.json", field="version")],
+    )
+    result = evaluate(
+        config=config,
+        project_dir=repo_with_manifest,
+        commit_message="release: v2.0.0",
+        is_tag=False,
+    )
+    assert result.allowed is True
+    assert "higher" in result.message.lower()
+
+
+def test_evaluate_tag_matches_manifest(repo_with_manifest: Path) -> None:
+    """Tag creation matching manifest version passes."""
+    from version_guard import evaluate, VersionGuardConfig, ManifestSpec
+
+    config = VersionGuardConfig(
+        manifests=[ManifestSpec(path="package.json", field="version")],
+    )
+    result = evaluate(
+        config=config,
+        project_dir=repo_with_manifest,
+        commit_message="",
+        is_tag=True,
+        tag_version="1.0.0",
+    )
+    assert result.allowed is True
+
+
+def test_evaluate_tag_mismatches_manifest(repo_with_manifest: Path) -> None:
+    """Tag creation not matching manifest version blocks."""
+    from version_guard import evaluate, VersionGuardConfig, ManifestSpec
+
+    config = VersionGuardConfig(
+        manifests=[ManifestSpec(path="package.json", field="version")],
+    )
+    result = evaluate(
+        config=config,
+        project_dir=repo_with_manifest,
+        commit_message="",
+        is_tag=True,
+        tag_version="2.0.0",
+    )
+    assert result.allowed is False
+    assert "2.0.0" in result.message
+    assert "1.0.0" in result.message
+
+
+def test_evaluate_manifest_consistency_blocks(git_repo: Path) -> None:
+    """Manifests disagreeing blocks on release commits."""
+    from version_guard import evaluate, VersionGuardConfig, ManifestSpec
+
+    (git_repo / "package.json").write_text('{"version": "1.0.0"}')
+    plugin_dir = git_repo / ".claude-plugin"
+    plugin_dir.mkdir()
+    (plugin_dir / "plugin.json").write_text('{"version": "0.9.0"}')
+    sp.run(["git", "add", "."], check=True, capture_output=True)
+    sp.run(
+        ["git", "tag", "-a", "v1.0.0", "-m", "v1.0.0"],
+        check=True,
+        capture_output=True,
+    )
+
+    config = VersionGuardConfig(
+        manifests=[
+            ManifestSpec(path="package.json", field="version"),
+            ManifestSpec(path=".claude-plugin/plugin.json", field="version"),
+        ],
+    )
+    result = evaluate(
+        config=config,
+        project_dir=git_repo,
+        commit_message="release: v1.0.0",
+        is_tag=False,
+    )
+    assert result.allowed is False
+    assert "disagree" in result.message.lower()
+
+
+def test_evaluate_no_tags_advisory(git_repo: Path) -> None:
+    """Repos with no tags get an advisory, never block."""
+    from version_guard import evaluate, VersionGuardConfig
+
+    # Need a manifest so we don't exit early at "no manifests found"
+    (git_repo / "package.json").write_text('{"version": "1.0.0"}')
+    sp.run(["git", "add", "."], check=True, capture_output=True)
+
+    config = VersionGuardConfig(strategy="conventional")
+    result = evaluate(
+        config=config,
+        project_dir=git_repo,
+        commit_message="release: v1.0.0",
+        is_tag=False,
+    )
+    assert result.allowed is True
+    assert "no version tags" in result.message.lower()
