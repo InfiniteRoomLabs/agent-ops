@@ -6,12 +6,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [agency-1.1.0] - 2026-03-15
+
 ### Added
 - **ADHD accessibility skill** (`skills/accessibility-adhd/`) -- behavioral overlay that adapts Claude's communication style with 9 independently configurable behaviors: micro-chunking, reduced decisions, response brevity, momentum preservation, progress dopamine, context anchoring, anti-rabbit-hole guardrails, time awareness, and sensory-friendly formatting
 - **`/init-adhd` command** (`commands/init-adhd.md`) -- guided setup wizard for configuring ADHD mode via CLAUDE.md YAML frontmatter
 - **Accessibility config detector** (`scripts/accessibility-config.py`) -- parses CLAUDE.md frontmatter for auto-activation via SessionStart hook
 - **User guide** (`docs/guides/accessibility-adhd.md`) -- configuration reference, behavior examples, preset recipes, and troubleshooting
 - SessionStart hook for automatic ADHD mode detection from CLAUDE.md frontmatter
+
+### Fixed
+- Changelog guard now outputs errors to stderr and blocks combined `git add + commit` in a single command
+- Removed explicit agent paths from `plugin.json` (uses auto-discovery)
+- Fixed `marketplace.json` source path to `./` for schema compliance
+- Restored `marketplace.json` for plugin discovery
 
 ## [agency-1.0.0] - 2026-03-12
 
