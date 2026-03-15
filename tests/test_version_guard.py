@@ -1,5 +1,6 @@
 """Tests for version-guard.py."""
 
+import json
 import subprocess as sp
 from pathlib import Path
 
@@ -405,3 +406,104 @@ def test_evaluate_no_tags_advisory(git_repo: Path) -> None:
     )
     assert result.allowed is True
     assert "no version tags" in result.message.lower()
+
+
+# -- Task 8: CLI commands (check + hook) --
+
+
+def test_check_command_passes(repo_with_manifest: Path) -> None:
+    """check command exits 0 when manifests are consistent and version > tag."""
+    from typer.testing import CliRunner
+
+    from version_guard import app
+
+    # Bump manifest ahead of the tag so Tier 1 doesn't block
+    (repo_with_manifest / "package.json").write_text('{"version": "1.1.0"}')
+    sp.run(["git", "add", "."], check=True, capture_output=True)
+
+    runner = CliRunner()
+    result = runner.invoke(app, ["check", "--project-dir", str(repo_with_manifest)])
+    assert result.exit_code == 0
+
+
+def test_hook_ignores_non_commit(git_repo: Path) -> None:
+    """Hook exits 0 for non-commit Bash commands."""
+    from typer.testing import CliRunner
+
+    from version_guard import app
+
+    runner = CliRunner()
+    result = runner.invoke(app, ["hook"], input='{"tool_name": "Bash", "tool_input": {"command": "ls -la"}}')
+    assert result.exit_code == 0
+
+
+def test_hook_blocks_combined_add_commit(git_repo: Path) -> None:
+    """Hook blocks combined git add + git commit."""
+    from typer.testing import CliRunner
+
+    from version_guard import app
+
+    runner = CliRunner()
+    result = runner.invoke(
+        app,
+        ["hook"],
+        input='{"tool_name": "Bash", "tool_input": {"command": "git add . && git commit -m \\"release: v1.0.0\\""}}',
+    )
+    assert result.exit_code == 2
+
+
+def test_hook_ignores_non_git(git_repo: Path) -> None:
+    """Hook exits 0 for non-git operations."""
+    from typer.testing import CliRunner
+
+    from version_guard import app
+
+    runner = CliRunner()
+    result = runner.invoke(
+        app,
+        ["hook"],
+        input='{"tool_name": "Bash", "tool_input": {"command": "echo hello"}}',
+    )
+    assert result.exit_code == 0
+
+
+def test_hook_handles_git_tag_a_pattern(repo_with_manifest: Path) -> None:
+    """Hook correctly parses git tag -a v1.0.0 -m 'msg' (the most common form)."""
+    from typer.testing import CliRunner
+
+    from version_guard import app
+
+    runner = CliRunner()
+    result = runner.invoke(
+        app,
+        ["hook"],
+        input='{"tool_name": "Bash", "tool_input": {"command": "git tag -a v1.0.0 -m \\"Release v1.0.0\\""}}',
+    )
+    # Tag matches manifest (1.0.0) so should pass
+    assert result.exit_code == 0
+
+
+def test_hook_handles_heredoc_release_commit(repo_with_manifest: Path) -> None:
+    r"""Hook detects release: in HEREDOC-style commit messages."""
+    from typer.testing import CliRunner
+
+    from version_guard import app
+
+    heredoc_cmd = (
+        'git commit -m "$(cat <<\'EOF\'\n'
+        'release: v1.1.0\n'
+        '\n'
+        'Co-Authored-By: Test\n'
+        'EOF\n'
+        ')"'
+    )
+    runner = CliRunner()
+    result = runner.invoke(
+        app,
+        ["hook"],
+        input=json.dumps({"tool_name": "Bash", "tool_input": {"command": heredoc_cmd}}),
+    )
+    # On main with conventional strategy not active by default,
+    # release commit triggers Tier 1 checks
+    # Manifest is 1.0.0, tag is 1.0.0 -- should block (not newer)
+    assert result.exit_code == 2

@@ -389,5 +389,113 @@ def evaluate(
     return EvalResult(allowed=True, message="")
 
 
+# -- Commands --
+
+
+@app.command()
+def check(
+    project_dir: Annotated[
+        Optional[str],
+        typer.Option("--project-dir", "-d", help="Project root. Defaults to cwd."),
+    ] = None,
+    dry_run: Annotated[
+        bool,
+        typer.Option("--dry-run", help="Show what would happen without blocking."),
+    ] = False,
+) -> None:
+    """Check version consistency for the current project."""
+    pdir = Path(project_dir) if project_dir else Path.cwd()
+    config = load_config(pdir)
+
+    # For CLI check, simulate a release commit to trigger full validation
+    result = evaluate(
+        config=config,
+        project_dir=pdir,
+        commit_message="release: check",
+        is_tag=False,
+    )
+
+    if result.message:
+        typer.echo(result.message)
+
+    if not result.allowed and not dry_run:
+        raise typer.Exit(1)
+    raise typer.Exit(0)
+
+
+@app.command()
+def hook() -> None:
+    """Claude Code PreToolUse hook entry point. Reads JSON from stdin."""
+    payload = HookPayload.model_validate_json(sys.stdin.read())
+    cmd = payload.tool_input.command
+
+    is_commit = bool(re.search(r"git\s+commit", cmd))
+    is_tag_cmd = bool(re.search(r"git\s+tag\s", cmd))
+
+    if not is_commit and not is_tag_cmd:
+        raise typer.Exit(0)
+
+    # Block combined add+commit
+    if is_commit and re.search(r"git\s+add\b", cmd):
+        typer.echo(
+            "BLOCKED: Run 'git add' and 'git commit' as separate Bash calls.\n"
+            "The version guard needs to inspect staged files between the two steps.\n"
+            "Stage your files first, then commit in a follow-up command.",
+            err=True,
+        )
+        raise typer.Exit(2)
+
+    project_dir = Path.cwd()
+    config = load_config(project_dir)
+
+    # Extract commit message for release detection.
+    # Handles both -m "msg" and HEREDOC patterns (cat <<'EOF' ... EOF).
+    # For release detection we only need to know if the message starts with
+    # "release:" or "chore(release):" -- so search the entire command string
+    # as a heuristic rather than trying to precisely parse shell quoting.
+    commit_message = ""
+    if is_commit:
+        # Try direct -m extraction first
+        msg_match = re.search(r"""-m\s+(['"])(.*?)\1""", cmd)
+        if msg_match:
+            commit_message = msg_match.group(2)
+        elif re.search(r"release:|chore\(release\):", cmd, re.IGNORECASE):
+            # HEREDOC or other format -- extract the release line
+            release_match = re.search(
+                r"((?:release:|chore\(release\):)\s*\S.*)", cmd, re.IGNORECASE
+            )
+            commit_message = release_match.group(1) if release_match else ""
+
+    # Extract tag version for tag checks.
+    # Parse the positional argument to `git tag` by finding the tag prefix
+    # anywhere in the command after "git tag".
+    tag_version = None
+    if is_tag_cmd:
+        # Find tag_prefix followed by a semver-like string
+        tag_match = re.search(
+            re.escape(config.tag_prefix) + r"(\d+\.\d+\.\d+\S*)",
+            cmd,
+        )
+        if tag_match:
+            tag_version = tag_match.group(1)
+
+    result = evaluate(
+        config=config,
+        project_dir=project_dir,
+        commit_message=commit_message,
+        is_tag=is_tag_cmd,
+        tag_version=tag_version,
+    )
+
+    if result.message:
+        if result.allowed:
+            # Advisory: print to stderr so Claude sees it but it doesn't block
+            typer.echo(result.message, err=True)
+        else:
+            typer.echo(result.message, err=True)
+
+    raise typer.Exit(2 if not result.allowed else 0)
+
+
 if __name__ == "__main__":
     app()
