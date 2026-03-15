@@ -28,10 +28,6 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 
-# -- Release commit detection --
-
-RELEASE_COMMIT_RE = re.compile(r"^(release:|chore\(release\):)", re.IGNORECASE)
-
 # -- Pydantic models --
 
 
@@ -138,6 +134,8 @@ def read_manifest_version(project_dir: Path, spec: ManifestSpec) -> str | None:
         data = tomllib.loads(text)
     elif spec.path.endswith(".json"):
         data = json.loads(text)
+    elif spec.path.endswith((".yaml", ".yml")):
+        data = yaml.safe_load(text)
     else:
         return None
     return _traverse(data, spec.field)
@@ -488,11 +486,9 @@ def hook() -> None:
     )
 
     if result.message:
-        if result.allowed:
-            # Advisory: print to stderr so Claude sees it but it doesn't block
-            typer.echo(result.message, err=True)
-        else:
-            typer.echo(result.message, err=True)
+        # Both advisory and blocking messages go to stderr —
+        # Claude Code reads stderr from PreToolUse hooks.
+        typer.echo(result.message, err=True)
 
     raise typer.Exit(2 if not result.allowed else 0)
 
