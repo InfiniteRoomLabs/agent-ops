@@ -18,6 +18,7 @@ import tomllib
 from pathlib import Path
 from typing import Annotated, Optional
 
+import semver
 import typer
 import yaml
 from pydantic import BaseModel, Field
@@ -158,6 +159,29 @@ def check_manifest_consistency(project_dir: Path, specs: list[ManifestSpec]) -> 
         "BLOCKED: Manifest versions disagree:\n" + "\n".join(lines)
         + "\n\nAll manifest files must declare the same version.",
     )
+
+
+# -- Git helpers --
+
+
+def get_current_branch() -> str:
+    result = subprocess.run(["git", "branch", "--show-current"], capture_output=True, text=True)
+    return result.stdout.strip()
+
+
+def get_latest_tag_version(prefix: str = "v") -> semver.Version | None:
+    result = subprocess.run(
+        ["git", "tag", "-l", f"{prefix}*", "--sort=-v:refname"],
+        capture_output=True, text=True,
+    )
+    for line in result.stdout.strip().splitlines():
+        tag = line.strip()
+        raw = tag[len(prefix):] if tag.startswith(prefix) else tag
+        try:
+            return semver.Version.parse(raw)
+        except ValueError:
+            continue
+    return None
 
 
 if __name__ == "__main__":
