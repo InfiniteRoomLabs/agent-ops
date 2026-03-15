@@ -160,3 +160,67 @@ def test_get_latest_tag_version_multiple(tagged_repo: Path) -> None:
     sp.run(["git", "tag", "-a", "v1.1.0", "-m", "v1.1.0"], check=True, capture_output=True)
     ver = get_latest_tag_version("v")
     assert ver == semver.Version.parse("1.1.0")
+
+
+# -- Task 6: Conventional commits parser --
+
+
+def test_compute_bump_from_fix(tagged_repo: Path) -> None:
+    from version_guard import compute_next_version
+    (tagged_repo / "b.txt").write_text("b")
+    sp.run(["git", "add", "."], check=True, capture_output=True)
+    sp.run(["git", "commit", "-m", "fix: correct typo"], check=True, capture_output=True)
+    nxt = compute_next_version(semver.Version.parse("1.0.0"), "v")
+    assert nxt == semver.Version.parse("1.0.1")
+
+
+def test_compute_bump_from_feat(tagged_repo: Path) -> None:
+    from version_guard import compute_next_version
+    (tagged_repo / "c.txt").write_text("c")
+    sp.run(["git", "add", "."], check=True, capture_output=True)
+    sp.run(["git", "commit", "-m", "feat: add widget"], check=True, capture_output=True)
+    nxt = compute_next_version(semver.Version.parse("1.0.0"), "v")
+    assert nxt == semver.Version.parse("1.1.0")
+
+
+def test_compute_bump_from_breaking_bang(tagged_repo: Path) -> None:
+    from version_guard import compute_next_version
+    (tagged_repo / "d.txt").write_text("d")
+    sp.run(["git", "add", "."], check=True, capture_output=True)
+    sp.run(["git", "commit", "-m", "feat!: redesign API"], check=True, capture_output=True)
+    nxt = compute_next_version(semver.Version.parse("1.0.0"), "v")
+    assert nxt == semver.Version.parse("2.0.0")
+
+
+def test_compute_bump_from_breaking_footer(tagged_repo: Path) -> None:
+    from version_guard import compute_next_version
+    (tagged_repo / "e.txt").write_text("e")
+    sp.run(["git", "add", "."], check=True, capture_output=True)
+    sp.run(["git", "commit", "-m", "feat: new thing\n\nBREAKING CHANGE: removed old API"], check=True, capture_output=True)
+    nxt = compute_next_version(semver.Version.parse("1.0.0"), "v")
+    assert nxt == semver.Version.parse("2.0.0")
+
+
+def test_compute_bump_highest_wins(tagged_repo: Path) -> None:
+    from version_guard import compute_next_version
+    for name, msg in [("f.txt", "fix: a"), ("g.txt", "feat: b"), ("h.txt", "fix: c")]:
+        (tagged_repo / name).write_text(name)
+        sp.run(["git", "add", "."], check=True, capture_output=True)
+        sp.run(["git", "commit", "-m", msg], check=True, capture_output=True)
+    nxt = compute_next_version(semver.Version.parse("1.0.0"), "v")
+    assert nxt == semver.Version.parse("1.1.0")
+
+
+def test_compute_bump_no_bumping_commits(tagged_repo: Path) -> None:
+    from version_guard import compute_next_version
+    (tagged_repo / "i.txt").write_text("i")
+    sp.run(["git", "add", "."], check=True, capture_output=True)
+    sp.run(["git", "commit", "-m", "chore: update readme"], check=True, capture_output=True)
+    nxt = compute_next_version(semver.Version.parse("1.0.0"), "v")
+    assert nxt == semver.Version.parse("1.0.0")
+
+
+def test_compute_bump_no_commits_since_tag(tagged_repo: Path) -> None:
+    from version_guard import compute_next_version
+    nxt = compute_next_version(semver.Version.parse("1.0.0"), "v")
+    assert nxt == semver.Version.parse("1.0.0")

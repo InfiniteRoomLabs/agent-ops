@@ -184,5 +184,56 @@ def get_latest_tag_version(prefix: str = "v") -> semver.Version | None:
     return None
 
 
+# -- Conventional commits parser --
+
+COMMIT_TYPE_RE = re.compile(r"^(\w+)(?:\([^)]*\))?(!)?\s*:")
+BREAKING_FOOTER_RE = re.compile(r"^BREAKING[ -]CHANGE\s*:", re.MULTILINE)
+
+BUMP_LEVELS = {"major": 3, "minor": 2, "patch": 1, "none": 0}
+
+COMMIT_TYPE_BUMP: dict[str, str] = {
+    "fix": "patch",
+    "perf": "patch",
+    "feat": "minor",
+}
+
+
+def _parse_bump_from_message(message: str) -> str:
+    first_line = message.split("\n", 1)[0]
+    match = COMMIT_TYPE_RE.match(first_line)
+    if not match:
+        return "none"
+    commit_type = match.group(1).lower()
+    has_bang = match.group(2) == "!"
+    if has_bang:
+        return "major"
+    if BREAKING_FOOTER_RE.search(message):
+        return "major"
+    return COMMIT_TYPE_BUMP.get(commit_type, "none")
+
+
+def compute_next_version(base: semver.Version, tag_prefix: str = "v") -> semver.Version:
+    tag_ref = f"{tag_prefix}{base}"
+    result = subprocess.run(
+        ["git", "log", f"{tag_ref}..HEAD", "--format=%B---COMMIT_END---", "--max-count=500"],
+        capture_output=True, text=True,
+    )
+    highest = "none"
+    for block in result.stdout.split("---COMMIT_END---"):
+        msg = block.strip()
+        if not msg:
+            continue
+        bump = _parse_bump_from_message(msg)
+        if BUMP_LEVELS[bump] > BUMP_LEVELS[highest]:
+            highest = bump
+    if highest == "major":
+        return base.bump_major()
+    elif highest == "minor":
+        return base.bump_minor()
+    elif highest == "patch":
+        return base.bump_patch()
+    return base
+
+
 if __name__ == "__main__":
     app()
