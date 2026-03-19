@@ -19,7 +19,6 @@ from __future__ import annotations
 import json
 import re
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 
 import typer
@@ -27,7 +26,8 @@ from pydantic import BaseModel, Field
 
 # Ensure sibling modules are importable when invoked via uv run
 sys.path.insert(0, str(Path(__file__).parent))
-
+from _shared.audit import write_audit_entry  # noqa: E402
+from _shared.paths import get_audit_dir  # noqa: E402
 from frontmatter_config import resolve_typed  # noqa: E402
 
 app = typer.Typer(
@@ -83,24 +83,15 @@ def write_elicitation_audit(
     details: dict,
 ) -> None:
     """Append a JSONL entry to elicitation-events.jsonl."""
-    audit_dir.mkdir(parents=True, exist_ok=True)
-    log_file = audit_dir / "elicitation-events.jsonl"
-
-    entry = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "event_type": event_type,
-        "server_name": server_name,
-        **details,
-    }
-
-    with log_file.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(entry) + "\n")
-
-
-def _audit_path() -> Path:
-    """Compute the audit directory based on cwd slug."""
-    slug = str(Path.cwd()).replace("/", "-")
-    return Path.home() / ".claude" / "projects" / slug / "memory" / "audit"
+    write_audit_entry(
+        audit_dir,
+        "elicitation-events",
+        {
+            "event_type": event_type,
+            "server_name": server_name,
+            **details,
+        },
+    )
 
 
 # -- Typer commands --
@@ -121,7 +112,7 @@ def request() -> None:
     # Audit
     if cfg.audit_elicitations:
         write_elicitation_audit(
-            audit_dir=_audit_path(),
+            audit_dir=get_audit_dir(),
             event_type="elicitation_request",
             server_name=server_name,
             details={
@@ -142,7 +133,7 @@ def request() -> None:
         # Audit the block
         if cfg.audit_elicitations:
             write_elicitation_audit(
-                audit_dir=_audit_path(),
+                audit_dir=get_audit_dir(),
                 event_type="elicitation_blocked",
                 server_name=server_name,
                 details={
@@ -179,7 +170,7 @@ def result() -> None:
 
     if cfg.audit_elicitations:
         write_elicitation_audit(
-            audit_dir=_audit_path(),
+            audit_dir=get_audit_dir(),
             event_type="elicitation_result",
             server_name=server_name,
             details={"result": result_data},
