@@ -18,6 +18,10 @@ import tomllib
 from pathlib import Path
 from typing import Annotated, Optional
 
+sys.path.insert(0, str(Path(__file__).parent))
+from _shared.dotted import resolve_dotted  # noqa: E402
+from _shared.git_ops import get_current_branch, get_latest_tag  # noqa: E402
+
 import semver
 import typer
 import yaml
@@ -114,15 +118,6 @@ def detect_manifests(project_dir: Path) -> list[ManifestSpec]:
 
 # -- Version reading --
 
-def _traverse(data: dict, dotted_field: str) -> str | None:
-    keys = dotted_field.split(".")
-    current = data
-    for key in keys:
-        if not isinstance(current, dict) or key not in current:
-            return None
-        current = current[key]
-    return str(current) if current is not None else None
-
 def read_manifest_version(project_dir: Path, spec: ManifestSpec) -> str | None:
     filepath = project_dir / spec.path
     if not filepath.is_file():
@@ -138,7 +133,8 @@ def read_manifest_version(project_dir: Path, spec: ManifestSpec) -> str | None:
         data = yaml.safe_load(text)
     else:
         return None
-    return _traverse(data, spec.field)
+    val = resolve_dotted(data, spec.field)
+    return str(val) if val is not None else None
 
 def check_manifest_consistency(project_dir: Path, specs: list[ManifestSpec]) -> tuple[bool, str]:
     versions: dict[str, str] = {}
@@ -162,24 +158,15 @@ def check_manifest_consistency(project_dir: Path, specs: list[ManifestSpec]) -> 
 # -- Git helpers --
 
 
-def get_current_branch() -> str:
-    result = subprocess.run(["git", "branch", "--show-current"], capture_output=True, text=True)
-    return result.stdout.strip()
-
-
 def get_latest_tag_version(prefix: str = "v") -> semver.Version | None:
-    result = subprocess.run(
-        ["git", "tag", "-l", f"{prefix}*", "--sort=-v:refname"],
-        capture_output=True, text=True,
-    )
-    for line in result.stdout.strip().splitlines():
-        tag = line.strip()
-        raw = tag[len(prefix):] if tag.startswith(prefix) else tag
-        try:
-            return semver.Version.parse(raw)
-        except ValueError:
-            continue
-    return None
+    tag = get_latest_tag(prefix)
+    if tag is None:
+        return None
+    raw = tag[len(prefix):] if tag.startswith(prefix) else tag
+    try:
+        return semver.Version.parse(raw)
+    except ValueError:
+        return None
 
 
 # -- Conventional commits parser --
