@@ -14,12 +14,13 @@ Usage:
 from __future__ import annotations
 
 import json
-import subprocess
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
+from _shared.audit import write_audit_entry  # noqa: E402
+from _shared.paths import get_audit_dir  # noqa: E402
+from _shared.summon_state import get_active_agent_name  # noqa: E402
 from frontmatter_config import resolve_typed  # noqa: E402
 
 import typer
@@ -68,49 +69,17 @@ def write_failure_audit(
     agent_name: str | None,
 ) -> None:
     """Append JSONL entry with timestamp, error, error_details, session_id, cwd, agent_name."""
-    audit_dir.mkdir(parents=True, exist_ok=True)
-    log_file = audit_dir / "stop-failures.jsonl"
-
-    entry = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "error": error,
-        "error_details": error_details,
-        "session_id": session_id,
-        "cwd": cwd,
-        "agent_name": agent_name,
-    }
-
-    with log_file.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(entry) + "\n")
-
-
-# ---------------------------------------------------------------------------
-# Agent check (same pattern as postcompact-recovery)
-# ---------------------------------------------------------------------------
-
-
-def _get_agent_name() -> str | None:
-    """Call summon.py state check to get the active agent name, if any."""
-    try:
-        result = subprocess.run(
-            [
-                sys.executable,
-                str(Path(__file__).resolve().parent / "summon.py"),
-                "state",
-                "check",
-            ],
-            capture_output=True,
-            text=True,
-            timeout=5,
-        )
-        if result.returncode != 0:
-            return None
-        data = json.loads(result.stdout)
-        if data.get("active") and data.get("agent"):
-            return data["agent"].get("active_agent") or None
-    except (subprocess.TimeoutExpired, json.JSONDecodeError, OSError):
-        pass
-    return None
+    write_audit_entry(
+        audit_dir,
+        "stop-failures",
+        {
+            "error": error,
+            "error_details": error_details,
+            "session_id": session_id,
+            "cwd": cwd,
+            "agent_name": agent_name,
+        },
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -139,11 +108,10 @@ def hook() -> None:
     if config.log_path:
         audit_dir = Path(config.log_path).expanduser()
     else:
-        slug = payload.cwd.replace("/", "-")
-        audit_dir = Path.home() / ".claude" / "projects" / slug / "memory" / "audit"
+        audit_dir = get_audit_dir(payload.cwd) if payload.cwd else get_audit_dir()
 
     # Get active agent name
-    agent_name = _get_agent_name()
+    agent_name = get_active_agent_name()
 
     # Write audit entry -- fire and forget
     try:

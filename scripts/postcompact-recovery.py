@@ -15,13 +15,13 @@ Usage (hook):
 from __future__ import annotations
 
 import json
-import os
-import subprocess
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
+from _shared.audit import write_audit_entry  # noqa: E402
+from _shared.paths import get_audit_dir  # noqa: E402
+from _shared.summon_state import get_active_agent_name  # noqa: E402
 from frontmatter_config import resolve_typed  # noqa: E402
 
 from pydantic import BaseModel, Field
@@ -80,63 +80,23 @@ def check_compaction(
 
 
 # ---------------------------------------------------------------------------
-# Agent state check
-# ---------------------------------------------------------------------------
-
-
-def _get_active_agent_name() -> str | None:
-    """Call summon.py state check to get the active agent name.
-
-    Returns the agent name if active, None otherwise. Fails gracefully.
-    """
-    plugin_root = os.environ.get("CLAUDE_PLUGIN_ROOT", "")
-    if not plugin_root:
-        # Fallback: derive from this script's location
-        plugin_root = str(Path(__file__).resolve().parent.parent)
-
-    summon_path = Path(plugin_root) / "scripts" / "summon.py"
-    if not summon_path.is_file():
-        return None
-
-    try:
-        result = subprocess.run(
-            ["uv", "run", str(summon_path), "state", "check"],
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
-        if result.returncode != 0:
-            return None
-        data = json.loads(result.stdout)
-        if data.get("active") and data.get("agent"):
-            return data["agent"].get("active_agent") or None
-    except (json.JSONDecodeError, subprocess.TimeoutExpired, OSError):
-        pass
-
-    return None
-
-
-# ---------------------------------------------------------------------------
 # Audit
 # ---------------------------------------------------------------------------
 
 
 def _write_audit(cwd: str, session_id: str, warnings: list[str]) -> None:
     """Write a JSONL audit entry for this compaction check."""
-    slug = cwd.replace("/", "-")
-    audit_dir = Path.home() / ".claude" / "projects" / slug / "memory" / "audit"
-    audit_dir.mkdir(parents=True, exist_ok=True)
-
-    audit_file = audit_dir / "compaction-checks.jsonl"
-    entry = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "session_id": session_id,
-        "cwd": cwd,
-        "warning_count": len(warnings),
-        "warnings": warnings,
-    }
-    with open(audit_file, "a", encoding="utf-8") as fh:
-        fh.write(json.dumps(entry) + "\n")
+    audit_dir = get_audit_dir(cwd)
+    write_audit_entry(
+        audit_dir,
+        "compaction-checks",
+        {
+            "session_id": session_id,
+            "cwd": cwd,
+            "warning_count": len(warnings),
+            "warnings": warnings,
+        },
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -162,7 +122,7 @@ def main() -> None:
     )
 
     # Check for active agent
-    agent_name = _get_active_agent_name()
+    agent_name = get_active_agent_name()
 
     # Run the check
     result = check_compaction(
