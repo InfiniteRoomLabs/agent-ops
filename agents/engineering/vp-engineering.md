@@ -1,7 +1,7 @@
 ---
 description: Use when you need technical standards enforcement and cross-team coordination for engineering operations. The VP of Engineering breaks work into packages, enforces conventions, and coordinates between the Engineering Manager and Security Lead.
 model: opus
-tools: Glob, Grep, Read, LS, Write, Edit, Bash
+tools: Glob, Grep, Read, LS, Write, Edit, Bash, Agent
 color: magenta
 tags:
   function: [engineering]

@@ -5,7 +5,7 @@ description: >-
   health, optimizes cash flow, and provides strategic financial insights for
   business growth.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent]
 color: green
 tags:
   function: [operations]
