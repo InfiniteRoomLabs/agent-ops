@@ -6,6 +6,24 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [agency-1.3.0] - 2026-03-18
+
+### Added
+- **Shared frontmatter config library** (`scripts/frontmatter_config.py`) -- extracts CLAUDE.md hierarchy resolution into a reusable module (idea 73). Three public functions: `resolve_config()`, `resolve_typed()`, `resolve_frontmatter()`. Deep-merge semantics with last-wins. `home_override` parameter for testing.
+- **Instructions guard** (`scripts/instructions-guard.py`) -- InstructionsLoaded hook validating UTF-8 encoding and detecting [PLACEHOLDER] markers when CLAUDE.md/rules files load into context. Advisory only.
+- **PostCompact recovery** (`scripts/postcompact-recovery.py`) -- PostCompact hook verifying critical context survived compaction. Checks agent persona and configurable reinject strings against compact summary. Writes audit JSONL.
+- **Config tamper guard** (`scripts/config-tamper-guard.py`) -- ConfigChange hook with two-phase design: snapshots settings.json at SessionStart, diffs against cache on ConfigChange. Blocks removal of protected keys (hooks, permissions.deny) via JSON decision format.
+- **Worktree lifecycle** (`scripts/worktree_lifecycle.py`) -- WorktreeCreate hook that replaces default worktree creation, propagates git hooks from main repo, checks for .env files. WorktreeRemove hook for audit logging.
+- **Stop failure audit** (`scripts/stop-failure-audit.py`) -- StopFailure hook writing structured JSONL audit entries when sessions crash from API errors. Fire-and-forget.
+- **Teammate gate** (`scripts/teammate-gate.py`) -- TeammateIdle/TaskCompleted hook validating subagent output. Discovers changed files via git status. Exit 2 for fixable violations (retry), continue:false for security violations (hard stop).
+- **Elicitation gate** (`scripts/elicitation-gate.py`) -- Elicitation/ElicitationResult hook for MCP audit logging and optional blocking via hookSpecificOutput action:decline.
+- hooks.json expanded from 3 to 13 event types (SessionStart, InstructionsLoaded, PreCompact, PostCompact, ConfigChange, WorktreeCreate, WorktreeRemove, PreToolUse, StopFailure, TeammateIdle, TaskCompleted, Elicitation, ElicitationResult)
+- New frontmatter config namespaces: `enforcement`, `compaction`, `worktree`, `audit`, `mcp`
+- 46 new tests across 8 test files
+
+### Changed
+- `accessibility-config.py` refactored to use shared frontmatter config library (174 -> ~60 lines, no behavior change)
+
 ## [agency-1.2.0] - 2026-03-15
 
 ### Added
