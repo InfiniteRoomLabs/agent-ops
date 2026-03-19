@@ -6,6 +6,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [agency-1.4.1] - 2026-03-19
+
+### Changed
+- Grant Agent tool to all 12 managing agents, enabling delegation through the org chart hierarchy: CEO, Orchestrator, CTO, VP of Engineering, DevOps Manager, Incident Response Commander, Studio Producer, Project Shepherd, Studio Operations, Sprint Prioritizer, Sales Coach, Finance Tracker
+
 ## [agency-1.4.0] - 2026-03-19
 
 ### Added
