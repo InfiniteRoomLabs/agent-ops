@@ -13,10 +13,14 @@ import hashlib
 import json
 import os
 import re
+import sys
 import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Annotated, Optional
+
+sys.path.insert(0, str(Path(__file__).parent))
+from _shared.paths import cwd_slug  # noqa: E402
 
 import typer
 import yaml
@@ -85,8 +89,7 @@ def get_state_dir() -> Path:
     if _state_dir_override is not None:
         return _state_dir_override
 
-    cwd = Path.cwd().resolve()
-    slug = str(cwd).replace("/", "-")
+    slug = cwd_slug()
     return Path.home() / ".claude" / "projects" / slug / "memory" / "summon"
 
 
