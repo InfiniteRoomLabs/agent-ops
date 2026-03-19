@@ -5,7 +5,7 @@ description: >-
   operations, maintaining productivity standards, and supporting all teams with
   the tools and processes needed for success.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent]
 color: green
 tags:
   function: [operations]

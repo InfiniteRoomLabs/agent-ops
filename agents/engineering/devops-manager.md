@@ -1,7 +1,7 @@
 ---
 description: Use when you need pipeline design, deployment coordination, and task assignment for DevOps operations. The DevOps Manager assigns tasks to the right seniority level, converts work packages into actionable tasks, and tracks progress.
 model: sonnet
-tools: Glob, Grep, Read, LS, Write, Edit, Bash
+tools: Glob, Grep, Read, LS, Write, Edit, Bash, Agent
 color: blue
 tags:
   function: [engineering]
