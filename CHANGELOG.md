@@ -6,6 +6,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [agency-1.4.0] - 2026-03-19
+
+### Added
+- **Shared changelog parsing library** (`scripts/_shared/changelog.py`) -- reusable CHANGELOG.md parser following the Apache Commons shared-utilities pattern. Two public functions: `get_latest_changelog_version()` and `has_content_under_header()`.
+- **Auto-tag hook** (`scripts/auto-tag.py`) -- PostToolUse hook that detects `gh pr merge` commands and automatically creates + pushes a git tag when CHANGELOG version is ahead of the latest tag. Includes `ci` subcommand for GitHub Actions.
+- **Auto-tag GitHub Action** (`.github/workflows/auto-tag.yml`) -- triggers on pushes to main that touch CHANGELOG.md or plugin.json, runs `auto-tag.py ci` to create tags.
+- PostToolUse hook registration in hooks.json (14 event types total)
+
+### Changed
+- Refactored all 10 scripts to use `_shared/` utility modules (git_ops, dotted, encoding, paths, audit, summon_state)
+
+### Fixed
+- `worktree_lifecycle.py` slug computation no longer incorrectly lstrips the leading slash (uses `_shared.paths.cwd_slug`)
+
 ## [agency-1.3.0] - 2026-03-18
 
 ### Added
