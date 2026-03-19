@@ -13,7 +13,11 @@ from __future__ import annotations
 import re
 import subprocess
 import sys
+from pathlib import Path
 from typing import Annotated, Optional
+
+sys.path.insert(0, str(Path(__file__).parent))
+from _shared.git_ops import get_current_branch  # noqa: E402
 
 import typer
 from pydantic import BaseModel
@@ -39,15 +43,6 @@ class HookPayload(BaseModel):
 
 
 # -- Shared logic --
-
-
-def get_current_branch() -> str:
-    result = subprocess.run(
-        ["git", "branch", "--show-current"],
-        capture_output=True,
-        text=True,
-    )
-    return result.stdout.strip()
 
 
 def changelog_is_staged() -> bool:

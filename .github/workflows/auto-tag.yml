@@ -1,0 +1,20 @@
+name: Auto-tag on version bump
+on:
+  push:
+    branches: [main]
+    paths:
+      - CHANGELOG.md
+      - .claude-plugin/plugin.json
+
+jobs:
+  auto-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v4
+      - name: Check and create tag
+        run: PYTHONPATH=scripts uv run scripts/auto-tag.py ci

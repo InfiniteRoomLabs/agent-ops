@@ -25,28 +25,13 @@ from pydantic import BaseModel
 
 # Ensure sibling modules are importable when invoked via uv run
 sys.path.insert(0, str(Path(__file__).parent))
-
+from _shared.encoding import ENCODING_ARTIFACTS, find_encoding_artifacts  # noqa: E402
 from frontmatter_config import resolve_typed  # noqa: E402
 
 app = typer.Typer(
     help="Validate CLAUDE.md and rules files when loaded into context.",
     no_args_is_help=True,
 )
-
-# -- Windows-1252 artifact codepoints --
-
-ENCODING_ARTIFACTS: set[str] = {
-    "\u201c",  # left double quotation mark
-    "\u201d",  # right double quotation mark
-    "\u2018",  # left single quotation mark
-    "\u2019",  # right single quotation mark
-    "\u2013",  # en dash
-    "\u2014",  # em dash
-    "\u2026",  # horizontal ellipsis
-    "\u2022",  # bullet
-    "\u00a0",  # no-break space
-    "\u2192",  # rightwards arrow
-}
 
 PLACEHOLDER_RE = re.compile(r"\[PLACEHOLDER\]", re.IGNORECASE)
 
@@ -83,7 +68,7 @@ def validate_file(
         return warnings
 
     if encoding_check:
-        found = {ch for ch in content if ch in ENCODING_ARTIFACTS}
+        found = find_encoding_artifacts(content)
         if found:
             chars = ", ".join(f"U+{ord(c):04X}" for c in sorted(found))
             warnings.append(
