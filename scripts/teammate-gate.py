@@ -23,6 +23,7 @@ from typing import Annotated, Optional
 sys.path.insert(0, str(Path(__file__).parent))
 
 import typer
+from _shared.encoding import ENCODING_ARTIFACTS, find_encoding_artifacts  # noqa: E402
 from frontmatter_config import resolve_typed  # noqa: E402
 from pydantic import BaseModel, Field
 
@@ -34,19 +35,6 @@ app = typer.Typer(
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
-
-PROBLEMATIC_CHARS = {
-    "\u201c",  # left double quotation mark
-    "\u201d",  # right double quotation mark
-    "\u2018",  # left single quotation mark
-    "\u2019",  # right single quotation mark
-    "\u2013",  # en dash
-    "\u2014",  # em dash
-    "\u2026",  # horizontal ellipsis
-    "\u2022",  # bullet
-    "\u00a0",  # non-breaking space
-    "\u2192",  # rightwards arrow
-}
 
 AGENT_DIRS = {
     ".claude",
@@ -93,7 +81,7 @@ def check_encoding(files: list[Path]) -> list[dict]:
             content = f.read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError):
             continue
-        found = PROBLEMATIC_CHARS & set(content)
+        found = find_encoding_artifacts(content)
         if found:
             chars_desc = ", ".join(f"U+{ord(c):04X}" for c in sorted(found))
             violations.append(

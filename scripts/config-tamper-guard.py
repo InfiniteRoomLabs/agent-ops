@@ -19,9 +19,10 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
-from typing import Any
 
 sys.path.insert(0, str(Path(__file__).parent))
+from _shared.dotted import resolve_dotted  # noqa: E402
+from _shared.paths import get_audit_dir  # noqa: E402
 from frontmatter_config import resolve_typed  # noqa: E402
 
 import typer
@@ -49,19 +50,6 @@ class EnforcementConfig(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-def _resolve_dotted(data: dict, dotted_key: str) -> Any:
-    """Resolve a dotted key path like ``permissions.deny`` in a nested dict.
-
-    Returns ``None`` if any segment is missing.
-    """
-    current: Any = data
-    for segment in dotted_key.split("."):
-        if not isinstance(current, dict) or segment not in current:
-            return None
-        current = current[segment]
-    return current
-
-
 def snapshot_settings(
     *,
     settings_path: Path | None = None,
@@ -72,8 +60,7 @@ def snapshot_settings(
         settings_path = Path.cwd() / ".claude" / "settings.json"
 
     if cache_dir is None:
-        slug = str(Path.cwd()).replace("/", "-")
-        cache_dir = Path.home() / ".claude" / "projects" / slug / "memory" / "audit"
+        cache_dir = get_audit_dir()
 
     if not settings_path.is_file():
         return
@@ -100,8 +87,8 @@ def detect_tamper(
     reasons: list[str] = []
 
     for key in protected_keys:
-        old_val = _resolve_dotted(before, key)
-        new_val = _resolve_dotted(after, key)
+        old_val = resolve_dotted(before, key)
+        new_val = resolve_dotted(after, key)
 
         if old_val is None:
             # Key wasn't present before -- nothing to protect
@@ -154,10 +141,7 @@ def hook() -> None:
         )
 
         # Locate cached snapshot
-        slug = str(Path.cwd()).replace("/", "-")
-        cache_dir = (
-            Path.home() / ".claude" / "projects" / slug / "memory" / "audit"
-        )
+        cache_dir = get_audit_dir()
         cache_file = cache_dir / "settings-snapshot.json"
 
         if not cache_file.is_file():

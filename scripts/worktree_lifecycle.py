@@ -13,7 +13,6 @@ Usage:
 
 from __future__ import annotations
 
-import datetime
 import json
 import os
 import shutil
@@ -22,6 +21,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
+from _shared.audit import write_audit_entry  # noqa: E402
+from _shared.paths import get_audit_dir  # noqa: E402
 from frontmatter_config import resolve_typed  # noqa: E402
 
 import typer
@@ -133,22 +134,10 @@ def check_env_files(worktree: Path) -> list[str]:
 # ---------------------------------------------------------------------------
 
 
-def _audit_dir() -> Path:
-    """Return the audit directory path based on cwd slug."""
-    cwd = Path.cwd()
-    slug = str(cwd).lstrip("/").replace("/", "-")
-    audit = Path.home() / ".claude" / "projects" / slug / "memory" / "audit"
-    audit.mkdir(parents=True, exist_ok=True)
-    return audit
-
-
 def _write_audit(event: dict) -> None:
     """Append a JSON event to the worktree audit log."""
-    audit_dir = _audit_dir()
-    log_file = audit_dir / "worktree-events.jsonl"
-    event["timestamp"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
-    with open(log_file, "a") as f:
-        f.write(json.dumps(event) + "\n")
+    audit_dir = get_audit_dir()
+    write_audit_entry(audit_dir, "worktree-events", event)
 
 
 # ---------------------------------------------------------------------------
