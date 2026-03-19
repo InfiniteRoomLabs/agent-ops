@@ -5,7 +5,7 @@ description: >-
   rep and every deal better through structured coaching methodology and
   behavioral feedback.
 model: sonnet
-tools: [Read, WebSearch, WebFetch]
+tools: [Read, WebSearch, WebFetch, Agent]
 color: "#E65100"
 tags:
   function: [revenue]
