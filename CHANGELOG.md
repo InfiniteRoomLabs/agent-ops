@@ -6,6 +6,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [agency-1.6.0] - 2026-03-20
+
+### Added
+- **Entropy agent** (`agents/engineering/entropy.md`) -- secrets lifecycle manager that watches Bitwarden, syncs to Ansible Vault/K8s targets, enforces rotation policy, and alerts on drift
+- **Secrets-sync skill** (`skills/secrets-sync/`) -- user-invocable workflow for syncing secrets from Bitwarden to infrastructure targets
+- **Pre-deploy secrets sync hook** (`hooks/pre-deploy-secrets-sync.sh`) -- PreToolUse hook that triggers secret sync before deployment commands
+- **Post-deploy secrets verify hook** (`hooks/post-deploy-secrets-verify.sh`) -- PostToolUse hook that verifies secrets match after deployments
+
+### Changed
+- **Orchestrator agent v2** (`agents/core/orchestrator.md`) -- major rewrite adding agent coordination patterns (parallel spawning, background agents, SendMessage continuations, worktree isolation), subagent selection tables, NEXUS integration section, hook compliance awareness, and 6th iron law ("never combine unrelated changes")
+- Updated orchestrator registry description to include trigger text for subagent selection
+- Updated CLAUDE.md with Entropy agent documentation and engineering division details
+
 ## [agency-1.5.0] - 2026-03-19
 
 ### Changed

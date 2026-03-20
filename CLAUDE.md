@@ -14,7 +14,7 @@ Single plugin: `infinite-room-labs@agency`. All components live at the repo root
 .claude-plugin/plugin.json        # plugin manifest with agent directory declarations
 agents/                            # 148+ agent definitions organized by division
   core/                            # CEO, Orchestrator, Reality Checker
-  engineering/                     # CTO, VP Eng, DevOps chain + imported specialists
+  engineering/                     # CTO, VP Eng, DevOps chain, Entropy (secrets) + imported specialists
   design/                          # UI, UX, brand, visual specialists
   marketing/                       # Growth, content, social media, SEO specialists
   sales/                           # Account strategy, pipeline, outbound specialists
@@ -106,6 +106,10 @@ Use the `new-agent` skill, or manually:
 2. Include YAML frontmatter with `description`, `model`, `tools`, `color`, and `tags`
 3. Update `registry.yaml` at the repo root
 4. If adding a new division, update the `agents` array in `.claude-plugin/plugin.json`
+
+## Notable Engineering Agents
+
+**Entropy** (`agents/engineering/entropy.md`) -- Secrets lifecycle manager. Tracks rotation schedules, reports overdue secrets, and coordinates with `bw-sync.sh` for Bitwarden-to-Ansible/K8s sync. Invoke when auditing secret age, planning a rotation sprint, or responding to a compromised credential. Tags: `engineering`, `secrets`, `compliance`.
 
 ## Installation
 
