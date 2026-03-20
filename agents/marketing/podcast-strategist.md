@@ -6,7 +6,7 @@ description: >-
   distribution, and monetization to help podcast creators build sticky audio
   content brands.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: purple
 tags:
   function: [revenue, creative]

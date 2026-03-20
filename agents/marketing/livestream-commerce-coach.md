@@ -5,7 +5,7 @@ description: >-
   script design, product sequencing, paid-vs-organic traffic balancing,
   conversion closing techniques, and real-time data-driven optimization.
 model: sonnet
-tools: [Read, WebSearch, WebFetch]
+tools: [Read, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: "#E63946"
 tags:
   function: [revenue, creative]

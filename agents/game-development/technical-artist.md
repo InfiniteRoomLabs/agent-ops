@@ -3,7 +3,7 @@ description: >-
   Art-to-engine pipeline specialist - Masters shaders, VFX systems, LOD
   pipelines, performance budgeting, and cross-engine asset optimization
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: pink
 tags:
   function: [engineering, creative]

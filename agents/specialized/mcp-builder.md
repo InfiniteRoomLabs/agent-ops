@@ -4,7 +4,7 @@ description: >-
   servers that extend AI agent capabilities with custom tools, resources, and
   prompts.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: indigo
 tags:
   function: [engineering]

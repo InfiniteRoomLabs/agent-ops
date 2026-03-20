@@ -4,7 +4,7 @@ description: >-
   Creates dashboards, performs statistical analysis, tracks KPIs, and provides
   strategic decision support through data visualization and reporting.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: teal
 tags:
   function: [operations]

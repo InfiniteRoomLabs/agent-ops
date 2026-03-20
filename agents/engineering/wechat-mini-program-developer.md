@@ -4,7 +4,7 @@ description: >-
   WXML/WXSS/WXS, WeChat API integration, payment systems, subscription
   messaging, and the full WeChat ecosystem.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: green
 tags:
   function: [engineering]

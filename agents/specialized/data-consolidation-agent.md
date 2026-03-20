@@ -3,7 +3,7 @@ description: >-
   AI agent that consolidates extracted sales data into live reporting dashboards
   with territory, rep, and pipeline summaries
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: "#38a169"
 tags:
   function: [revenue]

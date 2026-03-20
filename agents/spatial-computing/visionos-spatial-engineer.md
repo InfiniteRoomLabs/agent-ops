@@ -3,7 +3,7 @@ description: >-
   Native visionOS spatial computing, SwiftUI volumetric interfaces, and Liquid
   Glass design implementation
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: indigo
 tags:
   function: [engineering]

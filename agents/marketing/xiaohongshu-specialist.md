@@ -4,7 +4,7 @@ description: >-
   trend-driven strategies, and authentic community engagement. Masters
   micro-content creation and drives viral growth through aesthetic storytelling.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: "#FF1B6D"
 tags:
   function: [revenue, creative]

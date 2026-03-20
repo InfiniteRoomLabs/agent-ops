@@ -4,7 +4,7 @@ description: >-
   Services (Relay/Lobby), client-server authority, lag compensation, and state
   synchronization
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: blue
 tags:
   function: [engineering, creative]

@@ -3,7 +3,7 @@ description: >-
   Terminal emulation, text rendering optimization, and SwiftTerm integration for
   modern Swift applications
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: green
 tags:
   function: [engineering]

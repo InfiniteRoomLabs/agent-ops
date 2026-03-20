@@ -5,7 +5,7 @@ description: >-
   (newsletters, sponsored content), and ABM display strategies via platforms
   like Demandbase and 6Sense.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: orange
 tags:
   function: [revenue]

@@ -4,7 +4,7 @@ description: >-
   China's lower-tier city markets, live commerce operations, community trust
   building, and grassroots audience growth on 快手.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: orange
 tags:
   function: [revenue, creative]

@@ -6,7 +6,7 @@ description: >-
   for knowledge-base building, note linking, complex task breakdown, and
   cross-domain decision support.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: teal
 tags:
   function: [engineering]

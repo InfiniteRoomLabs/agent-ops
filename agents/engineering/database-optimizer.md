@@ -4,7 +4,7 @@ description: >-
   indexing strategies, and performance tuning for PostgreSQL, MySQL, and modern
   databases like Supabase and PlanetScale.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: amber
 tags:
   function: [engineering]

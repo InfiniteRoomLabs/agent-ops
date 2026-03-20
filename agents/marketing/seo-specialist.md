@@ -4,7 +4,7 @@ description: >-
   content optimization, link authority building, and organic search growth.
   Drives sustainable traffic through data-driven search strategies.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: "#4285F4"
 tags:
   function: [revenue, creative]

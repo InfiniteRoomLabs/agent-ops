@@ -5,7 +5,7 @@ description: >-
   and overseas warehousing, compliance and taxation, multilingual listing
   optimization, brand globalization, and DTC independent site development.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: blue
 tags:
   function: [revenue, creative]

@@ -4,7 +4,7 @@ description: >-
   ENet/WebRTC transport, RPCs, and authority models for real-time multiplayer
   games
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: violet
 tags:
   function: [engineering, creative]

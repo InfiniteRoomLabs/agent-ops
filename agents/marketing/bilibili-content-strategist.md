@@ -4,7 +4,7 @@ description: >-
   mastery, B站 algorithm optimization, community building, and branded content
   strategy for China's leading video community platform.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: pink
 tags:
   function: [revenue, creative]

@@ -3,7 +3,7 @@ description: >-
   Systems and mechanics architect - Masters GDD authorship, player psychology,
   economy balancing, and gameplay loop design across all engines and genres
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: yellow
 tags:
   function: [engineering, creative]

@@ -4,7 +4,7 @@ description: >-
   DOCX, and XLSX files using code-based approaches with proper formatting,
   charts, and data visualization.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: blue
 tags:
   function: [engineering]

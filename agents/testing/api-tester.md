@@ -4,7 +4,7 @@ description: >-
   performance testing, and quality assurance across all systems and third-party
   integrations
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: purple
 tags:
   function: [engineering]

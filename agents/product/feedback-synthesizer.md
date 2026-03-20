@@ -4,7 +4,7 @@ description: >-
   channels to extract actionable product insights. Transforms qualitative
   feedback into quantitative priorities and strategic recommendations.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: blue
 tags:
   function: [operations]
