@@ -4,7 +4,7 @@ description: >-
   contractor invoices, and recurring bills across any payment rail -- crypto,
   fiat, stablecoins. Integrates with AI agent workflows via tool calls.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: green
 tags:
   function: [operations]

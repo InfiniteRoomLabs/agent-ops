@@ -4,7 +4,7 @@ description: >-
   Niagara VFX, Procedural Content Generation, and the art-to-engine pipeline for
   UE5 projects
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: orange
 tags:
   function: [engineering, creative]

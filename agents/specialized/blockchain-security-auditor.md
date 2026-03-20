@@ -4,7 +4,7 @@ description: >-
   detection, formal verification, exploit analysis, and comprehensive audit
   report writing for DeFi protocols and blockchain applications.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: red
 tags:
   function: [operations]

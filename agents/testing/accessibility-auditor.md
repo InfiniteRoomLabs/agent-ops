@@ -5,7 +5,7 @@ description: >-
   finding barriers -- if it's not tested with a screen reader, it's not
   accessible.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: "#0077B6"
 tags:
   function: [engineering]

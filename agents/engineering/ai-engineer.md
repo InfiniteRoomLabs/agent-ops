@@ -5,7 +5,7 @@ description: >-
   intelligent features, data pipelines, and AI-powered applications with
   emphasis on practical, scalable solutions.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: blue
 tags:
   function: [engineering]

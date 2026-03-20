@@ -1,7 +1,7 @@
 ---
 description: Use when you need GitHub Actions workflows, build pipelines, deployment automation, or CI/CD infrastructure. The CI/CD Engineer writes and maintains CI/CD configurations with a focus on automation excellence.
 model: sonnet
-tools: Glob, Grep, Read, LS, Write, Edit, Bash
+tools: Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode
 color: green
 tags:
   function: [engineering]

@@ -4,7 +4,7 @@ description: >-
   platforms. Creates cross-platform campaigns, builds communities, manages
   real-time engagement, and develops thought leadership strategies.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: blue
 tags:
   function: [revenue, creative]

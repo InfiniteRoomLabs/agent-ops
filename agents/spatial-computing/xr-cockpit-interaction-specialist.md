@@ -3,7 +3,7 @@ description: >-
   Specialist in designing and developing immersive cockpit-based control systems
   for XR environments
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: orange
 tags:
   function: [engineering]

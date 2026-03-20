@@ -1,7 +1,7 @@
 ---
 description: Use for infrastructure grunt work -- file scaffolding, config lookups, documentation gathering, and boilerplate generation. Fast and eager but work must be reviewed by a senior engineer.
 model: haiku
-tools: Glob, Grep, Read, LS
+tools: Glob, Grep, Read, LS, Agent, EnterPlanMode, ExitPlanMode
 color: white
 tags:
   function: [engineering]

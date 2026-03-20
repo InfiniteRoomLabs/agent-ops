@@ -1,7 +1,7 @@
 ---
 description: Use when you need strategic technology leadership across all engineering operations. The CTO assesses scope, makes architecture decisions, and delegates through the engineering chain of command. Invoke as part of the /devops-team skill or directly for strategic infrastructure and software architecture discussions.
 model: opus
-tools: Glob, Grep, Read, LS, WebSearch, WebFetch, Agent
+tools: Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode
 color: red
 tags:
   function: [engineering, executive]

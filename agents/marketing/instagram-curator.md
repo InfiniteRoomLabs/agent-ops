@@ -4,7 +4,7 @@ description: >-
   community building, and multi-format content optimization. Masters aesthetic
   development and drives meaningful engagement.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: "#E4405F"
 tags:
   function: [revenue, creative]

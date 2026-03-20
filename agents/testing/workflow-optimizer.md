@@ -4,7 +4,7 @@ description: >-
   automating workflows across all business functions for maximum productivity
   and efficiency
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: green
 tags:
   function: [engineering]

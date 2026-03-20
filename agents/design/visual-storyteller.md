@@ -5,7 +5,7 @@ description: >-
   Specializes in transforming complex information into engaging visual stories
   that connect with audiences and drive emotional engagement.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: purple
 tags:
   function: [creative]

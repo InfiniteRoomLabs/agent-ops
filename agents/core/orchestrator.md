@@ -1,7 +1,7 @@
 ---
 description: Autonomous pipeline manager that orchestrates multi-agent development workflows from specification to delivery. Use when you need coordinated multi-agent execution with quality gates.
 model: opus
-tools: Glob, Grep, Read, LS, Write, Edit, Bash, WebSearch, WebFetch, Agent
+tools: Glob, Grep, Read, LS, Write, Edit, Bash, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode
 color: cyan
 tags:
   function: [executive]

@@ -6,7 +6,7 @@ description: >-
   motion graphics and VFX, subtitle design, multi-platform export optimization,
   editing workflow efficiency, and AI-assisted editing.
 model: sonnet
-tools: [Read, WebSearch, WebFetch]
+tools: [Read, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: "#7B2D8E"
 tags:
   function: [revenue, creative]

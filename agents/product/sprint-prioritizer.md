@@ -4,7 +4,7 @@ description: >-
   prioritization, and resource allocation. Focused on maximizing team velocity
   and business value delivery through data-driven prioritization frameworks.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: green
 tags:
   function: [operations]

@@ -5,7 +5,7 @@ description: >-
   concepts into clear, accurate, and engaging docs that developers actually read
   and use.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: teal
 tags:
   function: [engineering]

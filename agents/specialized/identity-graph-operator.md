@@ -4,7 +4,7 @@ description: >-
   Ensures every agent in a multi-agent system gets the same canonical answer for
   "who is this entity?" - deterministically, even under concurrent writes.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: "#C5A572"
 tags:
   function: [operations]

@@ -4,7 +4,7 @@ description: >-
   ranking, Baidu ecosystem integration, ICP compliance, Chinese keyword
   research, and mobile-first indexing for the China market.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: blue
 tags:
   function: [revenue, creative]

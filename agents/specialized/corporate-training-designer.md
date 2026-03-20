@@ -5,7 +5,7 @@ description: >-
   blended learning program design, internal trainer development, leadership
   programs, and training effectiveness evaluation and continuous optimization.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: orange
 tags:
   function: [operations]

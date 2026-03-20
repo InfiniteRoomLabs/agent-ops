@@ -4,7 +4,7 @@ description: >-
   analyzing, and improving system performance across all applications and
   infrastructure
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: orange
 tags:
   function: [engineering]

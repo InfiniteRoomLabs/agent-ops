@@ -6,7 +6,7 @@ description: >-
   managing complex cross-functional initiatives and ensuring optimal studio
   operations.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: gold
 tags:
   function: [operations]

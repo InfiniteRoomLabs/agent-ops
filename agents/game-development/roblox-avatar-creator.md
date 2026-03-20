@@ -4,7 +4,7 @@ description: >-
   UGC item creation, accessory rigging, texture standards, and the Creator
   Marketplace submission pipeline
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: fuchsia
 tags:
   function: [engineering, creative]

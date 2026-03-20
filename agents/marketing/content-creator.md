@@ -4,7 +4,7 @@ description: >-
   editorial calendars, creates compelling copy, manages brand storytelling, and
   optimizes content for engagement across all digital channels.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: teal
 tags:
   function: [revenue, creative]

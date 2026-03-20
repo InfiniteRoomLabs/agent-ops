@@ -4,7 +4,7 @@ description: >-
   continuum, Nanite geometry, Lumen GI, and Gameplay Ability System for
   AAA-grade Unreal Engine projects
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: orange
 tags:
   function: [engineering, creative]

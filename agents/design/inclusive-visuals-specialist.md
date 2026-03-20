@@ -3,7 +3,7 @@ description: >-
   Representation expert who defeats systemic AI biases to generate culturally
   accurate, affirming, and non-stereotypical images and video.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: "#4DB6AC"
 tags:
   function: [creative]

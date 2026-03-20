@@ -4,7 +4,7 @@ description: >-
   performance while enforcing strict financial and security guardrails against
   runaway costs.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: "#673AB7"
 tags:
   function: [engineering]

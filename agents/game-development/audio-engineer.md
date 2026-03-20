@@ -4,7 +4,7 @@ description: >-
   systems, spatial audio, and audio performance budgeting across all game
   engines
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: indigo
 tags:
   function: [engineering, creative]
