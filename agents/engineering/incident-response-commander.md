@@ -4,7 +4,7 @@ description: >-
   structured response coordination, post-mortem facilitation, SLO/SLI tracking,
   and on-call process design for reliable engineering organizations.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: "#e63946"
 tags:
   function: [engineering]

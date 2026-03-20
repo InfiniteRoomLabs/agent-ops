@@ -3,7 +3,7 @@ description: >-
   Technical architecture and UX specialist who provides developers with solid
   foundations, CSS systems, and clear implementation guidance
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: purple
 tags:
   function: [creative]

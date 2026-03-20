@@ -6,7 +6,7 @@ description: >-
   positioning. Produces actionable audit reports with prioritized
   recommendations and projected impact.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: orange
 tags:
   function: [revenue]

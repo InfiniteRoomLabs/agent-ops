@@ -3,7 +3,7 @@ description: >-
   Behavioral psychology specialist that adapts software interaction cadences and
   styles to maximize user motivation and success.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: "#FF8A65"
 tags:
   function: [operations]

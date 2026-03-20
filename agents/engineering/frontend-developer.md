@@ -3,7 +3,7 @@ description: >-
   Expert frontend developer specializing in modern web technologies,
   React/Vue/Angular frameworks, UI implementation, and performance optimization
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: cyan
 tags:
   function: [engineering]

@@ -5,7 +5,7 @@ description: >-
   opportunities, exposes pipeline risk, and builds deal strategies that survive
   forecast review.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: "#1B4D3E"
 tags:
   function: [revenue]

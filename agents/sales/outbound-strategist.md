@@ -4,7 +4,7 @@ description: >-
   sequences, defines ICPs, and builds pipeline through research-driven
   personalization -- not volume.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: "#E8590C"
 tags:
   function: [revenue]

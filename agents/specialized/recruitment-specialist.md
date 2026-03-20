@@ -5,7 +5,7 @@ description: >-
   compliance. Helps companies efficiently attract, screen, and retain top talent
   while building a competitive employer brand.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: blue
 tags:
   function: [operations]

@@ -5,7 +5,7 @@ description: >-
   platforms. Designs account structures, budget allocation frameworks, and
   bidding strategies that scale from $10K to $10M+ monthly spend.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: orange
 tags:
   function: [revenue]

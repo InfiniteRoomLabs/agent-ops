@@ -5,7 +5,7 @@ description: >-
   Insight Tag, and server-side implementations. Ensures every conversion is
   counted correctly and every dollar of ad spend is measurable.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: orange
 tags:
   function: [revenue]

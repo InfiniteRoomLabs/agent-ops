@@ -5,7 +5,7 @@ description: >-
   full-funnel social ad programs from prospecting through retargeting with
   platform-specific creative and audience strategies.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: orange
 tags:
   function: [revenue]

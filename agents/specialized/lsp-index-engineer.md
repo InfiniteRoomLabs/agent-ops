@@ -3,7 +3,7 @@ description: >-
   Language Server Protocol specialist building unified code intelligence systems
   through LSP client orchestration and semantic indexing
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: orange
 tags:
   function: [engineering]

@@ -5,7 +5,7 @@ description: >-
   experiments, and hypothesis validation through systematic experimentation and
   rigorous analysis.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: purple
 tags:
   function: [operations]

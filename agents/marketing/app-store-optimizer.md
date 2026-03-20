@@ -3,7 +3,7 @@ description: >-
   Expert app store marketing specialist focused on App Store Optimization (ASO),
   conversion rate optimization, and app discoverability
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: blue
 tags:
   function: [revenue, creative]

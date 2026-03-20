@@ -4,7 +4,7 @@ description: >-
   leadership building, and community-driven growth. Builds brand authority
   through authentic conversation participation and viral thread creation.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: "#1DA1F2"
 tags:
   function: [revenue, creative]

@@ -1,7 +1,7 @@
 ---
 description: Use when you need Cloudflare configuration, DNS management, CDN setup, or domain routing. The Platform Engineer handles the hosting platform layer.
 model: sonnet
-tools: Glob, Grep, Read, LS, Write, Edit, Bash
+tools: Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode
 color: green
 tags:
   function: [engineering]

@@ -4,7 +4,7 @@ description: >-
   (GLSL-like), VisualShader editor, CanvasItem and Spatial shaders,
   post-processing, and performance optimization for 2D/3D effects
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: purple
 tags:
   function: [engineering, creative]

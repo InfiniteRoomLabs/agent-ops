@@ -4,7 +4,7 @@ description: >-
   and PCI-DSS audits -- from readiness assessment through evidence collection to
   certification.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: orange
 tags:
   function: [operations]

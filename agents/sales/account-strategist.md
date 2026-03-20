@@ -5,7 +5,7 @@ description: >-
   deals into long-term platform relationships through systematic expansion
   planning and multi-threaded account development.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: "#2E7D32"
 tags:
   function: [revenue]
