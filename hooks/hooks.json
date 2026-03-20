@@ -101,6 +101,11 @@
             "type": "command",
             "command": "uv run ${CLAUDE_PLUGIN_ROOT}/scripts/version_guard.py hook",
             "timeout": 15
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/pre-deploy-secrets-sync.sh",
+            "timeout": 60
           }
         ]
       }
@@ -168,6 +173,11 @@
             "type": "command",
             "command": "uv run ${CLAUDE_PLUGIN_ROOT}/scripts/auto-tag.py hook",
             "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post-deploy-secrets-verify.sh",
+            "timeout": 60
           }
         ]
       }
