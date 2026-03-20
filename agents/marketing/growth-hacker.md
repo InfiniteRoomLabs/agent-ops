@@ -4,7 +4,7 @@ description: >-
   data-driven experimentation. Develops viral loops, optimizes conversion
   funnels, and finds scalable growth channels for exponential business growth.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: green
 tags:
   function: [revenue, creative]

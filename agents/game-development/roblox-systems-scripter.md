@@ -4,7 +4,7 @@ description: >-
   security model, RemoteEvents/RemoteFunctions, DataStore, and module
   architecture for scalable Roblox experiences
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: rose
 tags:
   function: [engineering, creative]

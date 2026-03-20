@@ -4,7 +4,7 @@ description: >-
   architecture, encounter design, and environmental narrative across all game
   engines
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: teal
 tags:
   function: [engineering, creative]

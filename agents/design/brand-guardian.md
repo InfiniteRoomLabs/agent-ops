@@ -3,7 +3,7 @@ description: >-
   Expert brand strategist and guardian specializing in brand identity
   development, consistency maintenance, and strategic brand positioning
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: blue
 tags:
   function: [creative]

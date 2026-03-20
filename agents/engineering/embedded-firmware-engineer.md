@@ -4,7 +4,7 @@ description: >-
   Arduino, ARM Cortex-M, STM32 HAL/LL, Nordic nRF5/nRF Connect SDK, FreeRTOS,
   Zephyr
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: orange
 tags:
   function: [engineering]

@@ -5,7 +5,7 @@ description: >-
   optimizations that eliminate waste and amplify high-intent traffic across paid
   search accounts.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: orange
 tags:
   function: [revenue]

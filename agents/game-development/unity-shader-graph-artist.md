@@ -4,7 +4,7 @@ description: >-
   URP/HDRP rendering pipelines, and custom pass authoring for real-time visual
   effects
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: cyan
 tags:
   function: [engineering, creative]

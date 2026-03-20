@@ -6,7 +6,7 @@ description: >-
   authentication, and workflow automation, building enterprise-grade
   collaboration and automation solutions within the Feishu ecosystem.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: blue
 tags:
   function: [engineering]

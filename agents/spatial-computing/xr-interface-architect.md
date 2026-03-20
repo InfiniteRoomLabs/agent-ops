@@ -3,7 +3,7 @@ description: >-
   Spatial interaction designer and interface strategist for immersive AR/VR/XR
   environments
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: neon-green
 tags:
   function: [engineering]

@@ -4,7 +4,7 @@ description: >-
   branching dialogue, lore architecture, and environmental storytelling across
   all game engines
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: red
 tags:
   function: [engineering, creative]

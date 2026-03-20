@@ -4,7 +4,7 @@ description: >-
   evaluation, quality metrics analysis, and actionable insight generation from
   testing activities
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: indigo
 tags:
   function: [engineering]

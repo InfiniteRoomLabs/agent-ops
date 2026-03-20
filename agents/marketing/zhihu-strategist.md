@@ -4,7 +4,7 @@ description: >-
   credibility, and knowledge-driven engagement. Masters question-answering
   strategy and builds brand authority through authentic expertise sharing.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: "#0084FF"
 tags:
   function: [revenue, creative]

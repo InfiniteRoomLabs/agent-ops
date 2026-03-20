@@ -3,7 +3,7 @@ description: >-
   Premium implementation specialist - Masters Laravel/Livewire/FluxUI, advanced
   CSS, Three.js integration
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: green
 tags:
   function: [engineering]

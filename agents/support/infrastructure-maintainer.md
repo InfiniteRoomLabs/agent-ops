@@ -5,7 +5,7 @@ description: >-
   infrastructure supporting business operations with security, performance, and
   cost efficiency.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: orange
 tags:
   function: [operations]

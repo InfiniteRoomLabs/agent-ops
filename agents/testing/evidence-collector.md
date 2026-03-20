@@ -3,7 +3,7 @@ description: >-
   Screenshot-obsessed, fantasy-allergic QA specialist - Default to finding 3-5
   issues, requires visual proof for everything
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: orange
 tags:
   function: [engineering]

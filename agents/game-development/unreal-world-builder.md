@@ -4,7 +4,7 @@ description: >-
   Landscape, procedural foliage, HLOD, and large-scale level streaming for
   seamless open-world experiences
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: green
 tags:
   function: [engineering, creative]

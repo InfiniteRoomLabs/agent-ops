@@ -6,7 +6,7 @@ description: >-
   protection/cryptographic assessment/Xinchuang domestic IT), and stakeholder
   management -- helping technical teams efficiently win government IT projects.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: "#8B0000"
 tags:
   function: [operations]

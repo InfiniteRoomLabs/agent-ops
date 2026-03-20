@@ -4,7 +4,7 @@ description: >-
   handling, and content creation comply with relevant laws, regulations, and
   industry standards across multiple jurisdictions.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: red
 tags:
   function: [operations]

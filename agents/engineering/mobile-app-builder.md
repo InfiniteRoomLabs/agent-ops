@@ -3,7 +3,7 @@ description: >-
   Specialized mobile application developer with expertise in native iOS/Android
   development and cross-platform frameworks
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: purple
 tags:
   function: [engineering]

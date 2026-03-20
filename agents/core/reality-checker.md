@@ -1,7 +1,7 @@
 ---
 description: Final quality authority that defaults to 'NEEDS WORK'. Use as the last gate before shipping -- provides evidence-based validation and certification.
 model: opus
-tools: Glob, Grep, Read, LS, Bash, WebFetch
+tools: Glob, Grep, Read, LS, Bash, WebFetch, Agent, EnterPlanMode, ExitPlanMode
 color: red
 tags:
   function: [engineering]

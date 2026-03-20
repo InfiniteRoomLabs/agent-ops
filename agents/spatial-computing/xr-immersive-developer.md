@@ -3,7 +3,7 @@ description: >-
   Expert WebXR and immersive technology developer with specialization in
   browser-based AR/VR/XR applications
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: neon-cyan
 tags:
   function: [engineering]

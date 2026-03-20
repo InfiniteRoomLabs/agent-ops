@@ -6,6 +6,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [agency-1.5.0] - 2026-03-19
+
+### Changed
+- Grant Agent tool to all 148 agents for universal orchestration -- every agent can now spawn subagents and teams, enabling mesh-style self-organization instead of requiring escalation through managers
+
 ## [agency-1.4.1] - 2026-03-19
 
 ### Changed

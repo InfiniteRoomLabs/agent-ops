@@ -5,7 +5,7 @@ description: >-
   and driving platform adoption through authentic engineering engagement.
   Bridges product and engineering teams with external developers.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
 color: purple
 tags:
   function: [engineering]

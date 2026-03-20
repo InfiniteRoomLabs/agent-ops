@@ -6,7 +6,7 @@ description: >-
   trending music, fetches analytics, and iteratively improves through a
   data-driven learning loop.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: "#FF0050"
 tags:
   function: [revenue, creative]

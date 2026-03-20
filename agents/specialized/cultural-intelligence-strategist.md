@@ -3,7 +3,7 @@ description: >-
   CQ specialist that detects invisible exclusion, researches global context, and
   ensures software resonates authentically across intersectional identities.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: "#FFA000"
 tags:
   function: [operations]

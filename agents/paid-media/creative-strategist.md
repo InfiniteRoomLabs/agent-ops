@@ -5,7 +5,7 @@ description: >-
   Microsoft, and programmatic platforms. Bridges the gap between performance
   data and persuasive messaging.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: orange
 tags:
   function: [revenue]

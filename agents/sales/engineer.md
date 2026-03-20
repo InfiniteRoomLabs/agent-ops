@@ -5,7 +5,7 @@ description: >-
   capabilities to business outcomes. Wins the technical decision so the deal can
   close.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
 color: "#2E5090"
 tags:
   function: [revenue]
