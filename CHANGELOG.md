@@ -6,6 +6,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [agency-1.7.0] - 2026-03-24
+
+### Added
+- **Format files hook** (`scripts/format_files.py`) -- data-driven PostToolUse formatter and PreToolUse guard for Edit/Write tools. Add new formatters or block rules by editing the RULES table -- no hook registration changes needed.
+  - PostToolUse: auto-runs `terraform fmt` on `.tf` files after edits
+  - PreToolUse: blocks direct edits to lock files (pnpm-lock.yaml, package-lock.json, yarn.lock, uv.lock, composer.lock, Cargo.lock, poetry.lock, Gemfile.lock)
+  - Includes `rules` subcommand to print the active rule table for debugging
+
 ## [agency-1.6.0] - 2026-03-20
 
 ### Added
