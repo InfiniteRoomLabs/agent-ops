@@ -108,6 +108,16 @@
             "timeout": 60
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run ${CLAUDE_PLUGIN_ROOT}/scripts/format_files.py pre",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "StopFailure": [
@@ -178,6 +188,16 @@
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post-deploy-secrets-verify.sh",
             "timeout": 60
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run ${CLAUDE_PLUGIN_ROOT}/scripts/format_files.py post",
+            "timeout": 15
           }
         ]
       }
