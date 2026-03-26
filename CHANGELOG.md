@@ -4,7 +4,7 @@ All notable changes to the agent-ops marketplace will be documented in this file
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [Unreleased]
+## [agency-1.8.0] - 2026-03-26
 
 ### Added
 - **Commit guard script** (`scripts/commit_guard.py`) -- data-driven PreToolUse/PostToolUse guard that blocks commits containing files that should be gitignored (build artifacts, dependency directories, secrets, OS junk). Pattern table covers Python, Node, PHP, Ruby, Rust, Java/JVM, .NET, and General ecosystems.
