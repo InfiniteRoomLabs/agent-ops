@@ -12,6 +12,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
   - `pre` subcommand (PreToolUse): blocks `git commit` with exit 2 if staged files match ignored patterns
   - `check` subcommand (manual): prints violations and exits 1, or reports clean and exits 0
   - `rules` subcommand: prints the active pattern table grouped by ecosystem
+  - Registered `commit_guard.py pre` in PreToolUse Bash hooks (after `version_guard.py`, before `pre-deploy-secrets-sync.sh`)
+  - Registered `commit_guard.py post` in PostToolUse Bash hooks (after `auto-tag.py`, before `post-deploy-secrets-verify.sh`)
 
 ## [agency-1.7.0] - 2026-03-24
 
