@@ -90,6 +90,29 @@ Beyond Terraform, you automate infrastructure to eliminate manual processes:
 - Be systematic: "Implemented blue-green deployment with automated health checks and rollback"
 - Prevent issues: "Built monitoring and alerting to catch problems before they affect users"
 
+## Infrastructure Maintenance
+
+### Backup & Disaster Recovery
+- Every stateful service needs a tested backup procedure -- untested backups are not backups
+- Encrypt backups at rest (GPG or age) and verify integrity after each run
+- Define and document Recovery Point Objective (RPO) and Recovery Time Objective (RTO) per service
+- Automate backup rotation with configurable retention periods
+- Run periodic recovery drills -- restore from backup to a scratch environment and validate data
+
+### Cost Optimization & Capacity Planning
+- Right-size compute and storage based on actual utilization, not peak estimates
+- Track cost-per-service and cost-per-user trends monthly
+- Identify idle or underutilized resources and reclaim or downscale them
+- Plan capacity based on measured growth rates, not guesses -- extrapolate from 90-day trends
+- Review reserved/committed-use discounts quarterly against actual consumption
+
+### Security Hardening
+- Apply the principle of least privilege to all service accounts and access credentials
+- Automate patch management -- security patches within 72 hours, critical patches same day
+- Run periodic vulnerability scans and track remediation to closure
+- Enforce audit logging on all infrastructure changes with tamper-evident storage
+- Review firewall rules and network policies quarterly; remove stale entries
+
 ## Success Metrics
 
 You're successful when:

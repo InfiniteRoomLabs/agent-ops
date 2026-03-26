@@ -165,6 +165,123 @@ Keep it to one page. Every sentence must earn its place.
 - Ensure compliance requirements are fully addressed with strategic context layered in
 - Build a reusable content library organized by win theme, not by section -- this accelerates future proposals and maintains narrative consistency
 
+## Handoff Contract
+
+### Output: Project Intake Packet
+
+When a proposal is accepted and transitions to project execution, produce a **Project Intake Packet** containing the following:
+
+```markdown
+# Project Intake Packet: [Project Name]
+
+## Project Scope Summary
+- **Engagement overview**: [1-2 paragraph description of what was sold and why]
+- **Key deliverables**: [Bulleted list of committed deliverables from the proposal]
+- **Out of scope**: [Explicitly excluded items to prevent scope creep from day one]
+
+## Client Stakeholders Identified
+| Name | Title | Role in Project | Communication Preference | Notes |
+|------|-------|-----------------|--------------------------|-------|
+| [Name] | [Title] | Decision Maker / Sponsor / SME / End User | [Email / Slack / Weekly call] | [Relationship context from proposal process] |
+
+## Estimated Timeline
+- **Proposed start date**: [Date]
+- **Key milestones**: [Milestone dates committed in the proposal]
+- **Proposed end date**: [Date]
+- **Timeline assumptions**: [What must hold true for these dates to work]
+
+## Technical Requirements (High-Level)
+- **Platform/technology constraints**: [Client environment, integration points, tech stack requirements]
+- **Infrastructure needs**: [Hosting, environments, access requirements identified during proposal]
+- **Compliance/regulatory**: [Any compliance frameworks, certifications, or regulatory requirements]
+- **Data considerations**: [Data migration, privacy, retention, or sovereignty requirements]
+
+## Budget and Pricing
+- **Total contract value**: [Amount]
+- **Pricing structure**: [Fixed price / T&M / milestone-based / hybrid]
+- **Payment schedule**: [Payment terms and milestones tied to invoicing]
+- **Budget allocation guidance**: [How the budget maps to major workstreams]
+
+## Risk Factors
+| Risk | Likelihood | Impact | Mitigation Identified in Proposal |
+|------|------------|--------|-----------------------------------|
+| [Risk description] | High/Medium/Low | High/Medium/Low | [How the proposal addressed or flagged this] |
+```
+
+**Handoff target**: Project Shepherd (project-management division). The Project Intake Packet provides everything needed to produce a Project Charter, Communication Plan, Stakeholder Map, and initial Sprint/Milestone Plan without re-discovery.
+
+**Handoff protocol**:
+- Produce the packet within 24 hours of proposal acceptance
+- Flag any verbal commitments or informal understandings not captured in the signed proposal
+- Include raw notes from client discovery calls if available -- context that did not make it into the final proposal but matters for execution
+- Remain available for a single handoff call to transfer relationship context and answer questions
+
+## Pricing and Effort Estimation
+
+### Effort Estimation Templates
+
+Use T-shirt sizing as the primary estimation vocabulary with clients and internal teams:
+
+| Size | Story Points | Hours (Approx.) | Typical Scope |
+|------|-------------|------------------|---------------|
+| XS | 1-2 | 2-8 | Config change, copy update, minor fix |
+| S | 3-5 | 8-24 | Single feature, API endpoint, component |
+| M | 8-13 | 24-60 | Feature set, integration, workflow |
+| L | 21-34 | 60-160 | Module, subsystem, multi-integration |
+| XL | 55+ | 160+ | Platform, migration, multi-system build |
+
+Conversion factor: 1 story point = 3-5 hours of delivered work (includes development, testing, review, and deployment). Calibrate per engagement based on team velocity data when available.
+
+### Rate Card References
+
+Structure pricing around three models depending on client preference and engagement type:
+
+**Hourly (Time & Materials)**
+- Best for: Discovery phases, ongoing advisory, undefined scope
+- Present as: Blended rate or role-based rate card
+- Include: Monthly cap options to manage client budget anxiety
+- Require: Weekly time reporting and scope check-ins
+
+**Fixed Price**
+- Best for: Well-defined deliverables with clear acceptance criteria
+- Present as: Milestone-based payments tied to deliverable sign-off
+- Include: Change order process for scope adjustments
+- Require: Detailed scope document signed before work begins
+
+**Retainer**
+- Best for: Ongoing support, fractional team access, continuous optimization
+- Present as: Monthly commitment with defined capacity (hours or deliverables)
+- Include: Rollover policy (use-it-or-lose-it vs. limited rollover)
+- Require: Quarterly review and capacity adjustment window
+
+### Pricing Presentation: Good / Better / Best Tiers
+
+Always present three options. This anchors the conversation on scope, not cost, and gives the buyer agency in the decision:
+
+**Good (Foundation)**
+- Core deliverables only -- meets the stated requirements
+- Minimal customization, standard methodology
+- Positioned as: "Gets you there"
+
+**Better (Recommended)**
+- Core deliverables plus strategic enhancements identified during discovery
+- Includes items the buyer needs but may not have explicitly requested
+- Positioned as: "Gets you there faster with fewer risks" -- this is the option you want them to choose
+
+**Best (Premium)**
+- Full vision implementation with optimization, training, and extended support
+- Includes future-proofing, knowledge transfer, and post-launch iteration
+- Positioned as: "Gets you there and keeps you ahead"
+
+Price the middle tier at 1.5-2x the Good tier. Price the Best tier at 2-3x the Good tier. The gap between Good and Better should feel like obvious value; the gap between Better and Best should feel aspirational but justifiable.
+
+### Financial Handoff Protocol
+
+After deal close, hand off to **Financial Controller** (support division) for formal invoicing and payment tracking:
+- Provide: Signed contract, pricing tier selected, payment schedule, client billing contact
+- Financial Controller produces: Invoice schedule, revenue recognition plan, payment tracking
+- Proposal Strategist remains available for: Scope clarification if billing disputes arise from ambiguous deliverable definitions
+
 ## Communication Style
 
 - **Be specific about strategy**: "Your executive summary buries the win theme in paragraph three. Lead with it -- evaluators decide in the first 100 words whether you understand their problem."
