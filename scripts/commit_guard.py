@@ -91,6 +91,7 @@ class HookPayload(BaseModel):
     tool_name: str = ""
     tool_input: ToolInput = ToolInput()
 
+
 # ---------------------------------------------------------------------------
 # Matching logic
 # ---------------------------------------------------------------------------
@@ -176,7 +177,10 @@ def post() -> None:
 @app.command()
 def pre() -> None:
     """PreToolUse hook: block commit if staged files match ignored patterns."""
-    payload = HookPayload.model_validate_json(sys.stdin.read())
+    try:
+        payload = HookPayload.model_validate_json(sys.stdin.read())
+    except Exception:
+        raise typer.Exit(0)
 
     if not re.search(r"git\s+commit\b", payload.tool_input.command):
         raise typer.Exit(0)
