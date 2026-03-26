@@ -4,6 +4,41 @@ All notable changes to the agent-ops marketplace will be documented in this file
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [agency-1.9.0] - 2026-03-26
+
+### Added
+- **7 new agents** closing coverage gaps across the software-house lifecycle:
+  - `integration-engineer` (engineering) -- third-party SaaS integrations (Stripe, OAuth, S3, etc.)
+  - `requirements-engineer` (product) -- structured requirements elicitation, PRDs, user story maps
+  - `lead-finder` (research) -- ICP matching, prospect scoring, pipeline entry point
+  - `debugger` (engineering) -- hypothesis-driven bug investigation with IRL stack awareness
+  - `retro-facilitator` (project-management) -- sprint retros, kaizen metrics, action item tracking
+  - `test-strategist` (testing) -- test pyramid selection, risk-based coverage targets
+  - `qa-triage-lead` (testing, haiku) -- defect lifecycle, severity classification, routing
+- **4 NEXUS quality gates**: scoping-complete, planning-complete, build-complete, release-readiness certificate
+- **4 NEXUS-Micro runbooks**: post-deploy-handoff, sprint-planning, ux-design-sprint, support-escalation
+- **12 handoff contracts** added to agents (proposal-strategist, project-shepherd, deal-strategist, feedback-synthesizer, outbound-strategist, requirements-engineer, integration-engineer, lead-finder, debugger, retro-facilitator, test-strategist, qa-triage-lead)
+- Pricing and effort estimation workflow in proposal-strategist
+- Communication setup section in project-shepherd (channel taxonomy, meeting templates, status reports, escalation matrix)
+- Invoicing capabilities in financial-controller (invoice templates, AR aging, payment reminders)
+- Contract drafting in legal-compliance-checker (NDAs, SOW terms, open-source license guidance)
+
+### Changed
+- **Renamed** `finance-tracker` -> `financial-controller` (support/) -- added Write/Edit tools, invoicing
+- **Renamed** `autonomous-optimization-architect` -> `ai-cost-optimizer` (engineering/) -- narrowed to AI cost focus
+- **Moved** `workflow-optimizer` from testing/ to project-management/ -- added Write/Edit tools, Lean/Six Sigma focus
+- **Moved** `accounts-payable-agent` from specialized/ to support/ -- removed crypto rails, added Stripe
+- **Fixed** `incident-response-commander` -- replaced PagerDuty with Alertmanager/Grafana/Loki, simplified escalation for solo founder
+- **Fixed** `database-optimizer` -- added ORM awareness, IRL stack specifics, handoff contract
+- **Fixed** `outbound-strategist` -- added Write tool, Deal Briefing handoff to deal-strategist
+- **Fixed** `analytics-reporter` -- added cross-cutting tag for discoverability
+- Cleaned emoji headers from 13 agency-import agents
+- Removed `agency-import` tag from 13 customized agents
+- Fixed encoding violations (U+2013, U+2014, U+2192) in 7 files
+
+### Removed
+- **Retired** `infrastructure-maintainer` (support/) -- merged useful content into infra-engineer
+
 ## [agency-1.8.0] - 2026-03-26
 
 ### Added

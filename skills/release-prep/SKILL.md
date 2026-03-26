@@ -15,6 +15,14 @@ Guide a repository through a complete release cycle: version bump, CHANGELOG upd
 
 **NO RELEASE WITHOUT CHANGELOG UPDATE.** If the CHANGELOG has not been updated for this version, stop and update it before proceeding.
 
+## Prerequisite: Release Readiness Certificate
+
+Before starting the release cycle, check for a **Release Readiness Certificate** from Reality Checker. This certificate confirms the version has passed final quality validation.
+
+- If a certificate is present and its status is **READY FOR RELEASE**, proceed with Step 1 using the version specified in the certificate.
+- If no certificate is present, ask the user whether to request one by invoking Reality Checker first. Do not block if the user explicitly opts to skip, but warn that releasing without certification bypasses the final quality gate.
+- If a certificate is present but its status is **NOT READY**, stop and surface the blocking reasons. Do not proceed until the blockers are resolved and a new certificate with READY status is provided.
+
 ## Step 1: Detect Current Version
 
 Read the package manifest to find the current version:
