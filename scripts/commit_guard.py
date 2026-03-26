@@ -142,5 +142,98 @@ def get_staged_files() -> list[str]:
     return [line for line in result.stdout.strip().splitlines() if line]
 
 
+# ---------------------------------------------------------------------------
+# Commands
+# ---------------------------------------------------------------------------
+
+
+@app.command()
+def post() -> None:
+    """PostToolUse hook: warn if staged files match ignored patterns after git add."""
+    try:
+        payload = HookPayload.model_validate_json(sys.stdin.read())
+    except Exception:
+        raise typer.Exit(0)
+
+    if not re.search(r"git\s+add\b", payload.tool_input.command):
+        raise typer.Exit(0)
+
+    staged = get_staged_files()
+    if not staged:
+        raise typer.Exit(0)
+
+    violations = find_violations(staged)
+    for filepath, pat in violations:
+        msg = pat.message or (
+            f"'{filepath}' is a typically gitignored path ({pat.ecosystem}). "
+            f"Consider adding '{pat.pattern}' to .gitignore and unstaging."
+        )
+        typer.echo(f"[commit-guard] WARNING: {msg}", err=True)
+
+    raise typer.Exit(0)
+
+
+@app.command()
+def pre() -> None:
+    """PreToolUse hook: block commit if staged files match ignored patterns."""
+    payload = HookPayload.model_validate_json(sys.stdin.read())
+
+    if not re.search(r"git\s+commit\b", payload.tool_input.command):
+        raise typer.Exit(0)
+
+    staged = get_staged_files()
+    if not staged:
+        raise typer.Exit(0)
+
+    violations = find_violations(staged)
+    if not violations:
+        raise typer.Exit(0)
+
+    lines = [f"  - {fp} ({pat.ecosystem}: {pat.pattern})" for fp, pat in violations]
+    typer.echo(
+        "BLOCKED: Commit includes paths that should be gitignored:\n"
+        + "\n".join(lines)
+        + "\n\nAdd these patterns to .gitignore and unstage the files before committing.",
+        err=True,
+    )
+    raise typer.Exit(2)
+
+
+@app.command()
+def check() -> None:
+    """Check if any currently staged files match ignored patterns."""
+    staged = get_staged_files()
+    if not staged:
+        typer.echo("No files staged.")
+        raise typer.Exit(0)
+
+    violations = find_violations(staged)
+    if not violations:
+        typer.echo(f"All {len(staged)} staged file(s) look clean.")
+        raise typer.Exit(0)
+
+    lines = [f"  - {fp} ({pat.ecosystem}: {pat.pattern})" for fp, pat in violations]
+    typer.echo(
+        "Staged files that should be gitignored:\n"
+        + "\n".join(lines)
+        + "\n\nAdd these patterns to .gitignore and unstage the files before committing.",
+    )
+    raise typer.Exit(1)
+
+
+@app.command()
+def rules() -> None:
+    """Print the active ignored-path patterns table."""
+    current_eco = ""
+    for pat in PATTERNS:
+        if pat.ecosystem != current_eco:
+            if current_eco:
+                typer.echo("")
+            typer.echo(f"  {pat.ecosystem}:")
+            current_eco = pat.ecosystem
+        note = f"  ({pat.message})" if pat.message else ""
+        typer.echo(f"    {pat.pattern}{note}")
+
+
 if __name__ == "__main__":
     app()

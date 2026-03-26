@@ -8,6 +8,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ### Added
 - **Commit guard script** (`scripts/commit_guard.py`) -- data-driven PreToolUse/PostToolUse guard that blocks commits containing files that should be gitignored (build artifacts, dependency directories, secrets, OS junk). Pattern table covers Python, Node, PHP, Ruby, Rust, Java/JVM, .NET, and General ecosystems.
+  - `post` subcommand (PostToolUse): warns on stderr after `git add` if staged files match ignored patterns
+  - `pre` subcommand (PreToolUse): blocks `git commit` with exit 2 if staged files match ignored patterns
+  - `check` subcommand (manual): prints violations and exits 1, or reports clean and exits 0
+  - `rules` subcommand: prints the active pattern table grouped by ecosystem
 
 ## [agency-1.7.0] - 2026-03-24
 
