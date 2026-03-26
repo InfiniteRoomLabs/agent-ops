@@ -56,6 +56,9 @@ agents:
     - name: frontend-developer
       description: "Expert frontend developer specializing in modern web technologies, React/Vue/Angular frameworks, UI implementation, and performance optimization"
       model: sonnet
+    - name: integration-engineer
+      description: "Implements third-party SaaS integrations for common business patterns: payment processing (Stripe), authentication (OAuth/OIDC, Authentik), email/notifications, analytics, CRM, and storage (S3-compatible)."
+      model: sonnet
     - name: git-workflow-master
       description: "Expert in Git workflows, branching strategies, and version control best practices including conventional commits, rebasing, worktrees, and CI-friendly branch management."
       model: sonnet
@@ -63,7 +66,7 @@ agents:
       description: "Expert incident commander specializing in production incident management, structured response coordination, post-mortem facilitation, SLO/SLI tracking, and on-call process design for reliable engineering organizations."
       model: sonnet
     - name: infra-engineer
-      description: "Use when you need Terraform modules, Terragrunt configurations, state management work, infrastructure automation, or SRE practices."
+      description: "Use when you need Terraform modules, Terragrunt configurations, state management work, infrastructure automation, SRE practices, backup/DR planning, cost optimization, or security hardening."
       model: sonnet
     - name: infra-intern
       description: "Use for infrastructure grunt work -- file scaffolding, config lookups, documentation gathering, and boilerplate generation."
@@ -264,6 +267,9 @@ agents:
     - name: feedback-synthesizer
       description: "Expert in collecting, analyzing, and synthesizing user feedback from multiple channels to extract actionable product insights."
       model: sonnet
+    - name: requirements-engineer
+      description: "Conducts structured requirements elicitation through discovery questions, stakeholder interviews, and existing-system audits. Produces PRDs, user story maps, acceptance criteria, and requirements traceability matrices."
+      model: sonnet
     - name: sprint-prioritizer
       description: "Expert product manager specializing in agile sprint planning, feature prioritization, and resource allocation."
       model: sonnet
@@ -312,11 +318,8 @@ agents:
     - name: executive-summary-generator
       description: "Consultant-grade AI specialist trained to think and communicate like a senior strategy consultant."
       model: sonnet
-    - name: finance-tracker
-      description: "Expert financial analyst and controller specializing in financial planning, budget management, and business performance analysis."
-      model: sonnet
-    - name: infrastructure-maintainer
-      description: "Expert infrastructure specialist focused on system reliability, performance optimization, and technical operations management."
+    - name: financial-controller
+      description: "Financial planning, analysis, and operations specialist. Manages budgets, generates financial reports, produces client invoices, tracks accounts receivable, and provides strategic financial insights."
       model: sonnet
     - name: legal-compliance-checker
       description: "Expert legal and compliance specialist ensuring business operations, data handling, and content creation comply with relevant laws, regulations, and industry standards across multiple jurisdictions."
@@ -526,3 +529,9 @@ scripts:
       function: [engineering]
       scenario: [versioning, release-management]
       custom: [semver, conventional-commits, enforcement]
+  - name: commit-guard
+    description: "PreToolUse/PostToolUse hook that blocks commits and warns on git add when staged files match commonly gitignored patterns"
+    tags:
+      function: [engineering]
+      scenario: [git, enforcement, gitignore]
+      custom: [commit-guard, staged-files]
