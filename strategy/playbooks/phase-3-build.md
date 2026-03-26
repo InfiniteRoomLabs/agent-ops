@@ -1,4 +1,4 @@
-# 🔨 Phase 3 Playbook — Build & Iterate
+# 🔨 Phase 3 Playbook -- Build & Iterate
 
 > **Duration**: 2-12 weeks (varies by scope) | **Agents**: 15-30+ | **Gate Keeper**: Agents Orchestrator
 
@@ -6,7 +6,7 @@
 
 ## Objective
 
-Implement all features through continuous Dev↔QA loops. Every task is validated before the next begins. This is where the bulk of the work happens — and where NEXUS's orchestration delivers the most value.
+Implement all features through continuous Dev↔QA loops. Every task is validated before the next begins. This is where the bulk of the work happens -- and where NEXUS's orchestration delivers the most value.
 
 ## Pre-Conditions
 
@@ -16,7 +16,7 @@ Implement all features through continuous Dev↔QA loops. Every task is validate
 - [ ] Design system and component library ready
 - [ ] API scaffold with auth system ready
 
-## The Dev↔QA Loop — Core Mechanic
+## The Dev↔QA Loop -- Core Mechanic
 
 The Agents Orchestrator manages every task through this cycle:
 
@@ -50,17 +50,17 @@ FOR EACH task IN sprint_backlog (ordered by RICE score):
 |--------------|--------------|-------------|----------|
 | **React/Vue/Angular UI** | Frontend Developer | Rapid Prototyper | Evidence Collector |
 | **REST/GraphQL API** | Backend Architect | Senior Developer | API Tester |
-| **Database operations** | Backend Architect | — | API Tester |
-| **Mobile (iOS/Android)** | Mobile App Builder | — | Evidence Collector |
-| **ML model/pipeline** | AI Engineer | — | Test Results Analyzer |
+| **Database operations** | Backend Architect | -- | API Tester |
+| **Mobile (iOS/Android)** | Mobile App Builder | -- | Evidence Collector |
+| **ML model/pipeline** | AI Engineer | -- | Test Results Analyzer |
 | **CI/CD/Infrastructure** | DevOps Automator | Infrastructure Maintainer | Performance Benchmarker |
 | **Premium/complex feature** | Senior Developer | Backend Architect | Evidence Collector |
 | **Quick prototype/POC** | Rapid Prototyper | Frontend Developer | Evidence Collector |
-| **WebXR/immersive** | XR Immersive Developer | — | Evidence Collector |
+| **WebXR/immersive** | XR Immersive Developer | -- | Evidence Collector |
 | **visionOS** | visionOS Spatial Engineer | macOS Spatial/Metal Engineer | Evidence Collector |
 | **Cockpit controls** | XR Cockpit Interaction Specialist | XR Interface Architect | Evidence Collector |
-| **CLI/terminal tools** | Terminal Integration Specialist | — | API Tester |
-| **Code intelligence** | LSP/Index Engineer | — | Test Results Analyzer |
+| **CLI/terminal tools** | Terminal Integration Specialist | -- | API Tester |
+| **Code intelligence** | LSP/Index Engineer | -- | Test Results Analyzer |
 | **Performance optimization** | Performance Benchmarker | Infrastructure Maintainer | Performance Benchmarker |
 
 ### Specialist Support (activated as needed)
@@ -98,10 +98,10 @@ Agents: Growth Hacker, Content Creator, Social Media Strategist,
 
 Sprint cadence: Aligned with Track A milestones
 Activities:
-- Growth Hacker → Design viral loops and referral mechanics
-- Content Creator → Build launch content pipeline
-- Social Media Strategist → Plan cross-platform campaign
-- App Store Optimizer → Prepare store listing (if mobile)
+- Growth Hacker -> Design viral loops and referral mechanics
+- Content Creator -> Build launch content pipeline
+- Social Media Strategist -> Plan cross-platform campaign
+- App Store Optimizer -> Prepare store listing (if mobile)
 ```
 
 ### Track C: Quality & Operations
@@ -111,11 +111,11 @@ Agents: Evidence Collector, API Tester, Performance Benchmarker,
         Workflow Optimizer, Experiment Tracker
 
 Continuous activities:
-- Evidence Collector → Screenshot QA for every task
-- API Tester → Endpoint validation for every API task
-- Performance Benchmarker → Periodic load testing
-- Workflow Optimizer → Process improvement identification
-- Experiment Tracker → A/B test setup for validated features
+- Evidence Collector -> Screenshot QA for every task
+- API Tester -> Endpoint validation for every API task
+- Performance Benchmarker -> Periodic load testing
+- Workflow Optimizer -> Process improvement identification
+- Experiment Tracker -> A/B test setup for validated features
 ```
 
 ### Track D: Brand & Experience Polish
@@ -125,10 +125,10 @@ Agents: UI Designer, Brand Guardian, Visual Storyteller,
         Whimsy Injector
 
 Triggered activities:
-- UI Designer → Component refinement when QA identifies visual issues
-- Brand Guardian → Periodic brand consistency audit
-- Visual Storyteller → Visual narrative assets as features complete
-- Whimsy Injector → Micro-interactions and delight moments
+- UI Designer -> Component refinement when QA identifies visual issues
+- Brand Guardian -> Periodic brand consistency audit
+- Visual Storyteller -> Visual narrative assets as features complete
+- Whimsy Injector -> Micro-interactions and delight moments
 ```
 
 ## Sprint Execution Template
@@ -195,43 +195,94 @@ Output: Retrospective Action Items
 ```
 WHEN task fails QA:
   IF attempt == 1:
-    → Send specific QA feedback to developer
-    → Developer fixes ONLY the identified issues
-    → Re-submit for QA
+    -> Send specific QA feedback to developer
+    -> Developer fixes ONLY the identified issues
+    -> Re-submit for QA
     
   IF attempt == 2:
-    → Send accumulated QA feedback
-    → Consider: Is the developer agent the right fit?
-    → Developer fixes with additional context
-    → Re-submit for QA
+    -> Send accumulated QA feedback
+    -> Consider: Is the developer agent the right fit?
+    -> Developer fixes with additional context
+    -> Re-submit for QA
     
   IF attempt == 3:
-    → ESCALATE
-    → Options:
+    -> ESCALATE
+    -> Options:
       a) Reassign to different developer agent
       b) Decompose task into smaller sub-tasks
       c) Revise approach/architecture
       d) Accept with known limitations (document)
       e) Defer to future sprint
-    → Document decision and rationale
+    -> Document decision and rationale
 ```
 
 ### Parallel Task Management
 
 ```
 WHEN multiple tasks have no dependencies:
-  → Assign to different developer agents simultaneously
-  → Each runs independent Dev↔QA loop
-  → Orchestrator tracks all loops concurrently
-  → Merge completed tasks in dependency order
+  -> Assign to different developer agents simultaneously
+  -> Each runs independent Dev↔QA loop
+  -> Orchestrator tracks all loops concurrently
+  -> Merge completed tasks in dependency order
 
 WHEN task has dependencies:
-  → Wait for dependency to pass QA
-  → Then assign dependent task
-  → Include dependency context in handoff
+  -> Wait for dependency to pass QA
+  -> Then assign dependent task
+  -> Include dependency context in handoff
 ```
 
-## Quality Gate Checklist
+## Build-Complete Gate
+
+Before advancing to Phase 4 (Quality & Hardening), the Orchestrator must verify that all build work is genuinely finished. This intermediate gate prevents half-done implementations from entering the hardening phase, where the Reality Checker's time would be wasted on incomplete work.
+
+**Gate Keeper**: Agents Orchestrator
+**Triggered**: After final sprint review, before Phase 4 activation
+**Blocking**: All Phase 4 work is held until this gate passes
+
+### Checklist
+
+| # | Criterion | Evidence Source | Status |
+|---|-----------|----------------|--------|
+| 1 | All sprint tasks implemented (checklist complete) | Sprint Prioritizer backlog shows 100% of in-scope tasks marked done | ☐ |
+| 2 | All PRs reviewed and merged | Git history shows no open PRs targeting the main/release branch for in-scope work | ☐ |
+| 3 | Test plan exists | Test Strategist test plan or test plan section in Spec Kitty spec (`kitty-specs/NNN-feature/spec.md`) | ☐ |
+| 4 | No blocking code review issues open | All code review comments resolved or explicitly deferred with documented rationale | ☐ |
+| 5 | CI pipeline passes | Latest CI run on the main/release branch is green (all stages pass) | ☐ |
+
+### Verification Protocol
+
+The Orchestrator verifies each criterion by confirming the artifact or state exists with substantive evidence -- not just superficial completion. Specifically:
+
+1. **All sprint tasks implemented**: Every task in the sprint backlog has a PASS verdict from the Evidence Collector. Deferred tasks are explicitly documented with rationale and approved by the Sprint Prioritizer. No task is in "in progress" or "blocked" state.
+2. **All PRs reviewed and merged**: The git log shows that every feature branch opened during the build phase has been reviewed (at least one approval), merged, and the branch cleaned up. No orphaned branches with unmerged work remain.
+3. **Test plan exists**: A test plan document exists that covers the implemented features. This may come from a dedicated Test Strategist deliverable, a test plan section in the Spec Kitty spec, or an equivalent artifact. The plan must include at minimum: test scope, test types (unit, integration, e2e), critical user paths to test, and acceptance criteria mapping.
+4. **No blocking code review issues open**: All review threads on merged PRs are resolved. Any deferred items are captured as backlog tasks with priority assigned by Sprint Prioritizer. "Resolved" means the author addressed the feedback or the reviewer explicitly approved deferral.
+5. **CI pipeline passes**: The CI pipeline for the main/release branch passes all stages (lint, build, test, security scan if configured). Flaky tests that were skipped must be documented. No test failures are suppressed without documented justification.
+
+### Gate Failure Handling
+
+```
+IF build-complete gate FAILS:
+  +-- Orchestrator identifies which criteria are not met
+  +-- Routes incomplete items to the responsible agent:
+  |     Sprint tasks incomplete  --> Relevant Developer Agent (via Dev/QA loop)
+  |     PRs not merged           --> Relevant Developer Agent + reviewer
+  |     Test plan missing        --> Test Strategist or Senior Project Manager
+  |     Review issues open       --> Relevant Developer Agent
+  |     CI pipeline failing      --> DevOps Automator or relevant Developer Agent
+  +-- Agent completes the work and re-submits
+  +-- Orchestrator re-evaluates the gate
+  +-- Maximum 3 re-attempts before escalation to Studio Producer
+```
+
+### Gate Decision
+
+- **PASS**: All five criteria verified. Proceed to Phase 4 (Quality & Hardening) with full handoff package.
+- **FAIL**: Specific criteria not met. Route to responsible agents for completion.
+
+---
+
+## Feature Gate (Quality Gate Checklist)
 
 | # | Criterion | Evidence Source | Status |
 |---|-----------|----------------|--------|
@@ -247,14 +298,14 @@ WHEN task has dependencies:
 
 **Gate Keeper**: Agents Orchestrator
 
-- **PASS**: Feature-complete application → Phase 4 activation
-- **CONTINUE**: More sprints needed → Continue Phase 3
-- **ESCALATE**: Systemic issues → Studio Producer intervention
+- **PASS**: Feature-complete application -> Phase 4 activation
+- **CONTINUE**: More sprints needed -> Continue Phase 3
+- **ESCALATE**: Systemic issues -> Studio Producer intervention
 
 ## Handoff to Phase 4
 
 ```markdown
-## Phase 3 → Phase 4 Handoff Package
+## Phase 3 -> Phase 4 Handoff Package
 
 ### For Reality Checker:
 - Complete application (all features implemented)

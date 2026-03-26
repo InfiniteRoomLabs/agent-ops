@@ -1,4 +1,4 @@
-# 🏗️ Phase 1 Playbook — Strategy & Architecture
+# 🏗️ Phase 1 Playbook -- Strategy & Architecture
 
 > **Duration**: 5-10 days | **Agents**: 8 | **Gate Keepers**: Studio Producer + Reality Checker
 
@@ -6,7 +6,7 @@
 
 ## Objective
 
-Define what we're building, how it's structured, and what success looks like — before writing a single line of code. Every architectural decision is documented. Every feature is prioritized. Every dollar is accounted for.
+Define what we're building, how it's structured, and what success looks like -- before writing a single line of code. Every architectural decision is documented. Every feature is prioritized. Every dollar is accounted for.
 
 ## Pre-Conditions
 
@@ -14,11 +14,102 @@ Define what we're building, how it's structured, and what success looks like —
 - [ ] Phase 0 Handoff Package received
 - [ ] Stakeholder alignment on project scope
 
+## Scoping-Complete Gate
+
+Before the architecture and design work begins, the Orchestrator must verify that onboarding and scoping are complete. This intermediate gate prevents the pipeline from advancing into heavy planning with incomplete requirements, undefined stakeholders, or missing project governance.
+
+**Gate Keeper**: Agents Orchestrator
+**Triggered**: Before Step 1 activation
+**Blocking**: All Step 1/2/3 work is held until this gate passes
+
+### Checklist
+
+| # | Criterion | Evidence Source | Status |
+|---|-----------|----------------|--------|
+| 1 | Requirements document exists (PRD from Requirements Engineer or spec from Spec Kitty specify phase) | Requirements Engineer PRD deliverable or `kitty-specs/NNN-feature/spec.md` | ☐ |
+| 2 | Stakeholder map is defined (all actors, roles, decision authority, and communication preferences documented) | Project Shepherd stakeholder analysis or Requirements Engineer Domain 2 output | ☐ |
+| 3 | Project charter/kickoff is completed (scope, objectives, success criteria, constraints, and sponsor sign-off recorded) | Project Shepherd project charter document | ☐ |
+| 4 | Communication cadence is established (status report frequency, escalation paths, and channel assignments agreed upon) | Project Shepherd communication plan | ☐ |
+| 5 | Timeline/milestone plan exists (high-level milestones with target dates and dependencies identified) | Project Shepherd milestone plan or Studio Producer strategic timeline | ☐ |
+
+### Verification Protocol
+
+The Orchestrator verifies each criterion by confirming the artifact exists and contains substantive content -- not just a template with placeholder text. Specifically:
+
+1. **Requirements document**: Must contain at least one complete user story with acceptance criteria, or a PRD with problem statement, user roles, and functional requirements sections populated.
+2. **Stakeholder map**: Must name at least the project sponsor, primary decision-maker, and key technical and business stakeholders with their roles and communication preferences.
+3. **Project charter**: Must include a problem statement, project objectives, scope boundaries (in-scope and out-of-scope), success criteria, and sponsor acknowledgment.
+4. **Communication cadence**: Must specify the reporting frequency (daily/weekly), the escalation chain, and the channels used for each type of communication (status updates, blockers, decisions).
+5. **Timeline/milestone plan**: Must include at least three milestones with target date ranges and must identify cross-phase dependencies.
+
+### Gate Failure Handling
+
+```
+IF scoping-complete gate FAILS:
+  +-- Orchestrator identifies which criteria are not met
+  +-- Routes incomplete items to the responsible agent:
+  |     Requirements document --> Requirements Engineer
+  |     Stakeholder map       --> Project Shepherd or Requirements Engineer
+  |     Project charter       --> Project Shepherd
+  |     Communication cadence --> Project Shepherd
+  |     Timeline/milestones   --> Project Shepherd or Studio Producer
+  +-- Agent completes the artifact and re-submits
+  +-- Orchestrator re-evaluates the gate
+  +-- Maximum 3 re-attempts before escalation to Studio Producer
+```
+
+### Gate Decision
+
+- **PASS**: All five criteria verified. Proceed to Step 1 (Strategic Framing).
+- **FAIL**: Specific criteria not met. Route to responsible agents for completion.
+
+---
+
+## Planning-Complete Gate
+
+For projects not using Spec Kitty (which enforces its own `plan` and `tasks` phases), the Orchestrator must verify that planning is complete before the pipeline advances to Phase 2 (Foundation & Scaffolding). This gate prevents the Build phase from starting without documented architecture decisions, a milestone plan, assigned resources, and recorded tech stack choices.
+
+**Gate Keeper**: Agents Orchestrator
+**Triggered**: After architecture and planning work completes, before Phase 2 activation
+**Blocking**: Phase 2 activation is held until this gate passes
+**Scope**: Only applies to projects that are NOT managed by Spec Kitty
+
+### Checklist
+
+| # | Criterion | What "Done" Looks Like | Responsible Agent |
+|---|-----------|------------------------|-------------------|
+| 1 | Architecture document exists and is reviewed | Architecture doc covers all spec requirements. At least one reviewer (Reality Checker or Backend Architect) has signed off with comments resolved. | Backend Architect (author), Reality Checker (reviewer) |
+| 2 | Sprint plan / milestone plan exists | At least 3 milestones with target date ranges, or a sprint backlog with estimated velocity. Cross-phase dependencies are identified. | Sprint Prioritizer or Project Shepherd |
+| 3 | Resource assignments are defined | Every workstream has a named lead agent or team. No critical-path work is unassigned. Capacity conflicts are resolved. | Senior Project Manager |
+| 4 | Tech stack decisions are documented | Language, framework, infrastructure, and third-party service choices are recorded with rationale. Each decision includes alternatives considered and why they were rejected. | Backend Architect or UX Architect |
+
+### Gate Failure Handling
+
+```
+IF planning-complete gate FAILS:
+  +-- Orchestrator identifies which criteria are not met
+  +-- Routes incomplete items to the responsible agent:
+  |     Architecture doc missing/unreviewed --> Backend Architect + Reality Checker
+  |     Milestone plan missing              --> Sprint Prioritizer or Project Shepherd
+  |     Resource assignments undefined      --> Senior Project Manager
+  |     Tech stack undocumented             --> Backend Architect or UX Architect
+  +-- Agent completes the artifact and re-submits
+  +-- Orchestrator re-evaluates the gate
+  +-- Maximum 3 re-attempts before escalation to Studio Producer
+```
+
+### Gate Decision
+
+- **PASS**: All four criteria verified. Proceed to Phase 2 (Foundation & Scaffolding).
+- **FAIL**: Specific criteria not met. Route to responsible agents for completion.
+
+---
+
 ## Agent Activation Sequence
 
 ### Step 1: Strategic Framing (Day 1-3, Parallel)
 
-#### 🎬 Studio Producer — Strategic Portfolio Alignment
+#### 🎬 Studio Producer -- Strategic Portfolio Alignment
 ```
 Activate Studio Producer for strategic portfolio alignment on [PROJECT].
 
@@ -35,7 +126,7 @@ Format: Strategic Portfolio Plan Template
 Timeline: 3 days
 ```
 
-#### 🎭 Brand Guardian — Brand Identity System
+#### 🎭 Brand Guardian -- Brand Identity System
 ```
 Activate Brand Guardian for brand identity development on [PROJECT].
 
@@ -51,7 +142,7 @@ Format: Brand Identity System Document
 Timeline: 3 days
 ```
 
-#### 💰 Finance Tracker — Budget and Resource Planning
+#### 💰 Finance Tracker -- Budget and Resource Planning
 ```
 Activate Finance Tracker for financial planning on [PROJECT].
 
@@ -69,7 +160,7 @@ Timeline: 2 days
 
 ### Step 2: Technical Architecture (Day 3-7, Parallel, after Step 1 outputs available)
 
-#### 🏛️ UX Architect — Technical Architecture + UX Foundation
+#### 🏛️ UX Architect -- Technical Architecture + UX Foundation
 ```
 Activate UX Architect for technical architecture on [PROJECT].
 
@@ -92,7 +183,7 @@ Format: Developer-Ready Foundation Package
 Timeline: 4 days
 ```
 
-#### 🏗️ Backend Architect — System Architecture
+#### 🏗️ Backend Architect -- System Architecture
 ```
 Activate Backend Architect for system architecture on [PROJECT].
 
@@ -112,7 +203,7 @@ Format: System Architecture Specification
 Timeline: 4 days
 ```
 
-#### 🤖 AI Engineer — ML Architecture (if applicable)
+#### 🤖 AI Engineer -- ML Architecture (if applicable)
 ```
 Activate AI Engineer for ML system architecture on [PROJECT].
 
@@ -132,7 +223,7 @@ Format: ML System Design Document
 Timeline: 3 days
 ```
 
-#### 👔 Senior Project Manager — Spec-to-Task Conversion
+#### 👔 Senior Project Manager -- Spec-to-Task Conversion
 ```
 Activate Senior Project Manager for task list creation on [PROJECT].
 
@@ -158,16 +249,16 @@ Timeline: 3 days
 
 ### Step 3: Prioritization (Day 7-10, Sequential, after Step 2)
 
-#### 🎯 Sprint Prioritizer — Feature Prioritization
+#### 🎯 Sprint Prioritizer -- Feature Prioritization
 ```
 Activate Sprint Prioritizer for backlog prioritization on [PROJECT].
 
 Input:
-- Senior Project Manager → Task List
-- Backend Architect → System Architecture
-- UX Architect → UX Architecture
-- Finance Tracker → Budget Framework
-- Studio Producer → Strategic Plan
+- Senior Project Manager -> Task List
+- Backend Architect -> System Architecture
+- UX Architect -> UX Architecture
+- Finance Tracker -> Budget Framework
+- Studio Producer -> Strategic Plan
 
 Deliverables required:
 1. RICE-scored backlog (Reach, Impact, Confidence, Effort)
@@ -204,7 +295,7 @@ Timeline: 2 days
 ## Handoff to Phase 2
 
 ```markdown
-## Phase 1 → Phase 2 Handoff Package
+## Phase 1 -> Phase 2 Handoff Package
 
 ### Architecture Package:
 1. Strategic Portfolio Plan (Studio Producer)
@@ -212,7 +303,7 @@ Timeline: 2 days
 3. Financial Plan (Finance Tracker)
 4. CSS Design System + UX Architecture (UX Architect)
 5. System Architecture Specification (Backend Architect)
-6. ML System Design (AI Engineer — if applicable)
+6. ML System Design (AI Engineer -- if applicable)
 7. Comprehensive Task List (Senior Project Manager)
 8. Prioritized Sprint Plan (Sprint Prioritizer)
 

@@ -162,8 +162,71 @@ When reviewing an opportunity, systematically probe:
 - "[Question that exposes a gap in their approach]"
 
 ### Trap Handling
-- If buyer says "[competitor claim]" → respond with "[reframe]"
+- If buyer says "[competitor claim]" -> respond with "[reframe]"
 ```
+
+## Handoff Contract
+
+### Output: Stakeholder Map
+
+When a deal closes, produce a **Stakeholder Map** artifact that transfers relationship intelligence to the project execution team.
+
+```markdown
+# Stakeholder Map: [Account Name]
+
+## Deal Context
+- **Deal ID / Opportunity**: [Reference]
+- **Close date**: [Date]
+- **Contract summary**: [1-2 sentence description of what was sold]
+- **Sales cycle length**: [Duration]
+- **Key selling points that resonated**: [What won the deal -- reference for ongoing relationship]
+
+## Stakeholder Registry
+| Name | Title | Role | Influence Level | Stance | Communication Preference | Best Contact Method |
+|------|-------|------|-----------------|--------|--------------------------|---------------------|
+| [Name] | [Title] | Decision Maker | High | Champion | [Formal email / Slack / Phone / Weekly call] | [Email / Direct line] |
+| [Name] | [Title] | Influencer | Medium | Supportive | [Prefers data-heavy updates] | [Email] |
+| [Name] | [Title] | End User | Low | Neutral | [Brief, action-oriented] | [Slack] |
+| [Name] | [Title] | Procurement | Medium | Blocker | [Process-driven, needs documentation] | [Email with CC to legal] |
+
+### Role Definitions
+- **Decision Maker**: Can approve budget, scope changes, and go/no-go decisions
+- **Influencer**: Shapes internal opinion but does not hold final authority
+- **Champion**: Actively advocates for the initiative internally -- invested in its success
+- **Blocker**: Raised objections during the sales process that may resurface during delivery
+- **End User**: Will interact with the deliverable daily -- their adoption determines success
+
+## Relationship Notes
+
+### [Stakeholder Name]
+- **Relationship history**: [How the relationship developed during the sales cycle]
+- **Personal motivations**: [What they care about -- career goals, team success, risk aversion, etc.]
+- **Hot buttons**: [Topics that energize or concern them]
+- **Commitments made**: [Any promises or expectations set during the sales process]
+- **Potential friction**: [Areas where expectations may not align with delivery reality]
+
+### [Stakeholder Name]
+...
+
+## Political Landscape
+- **Internal dynamics**: [Alliances, rivalries, or org changes that affect the project]
+- **Budget owner vs. project sponsor**: [If different, note the relationship between them]
+- **Upcoming changes**: [Reorgs, leadership changes, or strategic shifts mentioned during the deal]
+
+## Blocker Mitigation
+| Blocker | Objection Raised | How It Was Resolved in Sales | Risk of Resurfacing | Recommended Approach |
+|---------|-----------------|------------------------------|---------------------|----------------------|
+| [Name] | [Objection] | [Resolution] | High / Medium / Low | [Strategy for project team] |
+```
+
+**Handoff target**: Project Shepherd (project-management division). The Stakeholder Map ensures the project execution team inherits relationship context, political awareness, and communication preferences -- not just a list of names and titles.
+
+**Handoff protocol**:
+- Produce the Stakeholder Map within 48 hours of deal close
+- Include all verbal commitments and informal expectations not captured in the signed contract -- these are where scope disputes originate
+- Flag any stakeholders whose stance shifted during the sales cycle (e.g., champion who cooled off, blocker who was overruled but not convinced)
+- Note the preferred escalation path if project issues arise -- who the client expects to hear from
+- Remain available for a single handoff call with the Project Shepherd to transfer relationship nuance that does not fit in a document
 
 ## Communication Style
 

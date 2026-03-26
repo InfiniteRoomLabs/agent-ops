@@ -17,8 +17,8 @@ agents:
     - name: ai-engineer
       description: "Expert AI/ML engineer specializing in machine learning model development, deployment, and integration into production systems."
       model: sonnet
-    - name: autonomous-optimization-architect
-      description: "Intelligent system governor that continuously shadow-tests APIs for performance while enforcing strict financial and security guardrails against runaway costs."
+    - name: ai-cost-optimizer
+      description: "Monitors and optimizes AI/cloud API costs by shadow-testing for performance degradation, enforcing spending guardrails, and recommending model/provider switches."
       model: sonnet
     - name: backend-architect
       description: "Senior backend architect specializing in scalable system design, database architecture, API development, and cloud infrastructure."
@@ -40,6 +40,9 @@ agents:
       model: sonnet
     - name: database-optimizer
       description: "Expert database specialist focusing on schema design, query optimization, indexing strategies, and performance tuning for PostgreSQL, MySQL, and modern databases like Supabase and PlanetScale."
+      model: sonnet
+    - name: debugger
+      description: "Actively investigates bugs by reading stack traces, analyzing error logs, reproducing issues, tracing execution paths, and identifying root causes. Uses hypothesis-driven debugging with log analysis and binary search isolation."
       model: sonnet
     - name: devops-manager
       description: "Use when you need pipeline design, deployment coordination, and task assignment for DevOps operations."
@@ -284,11 +287,17 @@ agents:
     - name: project-shepherd
       description: "Expert project manager specializing in cross-functional project coordination, timeline management, and stakeholder alignment."
       model: sonnet
+    - name: retro-facilitator
+      description: "Facilitates structured sprint and project retrospectives using proven formats (Start/Stop/Continue, 4Ls, sailboat, timeline). Collects team feedback, identifies patterns, tracks action items, and measures improvement over time."
+      model: sonnet
     - name: studio-operations
       description: "Expert operations manager specializing in day-to-day studio efficiency, process optimization, and resource coordination."
       model: sonnet
     - name: studio-producer
       description: "Senior strategic leader specializing in high-level creative and technical project orchestration, resource allocation, and multi-project portfolio management."
+      model: sonnet
+    - name: workflow-optimizer
+      description: "Analyzes existing workflows using Lean/Six Sigma principles to identify bottlenecks, waste, and automation opportunities. Produces quantified optimization reports with prioritized recommendations."
       model: sonnet
 
   testing:
@@ -304,14 +313,20 @@ agents:
     - name: performance-benchmarker
       description: "Expert performance testing and optimization specialist focused on measuring, analyzing, and improving system performance across all applications and infrastructure"
       model: sonnet
+    - name: qa-triage-lead
+      description: "Manages the defect lifecycle from discovery through resolution verification. Triages bug reports by severity and impact, assigns to appropriate agents, tracks fix progress, and verifies regression tests before closing."
+      model: haiku
     - name: test-results-analyzer
       description: "Expert test analysis specialist focused on comprehensive test result evaluation, quality metrics analysis, and actionable insight generation from testing activities"
       model: sonnet
-    - name: workflow-optimizer
-      description: "Expert process improvement specialist focused on analyzing, optimizing, and automating workflows across all business functions for maximum productivity and efficiency"
+    - name: test-strategist
+      description: "Designs comprehensive test strategies for projects: defines testing scope, selects appropriate testing levels (unit, integration, E2E, performance, security), establishes coverage targets, and creates test plans with resource and timeline estimates."
       model: sonnet
 
   support:
+    - name: accounts-payable-agent
+      description: "Processes vendor payments, contractor invoices, and recurring bills via ACH, wire, and Stripe. Coordinates with financial-controller for the full financial operations cycle."
+      model: sonnet
     - name: analytics-reporter
       description: Expert data analyst transforming raw data into actionable business insights.
       model: sonnet
@@ -322,7 +337,7 @@ agents:
       description: "Financial planning, analysis, and operations specialist. Manages budgets, generates financial reports, produces client invoices, tracks accounts receivable, and provides strategic financial insights."
       model: sonnet
     - name: legal-compliance-checker
-      description: "Expert legal and compliance specialist ensuring business operations, data handling, and content creation comply with relevant laws, regulations, and industry standards across multiple jurisdictions."
+      description: "Reviews business operations for legal compliance across GDPR, CCPA, and industry standards. Drafts and reviews contracts, NDAs, terms of service, and privacy policies. Provides risk assessment and open-source licensing guidance."
       model: sonnet
     - name: support-responder
       description: "Expert customer support specialist delivering exceptional customer service, issue resolution, and user experience optimization."
@@ -331,6 +346,9 @@ agents:
   research:
     - name: competitor-scanner
       description: "Use when researching competitors in a given market, product category, or industry segment."
+      model: sonnet
+    - name: lead-finder
+      description: "Identifies and scores potential clients or target market segments using web research, industry analysis, and ICP matching. Builds prioritized prospect lists with company profiles and buying signal indicators."
       model: sonnet
     - name: tech-evaluator
       description: "Use when evaluating, comparing, or selecting technologies, libraries, frameworks, or tools for business use and productivity optimization"
@@ -416,9 +434,6 @@ agents:
       model: sonnet
 
   specialized:
-    - name: accounts-payable-agent
-      description: "Autonomous payment processing specialist that executes vendor payments, contractor invoices, and recurring bills across any payment rail -- crypto, fiat, stablecoins."
-      model: sonnet
     - name: agentic-identity-trust
       description: "Designs identity, authentication, and trust verification systems for autonomous AI agents operating in multi-agent environments."
       model: sonnet
