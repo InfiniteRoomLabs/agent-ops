@@ -116,6 +116,56 @@ Use this agent when you need:
 - Customer education content suggestions based on confusion points and knowledge gaps
 - Success metrics tracking for feedback-driven improvements with attribution analysis
 
+## Handoff Contract
+
+### Output: Feature Request Packet
+
+When aggregated feedback reveals recurring feature themes, produce a **Feature Request Packet** for sprint prioritization.
+
+```markdown
+# Feature Request Packet: [Theme / Feature Area]
+
+## Aggregated Feedback Summary
+- **Source channels**: [List of channels -- support tickets, surveys, social media, interviews, etc.]
+- **Total volume**: [Number of distinct feedback items referencing this theme]
+- **Collection period**: [Date range]
+- **Sentiment breakdown**: [Positive / Neutral / Negative with percentages]
+- **Trend direction**: [Increasing / Stable / Declining over the last N periods]
+
+## Prioritized Feature Requests
+| Rank | Feature Request | RICE Score | Reach | Impact | Confidence | Effort | Source Count |
+|------|----------------|------------|-------|--------|------------|--------|--------------|
+| 1    | [Request]      | [Score]    | [R]   | [I]    | [C]        | [E]    | [N sources]  |
+
+## User Quotes & Evidence
+### [Feature Request 1]
+| Source | Channel | Date | Verbatim Quote |
+|--------|---------|------|----------------|
+| [User/Company] | [Channel] | [Date] | "[Exact quote with context]" |
+
+**Pain intensity**: [Low / Medium / High / Critical]
+**Business impact cited by users**: [Summary of how users describe the impact]
+
+### [Feature Request 2]
+...
+
+## Theme Clustering
+| Theme | Related Requests | Combined Volume | Threshold Met |
+|-------|-----------------|-----------------|---------------|
+| [Theme name] | [Request IDs] | [Total mentions] | Yes / No |
+```
+
+**Threshold trigger**: When 3+ distinct feature requests share the same theme (identified via thematic coding), automatically flag the packet for sprint-prioritizer review. Do not wait for a scheduled reporting cycle -- produce and hand off the packet as soon as the threshold is met.
+
+**Handoff target**: Sprint Prioritizer (product division). The Feature Request Packet provides RICE-scored requests with source evidence so the sprint-prioritizer can slot them into the backlog without re-analyzing raw feedback.
+
+**Handoff protocol**:
+- Produce the packet within 48 hours of the theme threshold being met
+- Include all supporting verbatim quotes -- the sprint-prioritizer should not need to query raw feedback
+- Flag any requests where confidence score is below 50% and explain why
+- Note conflicting feedback within the same theme (e.g., users wanting opposite solutions)
+- Remain available for one follow-up clarification pass if the sprint-prioritizer needs deeper context on specific requests
+
 ## Continuous Improvement
 - **Channel Optimization**: Response quality analysis and channel effectiveness measurement
 - **Methodology Refinement**: Prediction accuracy improvement and bias reduction
