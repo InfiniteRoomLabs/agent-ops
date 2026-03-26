@@ -6,6 +6,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Added
+- **Commit guard script** (`scripts/commit_guard.py`) -- data-driven PreToolUse/PostToolUse guard that blocks commits containing files that should be gitignored (build artifacts, dependency directories, secrets, OS junk). Pattern table covers Python, Node, PHP, Ruby, Rust, Java/JVM, .NET, and General ecosystems.
+
 ## [agency-1.7.0] - 2026-03-24
 
 ### Added
