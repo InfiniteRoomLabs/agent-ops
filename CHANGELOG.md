@@ -14,6 +14,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
   - `rules` subcommand: prints the active pattern table grouped by ecosystem
   - Registered `commit_guard.py pre` in PreToolUse Bash hooks (after `version_guard.py`, before `pre-deploy-secrets-sync.sh`)
   - Registered `commit_guard.py post` in PostToolUse Bash hooks (after `auto-tag.py`, before `post-deploy-secrets-verify.sh`)
+  - Added `commit-guard` entry to `registry.yaml` scripts section
 
 ## [agency-1.7.0] - 2026-03-24
 
