@@ -496,8 +496,6 @@ agents:
       model: sonnet
 
 skills:
-  - name: accessibility-adhd
-    description: "Use when the user wants ADHD-friendly communication, asks for accessibility accommodations, says they have ADHD, or requests micro-chunking and reduced verbosity for focus reasons."
   - name: dep-audit
     description: "Use when auditing project dependencies for license, security, or staleness issues"
   - name: end-agent-session
@@ -528,14 +526,16 @@ commands:
     description: Unload the current agent persona and return to the default orchestrator
   - name: find-agent
     description: "Use when searching for agents, skills, or commands by tag or keyword across all divisions"
-  - name: init-adhd
-    description: "Guide the user through setting up ADHD accessibility mode configuration in their CLAUDE.md frontmatter"
   - name: load-agent
     description: "Load an agent-ops agent as the primary session persona"
   - name: publish-package
     description: "Use when publishing a package to a registry (npm, packagist, PyPI, crates.io)"
   - name: trend-watch
     description: "Use when checking current trends, popularity, or momentum for a technology or market"
+
+output-styles:
+  - name: adhd
+    description: "ADHD-friendly communication -- micro-chunking, reduced decisions, momentum preservation, progress tracking, and sensory-friendly formatting"
 
 scripts:
   - name: version-guard
