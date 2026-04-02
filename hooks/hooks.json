@@ -10,11 +10,6 @@
           },
           {
             "type": "command",
-            "command": "uv run ${CLAUDE_PLUGIN_ROOT}/scripts/accessibility-config.py",
-            "timeout": 10
-          },
-          {
-            "type": "command",
             "command": "uv run ${CLAUDE_PLUGIN_ROOT}/scripts/config-tamper-guard.py snapshot",
             "timeout": 5
           }

@@ -4,6 +4,22 @@ All notable changes to the agent-ops marketplace will be documented in this file
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [agency-1.10.0] - 2026-04-02
+
+### Added
+- **ADHD Accessibility output style** (`output-styles/adhd.md`) -- first-class output style replacing the old skill-based approach. All 9 behavioral rules (micro-chunking, reduced decisions, response brevity, momentum preservation, progress dopamine, context anchoring, anti-rabbit-hole guardrails, time awareness, sensory-friendly formatting) baked in with recommended defaults. Activate via `/config` -> Output style -> ADHD Accessibility.
+- **Output styles support** in `plugin.json` -- `outputStyles` field pointing to `./output-styles/` directory
+
+### Removed
+- `skills/accessibility-adhd/SKILL.md` -- replaced by the ADHD output style
+- `commands/init-adhd.md` -- no longer needed; output styles are selected via `/config`
+- `scripts/accessibility-config.py` -- SessionStart hook detection no longer needed
+- `accessibility-config.py` entry from SessionStart hooks in `hooks.json`
+- `accessibility-adhd` and `init-adhd` entries from `registry.yaml`
+
+### Changed
+- `docs/guides/accessibility-adhd.md` rewritten to document the output style approach with migration instructions from the old skill-based system
+
 ## [agency-1.9.0] - 2026-03-26
 
 ### Added
