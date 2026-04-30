@@ -6,6 +6,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [agency-1.10.1] - 2026-04-30
 
+### Changed
+- **Marketplace entry** (`.claude-plugin/marketplace.json`) -- bumped agency plugin entry from 1.2.0 to 1.2.1 so the marketplace catalog reflects the commit-guard hotfix.
+
 ### Fixed
 - **commit-guard `packages/` false positive** (`scripts/commit_guard.py`) -- the `.NET: packages/` rule was blocking commits in pnpm/npm/yarn/lerna/nx/turborepo workspaces where `packages/` is the standard source root. Heuristic now requires real .NET evidence (`.csproj`/`.sln`/`global.json`/`NuGet.Config`/legacy `<packages>` element in a csproj) before flagging, and skips entirely when JS workspace evidence is detected. Other .NET artifact dirs (`bin/`, `obj/`) remain unconditionally blocked. Reproduction case: `claudesync` repo at `~/projects/infinite-room-labs/claudesync` could no longer commit `packages/core/src/sync/state.ts`.
 
