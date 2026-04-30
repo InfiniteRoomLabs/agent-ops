@@ -12,12 +12,14 @@ Usage:
 
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from fnmatch import fnmatch
 from pathlib import Path
+from typing import Callable, Optional
 
 import typer
 from pydantic import BaseModel
@@ -40,11 +42,124 @@ class IgnoredPattern:
                 component). No trailing '/' means match the basename.
     ecosystem:  Human-readable label for output grouping.
     message:    Optional custom message. Falls back to generic if empty.
+    requires:   Optional predicate (root: Path -> bool). When set, the pattern
+                only flags violations if the predicate returns True for the
+                current repo root. Used to gate ambiguous patterns like
+                'packages/' on real ecosystem evidence.
     """
 
     pattern: str
     ecosystem: str
     message: str = ""
+    requires: Optional[Callable[[Path], bool]] = field(default=None, repr=False, compare=False)
+
+
+# ---------------------------------------------------------------------------
+# Repo-context detectors -- distinguish ambiguous directory names by scanning
+# tracked + working files for ecosystem markers.
+# ---------------------------------------------------------------------------
+
+
+_DOTNET_GLOBS = (
+    "*.csproj",
+    "*.fsproj",
+    "*.vbproj",
+    "*.sln",
+    "global.json",
+    "NuGet.Config",
+    "nuget.config",
+    "packages.config",
+    "Directory.Build.props",
+    "Directory.Build.targets",
+)
+
+_JS_WORKSPACE_FILES = (
+    "pnpm-workspace.yaml",
+    "pnpm-workspace.yml",
+    "lerna.json",
+    "nx.json",
+    "turbo.json",
+    "rush.json",
+)
+
+
+def _git_ls_files(root: Path) -> list[str]:
+    """Return tracked files in the repo, or empty list on failure."""
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(root), "ls-files"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except (FileNotFoundError, OSError):
+        return []
+    if result.returncode != 0:
+        return []
+    return [line for line in result.stdout.splitlines() if line]
+
+
+def _has_dotnet_evidence(root: Path) -> bool:
+    """True when the repo shows real .NET project signals.
+
+    Looks for project/solution manifests anywhere in the tracked tree, plus
+    quick filesystem checks at the root. Catches '<packages>' references in
+    .csproj files so legacy package-restore layouts still flag.
+    """
+    for name in _DOTNET_GLOBS:
+        if list(root.glob(name)):
+            return True
+    tracked = _git_ls_files(root)
+    for tracked_path in tracked:
+        basename = Path(tracked_path).name
+        for glob in _DOTNET_GLOBS:
+            if fnmatch(basename, glob):
+                return True
+    # Inspect any *.csproj for legacy <packages> element which signals
+    # the old NuGet packages.config restore layout (uses 'packages/' dir).
+    for tracked_path in tracked:
+        if tracked_path.endswith(".csproj"):
+            try:
+                content = (root / tracked_path).read_text(
+                    encoding="utf-8", errors="ignore"
+                )
+            except OSError:
+                continue
+            if re.search(r"<packages\b", content):
+                return True
+    return False
+
+
+def _has_js_workspace_evidence(root: Path) -> bool:
+    """True when the repo uses a JS/TS package-based workspace layout."""
+    for name in _JS_WORKSPACE_FILES:
+        if (root / name).exists():
+            return True
+    pkg_json = root / "package.json"
+    if pkg_json.exists():
+        try:
+            data = json.loads(pkg_json.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return False
+        if isinstance(data, dict) and "workspaces" in data:
+            return True
+    return False
+
+
+def _packages_dir_predicate(root: Path) -> bool:
+    """Flag 'packages/' only when .NET signals exist and JS workspace doesn't.
+
+    Reasoning: 'packages/' is the canonical workspace source root in
+    pnpm/yarn/lerna/nx/turborepo monorepos. It is also the legacy NuGet
+    package-restore directory. The basename alone cannot disambiguate. So:
+
+      - JS workspace evidence present  -> never flag (workspace source).
+      - .NET evidence present          -> flag (legacy NuGet artifact dir).
+      - Neither                        -> do not flag (avoid false positives).
+    """
+    if _has_js_workspace_evidence(root):
+        return False
+    return _has_dotnet_evidence(root)
 
 
 PATTERNS: list[IgnoredPattern] = [
@@ -70,7 +185,15 @@ PATTERNS: list[IgnoredPattern] = [
     # .NET
     IgnoredPattern("bin/", ".NET"),
     IgnoredPattern("obj/", ".NET"),
-    IgnoredPattern("packages/", ".NET"),
+    IgnoredPattern(
+        "packages/",
+        ".NET",
+        message=(
+            "'packages/' looks like a legacy NuGet package-restore directory. "
+            "Add 'packages/' to .gitignore and unstage."
+        ),
+        requires=_packages_dir_predicate,
+    ),
     # General
     IgnoredPattern(".env", "General"),
     IgnoredPattern(".DS_Store", "General"),
@@ -122,14 +245,51 @@ def matches(file_path: str, pattern: str) -> bool:
     return fnmatch(Path(file_path).name, pattern)
 
 
-def find_violations(staged_files: list[str]) -> list[tuple[str, IgnoredPattern]]:
-    """Return (file_path, matched_pattern) for every staged file that matches."""
+def _repo_root() -> Path:
+    """Best-effort repo root. Falls back to cwd when not in a git repo."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except (FileNotFoundError, OSError):
+        return Path.cwd()
+    top = result.stdout.strip()
+    if result.returncode != 0 or not top:
+        return Path.cwd()
+    return Path(top)
+
+
+def find_violations(
+    staged_files: list[str],
+    root: Optional[Path] = None,
+) -> list[tuple[str, IgnoredPattern]]:
+    """Return (file_path, matched_pattern) for every staged file that matches.
+
+    Patterns with a `requires` predicate are evaluated once per repo and
+    skipped when the predicate returns False.
+    """
+    if root is None:
+        root = _repo_root()
+    predicate_cache: dict[int, bool] = {}
     violations: list[tuple[str, IgnoredPattern]] = []
     for filepath in staged_files:
         for pat in PATTERNS:
-            if matches(filepath, pat.pattern):
-                violations.append((filepath, pat))
-                break  # one match per file is enough
+            if not matches(filepath, pat.pattern):
+                continue
+            if pat.requires is not None:
+                key = id(pat.requires)
+                if key not in predicate_cache:
+                    try:
+                        predicate_cache[key] = bool(pat.requires(root))
+                    except Exception:
+                        predicate_cache[key] = False
+                if not predicate_cache[key]:
+                    continue
+            violations.append((filepath, pat))
+            break  # one match per file is enough
     return violations
 
 

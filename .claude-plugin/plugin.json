@@ -1,6 +1,6 @@
 {
   "name": "agency",
-  "version": "1.10.0",
+  "version": "1.10.1",
   "description": "Infinite Room Labs AI agency - 155+ specialized agents with NEXUS orchestration",
   "author": { "name": "Infinite Room Labs" },
   "repository": "https://github.com/InfiniteRoomLabs/agent-ops",
