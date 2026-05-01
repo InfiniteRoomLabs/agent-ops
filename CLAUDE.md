@@ -111,6 +111,43 @@ Use the `new-agent` skill, or manually:
 
 **Entropy** (`agents/engineering/entropy.md`) -- Secrets lifecycle manager. Tracks rotation schedules, reports overdue secrets, and coordinates with `bw-sync.sh` for Bitwarden-to-Ansible/K8s sync. Invoke when auditing secret age, planning a rotation sprint, or responding to a compromised credential. Tags: `engineering`, `secrets`, `compliance`.
 
+## Release Workflow
+
+This repo tracks three independent versions:
+
+| File | Version | Bumped when |
+|------|---------|-------------|
+| `.claude-plugin/plugin.json` | plugin version | any change a plugin user would care about |
+| `pyproject.toml` | (synced to plugin.json) | every plugin bump -- the version-guard hook will block the commit if these disagree |
+| `.claude-plugin/marketplace.json` (agency entry) | marketplace catalog version | independent; bump when the marketplace listing itself needs to change |
+
+**Always use `tools/version_bump.py` to bump versions.** Do not edit the three files by hand -- the script handles plugin/pyproject sync, marketplace independence, and `uv lock` refresh in one step.
+
+```bash
+# Most common: same bump across plugin + pyproject (synced pair)
+uv run tools/version_bump.py --plugin minor --pyproject minor
+
+# Bump everything together (plugin + pyproject + marketplace entry)
+uv run tools/version_bump.py --all minor
+
+# Marketplace entry alone (catalog metadata change, no plugin behavior change)
+uv run tools/version_bump.py --marketplace patch
+
+# Pin to an exact version
+uv run tools/version_bump.py --plugin set:2.0.0 --pyproject set:2.0.0
+
+# Preview without writing
+uv run tools/version_bump.py --all minor --dry-run
+```
+
+Bump-level guidance (Semantic Versioning):
+
+- `major` -- breaking change to a plugin component contract (renamed agent, removed skill, hook signature change)
+- `minor` -- new agent/skill/command/hook/output style, additive behavior
+- `patch` -- bug fix, doc fix, internal refactor with no consumer-visible change
+
+After bumping: edit `CHANGELOG.md` by hand, add a `## [agency-<new-version>] - YYYY-MM-DD` section above the previous one, then `git add` and commit. The script does not touch CHANGELOG, the staging area, or git history.
+
 ## Installation
 
 ```bash
