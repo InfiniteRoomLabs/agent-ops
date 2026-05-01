@@ -5,6 +5,12 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.12.0] - 2026-05-01
+
+### Added
+- **`render-mermaid` skill** (`skills/render-mermaid/`) -- renders a mermaid diagram (from a `.mmd` file or piped stdin) and opens it in the user's default viewer. Defaults tuned for Linux + sandboxed browsers: PDF output (vector + baked fonts so text survives mermaid's CSS-variable rendering quirks in `eog`/Loupe and system dark mode), output written to `~/Downloads/` so snap/flatpak Firefox can read it, Puppeteer launched with `--no-sandbox` so Ubuntu 23.10+ AppArmor doesn't block Chromium. Description scoped tightly: triggers on "render/visualize/view/open/show me as a diagram" only -- not on plain mermaid authoring -- so it doesn't burn tokens when the user is just writing or editing mermaid source.
+- **`scripts/templates/`** convention extended: skill-local helpers may now ship as siblings of `SKILL.md` (e.g. `skills/render-mermaid/render_mermaid.py`) rather than under `scripts/`. Inline PEP 723 dependency headers keep them runnable via `uv run`.
+
 ## [agency-1.11.1] - 2026-05-01
 
 ### Changed
