@@ -518,6 +518,8 @@ skills:
     description: "Use when the user asks to refine, improve, restructure, or clarify a prompt for Claude Code."
   - name: release-prep
     description: Use when preparing a new version release of a library or project
+  - name: render-mermaid
+    description: "Use ONLY when the user explicitly asks to visualize, render, view, open, or display a mermaid diagram as an image or PDF. Does not trigger when merely writing or editing mermaid syntax."
   - name: secrets-sync
     description: "Sync secrets from Bitwarden to Ansible Vault and Kubernetes"
 
