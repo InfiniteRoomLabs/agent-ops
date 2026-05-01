@@ -1,0 +1,37 @@
+[project]
+name = "agent-ops"
+version = "1.10.2"
+description = "Dev environment for agent-ops scripts/tests. Scripts run via uv with PEP 723 inline deps; this file exists only so the editor LSP can resolve imports."
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2",
+    "typer>=0.15",
+    "semver>=3",
+    "pyyaml>=6",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "types-pyyaml>=6",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["scripts"]
+
+[tool.pyright]
+include = ["scripts", "tests"]
+extraPaths = ["scripts"]
+venvPath = "."
+venv = ".venv"
+
+[tool.basedpyright]
+include = ["scripts", "tests"]
+extraPaths = ["scripts"]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.12"
+typeCheckingMode = "standard"
+reportMissingImports = "error"
+reportMissingTypeStubs = "none"

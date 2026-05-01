@@ -4,6 +4,15 @@ All notable changes to the agent-ops marketplace will be documented in this file
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [agency-1.10.2] - 2026-05-01
+
+### Added
+- **Python dev environment** (`pyproject.toml`, `pyrightconfig.json`, `.zed/settings.json`) -- declares dev-only dependency manifest (`pydantic`, `typer`, `semver`, `pyyaml`, `pytest`) so editor LSPs (basedpyright/pyright) resolve imports for `scripts/` and `tests/`. Runtime scripts still use PEP 723 inline dependency headers and run via `uv run`. `pyrightconfig.json` pins venv path; `.zed/settings.json` forces basedpyright with `extraPaths=["scripts"]`.
+- `.venv/` to `.gitignore`.
+
+### Fixed
+- **Builtin shadowing in `scripts/summon.py`** -- the Typer command `def list(...)` shadowed `builtins.list` at module scope, causing every `list[X]` annotation in the file to resolve to the function rather than the type. Renamed to `def list_agents` with `@app.command(name="list")` so the CLI surface is unchanged. Removed unused `import hashlib`.
+
 ## [agency-1.10.1] - 2026-04-30
 
 ### Changed
