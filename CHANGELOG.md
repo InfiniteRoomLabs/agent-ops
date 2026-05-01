@@ -4,6 +4,13 @@ All notable changes to the agent-ops marketplace will be documented in this file
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [agency-1.11.0] - 2026-05-01
+
+### Added
+- **CHANGELOG bootstrap in `scripts/changelog-guard.py`** -- when committing on a protected branch with no `CHANGELOG.md` present, the guard now writes an example template to the repo root before blocking. The block message instructs the agent to keep the canonical 5-line header (title + Keep a Changelog + Semantic Versioning paragraphs), delete the example block, and replace it with real release entries.
+- **`scripts/templates/CHANGELOG.template.md`** -- standalone artifact owning the template body. Single `{{DATE}}` placeholder; demonstrates all six Keep a Changelog section names (Added, Changed, Deprecated, Removed, Fixed, Security) across two example patch releases of a fictional `widget` CLI, plus an HTML comment describing what to keep and what to replace.
+- **`tests/test_changelog_guard.py`** -- 10 tests covering template rendering, `{{DATE}}` substitution, file generation, and every branch of `evaluate()` including the no-overwrite guarantee when an existing CHANGELOG is present but unstaged.
+
 ## [agency-1.10.2] - 2026-05-01
 
 ### Added
