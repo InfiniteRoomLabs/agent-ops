@@ -5,6 +5,12 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.12.1] - 2026-05-01
+
+### Added
+- **`tools/version_bump.py`** -- repo-internal version bumper that updates `pyproject.toml`, `.claude-plugin/plugin.json`, and the agency entry in `.claude-plugin/marketplace.json` independently, with `--plugin`, `--pyproject`, `--marketplace`, and `--all` flags accepting `major|minor|patch` or `set:X.Y.Z`. Refreshes `uv.lock` automatically when `pyproject.toml` is touched. Warns when plugin and pyproject would diverge (the version-guard hook would block the resulting commit). Lives under `tools/` to flag it as not part of any plugin distribution surface.
+- **`tests/test_version_bump.py`** -- 16 tests covering bump-level parsing, `set:X.Y.Z` overrides, file round-trips, and the typer-driven end-to-end paths (all/plugin-only/marketplace-only/dry-run/no-args).
+
 ## [agency-1.12.0] - 2026-05-01
 
 ### Added
