@@ -1,0 +1,25 @@
+{
+  "languages": {
+    "Python": {
+      "language_servers": ["basedpyright", "!pyright", "!pylsp"]
+    }
+  },
+  "lsp": {
+    "basedpyright": {
+      "settings": {
+        "python": {
+          "pythonPath": ".venv/bin/python",
+          "venvPath": ".",
+          "venv": ".venv"
+        },
+        "basedpyright": {
+          "analysis": {
+            "extraPaths": ["scripts"],
+            "typeCheckingMode": "standard",
+            "diagnosticMode": "workspace"
+          }
+        }
+      }
+    }
+  }
+}
