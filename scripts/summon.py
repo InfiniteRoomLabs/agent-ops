@@ -9,7 +9,6 @@ Usage:
 
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 import re
@@ -425,8 +424,8 @@ def _list_from_filesystem(
     return summaries
 
 
-@app.command()
-def list(
+@app.command(name="list")
+def list_agents(
     division: Annotated[
         Optional[str],
         typer.Option("--division", "-d", help="Filter agents by division."),
