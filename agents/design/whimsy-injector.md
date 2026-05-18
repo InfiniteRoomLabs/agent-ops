@@ -4,7 +4,7 @@ description: >-
   elements to brand experiences. Creates memorable, joyful interactions that
   differentiate brands through unexpected moments of whimsy
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: pink
 tags:
   function: [creative]

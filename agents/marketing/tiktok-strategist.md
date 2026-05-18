@@ -4,7 +4,7 @@ description: >-
   algorithm optimization, and community building. Masters TikTok's unique
   culture and features for brand growth.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#000000"
 tags:
   function: [revenue, creative]

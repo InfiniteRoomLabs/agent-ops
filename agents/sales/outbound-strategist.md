@@ -4,7 +4,7 @@ description: >-
   target accounts. Does not source leads -- receives prospect lists from
   lead-finder.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, Write, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#E8590C"
 tags:
   function: [revenue]

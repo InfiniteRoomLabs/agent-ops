@@ -1,7 +1,7 @@
 ---
 description: "Identifies and scores potential clients or target market segments using web research, industry analysis, and ICP matching. Builds prioritized prospect lists with company profiles, decision-maker contacts, and buying signal indicators."
 model: sonnet
-tools: [WebSearch, WebFetch, Read, Write, Glob, Grep, Agent, EnterPlanMode, ExitPlanMode]
+tools: [WebSearch, WebFetch, Read, Write, Glob, Grep, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#06d6a0"
 tags:
   function: [research, revenue]

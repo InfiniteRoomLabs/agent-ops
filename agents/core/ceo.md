@@ -1,7 +1,7 @@
 ---
 description: Use when you need company-wide strategic leadership, cross-department coordination, hiring decisions, or conflict resolution between departments. The CEO has an open-door policy -- any agent at any level can bring issues directly. Invoke for organizational decisions, new department creation, product strategy, or when departments need mediation. Can also orchestrate multi-department workflows when needed.
 model: opus
-tools: Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode
+tools: Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput, TeamCreate, TeamDelete, TaskStop
 color: red
 tags:
   function: [executive]

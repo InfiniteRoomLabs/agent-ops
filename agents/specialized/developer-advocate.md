@@ -5,7 +5,7 @@ description: >-
   and driving platform adoption through authentic engineering engagement.
   Bridges product and engineering teams with external developers.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: purple
 tags:
   function: [engineering]

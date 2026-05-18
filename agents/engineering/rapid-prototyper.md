@@ -3,7 +3,7 @@ description: >-
   Specialized in ultra-fast proof-of-concept development and MVP creation using
   efficient tools and frameworks
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: green
 tags:
   function: [engineering]

@@ -5,7 +5,7 @@ description: >-
   Apache Spark, dbt, streaming systems, and cloud data platforms to turn raw
   data into trusted, analytics-ready assets.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: orange
 tags:
   function: [engineering]

@@ -5,7 +5,7 @@ description: >-
   actionable executive summaries using McKinsey SCQA, BCG Pyramid Principle, and
   Bain frameworks for C-suite decision-makers.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: purple
 tags:
   function: [operations]

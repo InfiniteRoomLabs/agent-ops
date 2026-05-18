@@ -1,7 +1,7 @@
 ---
 description: Use when reviewing infrastructure code (Terraform/Terragrunt) or general application code for best practices, security issues, structural problems, correctness, and maintainability. Provides constructive, actionable feedback focused on what matters.
 model: sonnet
-tools: Glob, Grep, Read, LS, Agent, EnterPlanMode, ExitPlanMode
+tools: Glob, Grep, Read, LS, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput
 color: cyan
 tags:
   function: [engineering]

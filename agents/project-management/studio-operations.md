@@ -5,7 +5,7 @@ description: >-
   operations, maintaining productivity standards, and supporting all teams with
   the tools and processes needed for success.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput, TeamCreate, TeamDelete, TaskStop]
 color: green
 tags:
   function: [operations]

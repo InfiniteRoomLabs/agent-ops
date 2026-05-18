@@ -4,7 +4,7 @@ description: >-
   traceable commits, structured pull requests, and release-safe branch strategy
   across software teams.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: orange
 tags:
   function: [operations]

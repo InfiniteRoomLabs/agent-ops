@@ -8,7 +8,7 @@ description: >-
   and patient privacy protection, helping enterprises conduct effective health
   marketing within legal boundaries.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#2E8B57"
 tags:
   function: [operations]

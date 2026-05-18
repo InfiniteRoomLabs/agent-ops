@@ -5,7 +5,7 @@ description: >-
   optimization, live commerce, store operations, 618/Double 11 campaigns, and
   cross-platform strategy.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: red
 tags:
   function: [revenue, creative]

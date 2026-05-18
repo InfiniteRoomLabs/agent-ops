@@ -4,7 +4,7 @@ description: >-
   architecture, API development, and cloud infrastructure. Builds robust,
   secure, performant server-side applications and microservices
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: blue
 tags:
   function: [engineering]

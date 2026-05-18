@@ -4,7 +4,7 @@ description: >-
   integration, node-based architecture, and type-safe signal design for Godot 4
   projects
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: purple
 tags:
   function: [engineering, creative]

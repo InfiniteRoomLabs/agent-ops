@@ -1,7 +1,7 @@
 ---
 description: "Secrets lifecycle manager. Watches Bitwarden, syncs to targets, enforces rotation policy, alerts on drift."
 model: haiku
-tools: Bash, Read, Glob, Grep, Write
+tools: Bash, Read, Glob, Grep, Write, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput
 color: "#8b0000"
 tags:
   function: [engineering, operations]

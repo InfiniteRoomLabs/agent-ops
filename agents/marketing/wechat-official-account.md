@@ -5,7 +5,7 @@ description: >-
   multi-format content and builds loyal communities through consistent value
   delivery.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#09B83E"
 tags:
   function: [revenue, creative]

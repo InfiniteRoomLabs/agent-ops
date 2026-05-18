@@ -2,9 +2,13 @@ version = 1
 revision = 3
 requires-python = ">=3.12"
 
+[options]
+exclude-newer = "2026-05-11T22:21:55.670444074Z"
+exclude-newer-span = "P7D"
+
 [[package]]
 name = "agent-ops"
-version = "1.12.2"
+version = "1.13.0"
 source = { virtual = "." }
 dependencies = [
     { name = "pydantic" },

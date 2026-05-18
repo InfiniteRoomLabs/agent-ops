@@ -5,7 +5,7 @@ description: >-
   testing, interpretability analysis, performance monitoring, and audit-grade
   reporting.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#B22222"
 tags:
   function: [operations]

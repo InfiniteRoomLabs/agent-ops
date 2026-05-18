@@ -5,6 +5,12 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.13.0] - 2026-05-18
+
+### Added
+- **Cross-agent coordination tools** added to all 155 agent frontmatters. Tier 1 (every agent): `SendMessage`, `TaskCreate`, `TaskGet`, `TaskUpdate`, `TaskList`, `TaskOutput` -- so any specialist can address peers by name and read/write the shared task board. Tier 2 (14 leads/orchestrators: CEO, Orchestrator, Reality Checker, CTO, VP Eng, DevOps Manager, Security Lead, Incident Commander, Studio Producer/Operations, Project Shepherd, QA Triage Lead, Test Strategist, Sprint Prioritizer): additionally `TeamCreate`, `TeamDelete`, `TaskStop` -- team-spawn and task-kill authority that maps to org-chart seniority. Converts the agency from a parent-only spawn tree into a peer-to-peer graph with a shared work board.
+- **`tools/add_coordination_tools.py`** -- idempotent bulk-edit script that classifies agents by relative path, preserves original tools-list format (bracketed vs comma), and skips any agent already holding the full additive set. Safe to re-run as new agents land.
+
 ## [agency-1.12.2] - 2026-05-01
 
 ### Changed

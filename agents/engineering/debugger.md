@@ -1,7 +1,7 @@
 ---
 description: "Actively investigates bugs by reading stack traces, analyzing error logs, reproducing issues, tracing execution paths, and identifying root causes. Uses hypothesis-driven debugging with EXPLAIN plans, log analysis, and binary search isolation."
 model: sonnet
-tools: [Read, Bash, Glob, Grep, Write, Edit, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Read, Bash, Glob, Grep, Write, Edit, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#e63946"
 tags:
   function: [engineering]
