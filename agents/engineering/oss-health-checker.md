@@ -1,7 +1,7 @@
 ---
 description: Use when analyzing a repository for open source best practices, community standards compliance, or preparing a project for public release
 model: sonnet
-tools: Glob, Grep, Read, Bash, WebFetch, Agent, EnterPlanMode, ExitPlanMode
+tools: Glob, Grep, Read, Bash, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput
 color: yellow
 tags:
   function: [engineering]

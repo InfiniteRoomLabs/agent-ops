@@ -1,6 +1,6 @@
 ---
 description: Use when evaluating, comparing, or selecting technologies, libraries, frameworks, or tools for business use and productivity optimization
-tools: WebSearch, WebFetch, Read, Write, Glob, Grep, Agent, EnterPlanMode, ExitPlanMode
+tools: WebSearch, WebFetch, Read, Write, Glob, Grep, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput
 model: sonnet
 color: blue
 tags:

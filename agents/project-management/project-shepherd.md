@@ -5,7 +5,7 @@ description: >-
   projects from conception to completion while managing resources, risks, and
   communications across multiple teams and departments.
 model: sonnet
-tools: [Glob, Grep, Read, Write, Edit, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, Write, Edit, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput, TeamCreate, TeamDelete, TaskStop]
 color: blue
 tags:
   function: [operations]

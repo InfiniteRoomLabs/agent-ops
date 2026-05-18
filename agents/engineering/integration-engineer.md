@@ -1,7 +1,7 @@
 ---
 description: "Implements third-party SaaS integrations for common business patterns: payment processing (Stripe), authentication (OAuth/OIDC, Authentik), email/notifications (SendGrid, Postmark), analytics (PostHog, Plausible), CRM (HubSpot), and storage (S3-compatible). Produces integration code, configuration, and testing guides."
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#4ecdc4"
 tags:
   function: [engineering]

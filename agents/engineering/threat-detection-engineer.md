@@ -4,7 +4,7 @@ description: >-
   coverage mapping, threat hunting, alert tuning, and detection-as-code
   pipelines for security operations teams.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#7b2d8e"
 tags:
   function: [engineering]

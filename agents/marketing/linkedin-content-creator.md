@@ -5,7 +5,7 @@ description: >-
   algorithm and culture to drive inbound opportunities for founders, job
   seekers, developers, and anyone building a professional presence.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#0A66C2"
 tags:
   function: [revenue, creative]

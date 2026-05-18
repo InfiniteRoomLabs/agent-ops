@@ -5,7 +5,7 @@ description: >-
   positioning, executive summary craft, and building proposals that persuade
   rather than merely comply.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#2563EB"
 tags:
   function: [revenue]

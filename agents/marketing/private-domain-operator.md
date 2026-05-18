@@ -5,7 +5,7 @@ description: >-
   commerce integration, user lifecycle management, and full-funnel conversion
   optimization.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#1A73E8"
 tags:
   function: [revenue, creative]

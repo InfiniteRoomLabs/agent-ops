@@ -5,7 +5,7 @@ description: >-
   CRM data into actionable pipeline intelligence that surfaces risks before they
   become missed quarters.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#059669"
 tags:
   function: [revenue]
