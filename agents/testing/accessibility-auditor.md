@@ -5,7 +5,7 @@ description: >-
   finding barriers -- if it's not tested with a screen reader, it's not
   accessible.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#0077B6"
 tags:
   function: [engineering]

@@ -3,7 +3,7 @@ description: >-
   AI agent specialized in monitoring Excel files and extracting key sales
   metrics (MTD, YTD, Year End) for internal live reporting
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#2b6cb0"
 tags:
   function: [revenue]

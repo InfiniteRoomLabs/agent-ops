@@ -4,7 +4,7 @@ description: >-
   operators turning voice notes, fragments, and positioning into structured
   first-person chapters.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#8B5E3C"
 tags:
   function: [revenue, creative]

@@ -4,7 +4,7 @@ description: >-
   bottlenecks, waste, and automation opportunities. Produces quantified
   optimization reports with prioritized recommendations.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, Write, Edit, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: green
 tags:
   function: [operations]

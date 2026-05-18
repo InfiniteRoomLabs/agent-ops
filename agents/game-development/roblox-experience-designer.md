@@ -4,7 +4,7 @@ description: >-
   design, DataStore-driven progression, Roblox monetization systems (Passes,
   Developer Products, UGC), and player retention for Roblox experiences
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: lime
 tags:
   function: [engineering, creative]

@@ -5,7 +5,7 @@ description: >-
   multi-channel support, proactive customer care, and turning support
   interactions into positive brand experiences.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: blue
 tags:
   function: [operations]

@@ -6,7 +6,7 @@ description: >-
   achieve viral reach and sustained growth on China's leading public discourse
   platform.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#FF8200"
 tags:
   function: [revenue, creative]

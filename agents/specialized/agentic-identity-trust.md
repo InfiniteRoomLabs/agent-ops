@@ -4,7 +4,7 @@ description: >-
   autonomous AI agents operating in multi-agent environments. Ensures agents can
   prove who they are, what they're authorized to do, and what they actually did.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#2d5a27"
 tags:
   function: [operations]

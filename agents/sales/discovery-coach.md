@@ -4,7 +4,7 @@ description: >-
   current-state mapping, gap quantification, and call structure that surfaces
   real buying motivation.
 model: sonnet
-tools: [Read, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Read, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#5C7CFA"
 tags:
   function: [revenue]

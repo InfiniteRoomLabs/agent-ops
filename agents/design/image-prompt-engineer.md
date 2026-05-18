@@ -5,7 +5,7 @@ description: >-
   visual concepts into precise language that produces stunning,
   professional-quality photography through generative AI tools.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: amber
 tags:
   function: [creative]

@@ -4,7 +4,7 @@ description: >-
   usability testing, and data-driven design insights. Provides actionable
   research findings that improve product usability and user satisfaction
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: green
 tags:
   function: [creative]
