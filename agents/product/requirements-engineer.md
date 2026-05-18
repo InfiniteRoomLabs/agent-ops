@@ -1,7 +1,7 @@
 ---
 description: "Conducts structured requirements elicitation through discovery questions, stakeholder interviews, and existing-system audits. Produces PRDs, user story maps, acceptance criteria, and requirements traceability matrices."
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, WebSearch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, Write, Edit, WebSearch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#9b5de5"
 tags:
   function: [operations]

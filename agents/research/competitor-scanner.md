@@ -1,6 +1,6 @@
 ---
 description: Use when researching competitors in a given market, product category, or industry segment. Combines competitive intelligence with trend research and market analysis capabilities.
-tools: WebSearch, WebFetch, Read, Write, Glob, Grep, Agent, EnterPlanMode, ExitPlanMode
+tools: WebSearch, WebFetch, Read, Write, Glob, Grep, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput
 model: sonnet
 color: cyan
 tags:

@@ -1,7 +1,7 @@
 ---
 description: "Facilitates structured sprint and project retrospectives using proven formats (Start/Stop/Continue, 4Ls, sailboat, timeline). Collects team feedback, identifies patterns across retrospectives, tracks action items to completion, and measures improvement over time."
 model: sonnet
-tools: [Read, Write, Edit, Glob, Grep, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Read, Write, Edit, Glob, Grep, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#f4a261"
 tags:
   function: [operations]

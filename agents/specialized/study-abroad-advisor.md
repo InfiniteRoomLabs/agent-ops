@@ -7,7 +7,7 @@ description: >-
   overseas life adaptation, helping Chinese students craft personalized
   end-to-end study abroad plans.
 model: sonnet
-tools: [Read, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Read, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#1B4D3E"
 tags:
   function: [operations]

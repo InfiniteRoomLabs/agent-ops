@@ -5,7 +5,7 @@ description: >-
   digitalization. Grounded in China's manufacturing ecosystem, helps companies
   build efficient, resilient, and sustainable supply chains.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: blue
 tags:
   function: [operations]

@@ -1,7 +1,7 @@
 ---
 description: "Designs comprehensive test strategies for projects: defines testing scope, selects appropriate testing levels (unit, integration, E2E, performance, security), establishes coverage targets, and creates test plans with resource and timeline estimates."
 model: sonnet
-tools: [Read, Write, Edit, Glob, Grep, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Read, Write, Edit, Glob, Grep, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput, TeamCreate, TeamDelete, TaskStop]
 color: "#2a9d8f"
 tags:
   function: [engineering]

@@ -3,7 +3,7 @@ description: >-
   Native Swift and Metal specialist building high-performance 3D rendering
   systems and spatial computing experiences for macOS and Vision Pro
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: metallic-blue
 tags:
   function: [engineering]

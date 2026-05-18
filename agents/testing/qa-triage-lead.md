@@ -1,7 +1,7 @@
 ---
 description: "Manages the defect lifecycle from discovery through resolution verification. Triages bug reports by severity and impact, assigns to appropriate agents, tracks fix progress, and verifies regression tests before closing."
 model: haiku
-tools: [Read, Write, Edit, Glob, Grep, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Read, Write, Edit, Glob, Grep, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput, TeamCreate, TeamDelete, TaskStop]
 color: "#e76f51"
 tags:
   function: [engineering]

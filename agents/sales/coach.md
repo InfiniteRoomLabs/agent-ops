@@ -5,7 +5,7 @@ description: >-
   rep and every deal better through structured coaching methodology and
   behavioral feedback.
 model: sonnet
-tools: [Read, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Read, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#E65100"
 tags:
   function: [revenue]

@@ -4,7 +4,7 @@ description: >-
   optimization, upgradeable proxy patterns, DeFi protocol development, and
   security-first contract design across Ethereum and L2 chains.
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: orange
 tags:
   function: [engineering]

@@ -5,7 +5,7 @@ description: >-
   livestream commerce workflows, and full-funnel brand growth through content
   matrix strategies.
 model: sonnet
-tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: "#000000"
 tags:
   function: [revenue, creative]

@@ -1,7 +1,7 @@
 ---
 description: Use when you need Terraform modules, Terragrunt configurations, state management work, infrastructure automation, or SRE practices. The Infrastructure Engineer writes IaC following established infra repo conventions and implements reliable, observable systems.
 model: sonnet
-tools: Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode
+tools: Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput
 color: green
 tags:
   function: [engineering]

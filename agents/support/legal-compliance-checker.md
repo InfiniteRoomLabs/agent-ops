@@ -5,7 +5,7 @@ description: >-
   and privacy policies. Provides risk assessment and open-source licensing
   guidance.
 model: sonnet
-tools: [Glob, Grep, Read, Write, Edit, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, Write, Edit, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: red
 tags:
   function: [operations]

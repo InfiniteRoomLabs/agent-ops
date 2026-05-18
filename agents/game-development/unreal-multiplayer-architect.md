@@ -4,7 +4,7 @@ description: >-
   GameMode/GameState architecture, server-authoritative gameplay, network
   prediction, and dedicated server setup for UE5
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: red
 tags:
   function: [engineering, creative]

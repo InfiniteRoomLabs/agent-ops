@@ -5,7 +5,7 @@ description: >-
   receivable, and provides strategic financial insights for both analysis
   (FP&A) and execution (invoicing, billing).
 model: sonnet
-tools: [Glob, Grep, Read, Write, Edit, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, Write, Edit, LS, WebSearch, WebFetch, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: green
 tags:
   function: [operations]

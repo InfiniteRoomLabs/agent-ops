@@ -1,7 +1,7 @@
 ---
 description: Use when you need security review of infrastructure code, deployment configs, CI/CD pipelines, or application code. The Security Lead audits for exposed secrets, overly permissive IAM, missing encryption, and application-level vulnerabilities. Extends the infra-reviewer patterns with full security engineering capabilities.
 model: sonnet
-tools: Glob, Grep, Read, LS, Agent, EnterPlanMode, ExitPlanMode
+tools: Glob, Grep, Read, LS, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput, TeamCreate, TeamDelete, TaskStop
 color: yellow
 tags:
   function: [engineering]

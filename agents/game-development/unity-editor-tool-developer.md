@@ -4,7 +4,7 @@ description: >-
   PropertyDrawers, AssetPostprocessors, ScriptedImporters, and pipeline
   automation that saves teams hours per week
 model: sonnet
-tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode]
+tools: [Glob, Grep, Read, LS, Write, Edit, Bash, Agent, EnterPlanMode, ExitPlanMode, SendMessage, TaskCreate, TaskGet, TaskUpdate, TaskList, TaskOutput]
 color: gray
 tags:
   function: [engineering, creative]
