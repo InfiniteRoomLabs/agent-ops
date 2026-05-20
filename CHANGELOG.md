@@ -5,6 +5,14 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.13.1] - 2026-05-20
+
+### Fixed
+- **`scripts/commit_guard.py`** -- `build/` no longer trips a false positive on non-Java repos. The pattern now requires evidence of a Gradle/Maven project (`build.gradle`, `pom.xml`, `gradlew`, `mvnw`, etc., at root or in any module) before flagging. Reasoning: `build/` is Gradle's canonical output dir, but many repos use `build/` for shell scripts, Docker build contexts, or CI helpers (e.g. amborle/featmap's `build/build_webapp.sh`) -- the basename alone is ambiguous. Mirrors the same predicate pattern already used for `packages/` (.NET vs. JS workspace).
+
+### Added
+- **`docs/superpowers/`** -- captures the plan and design spec behind the commit-guard predicate fix (`plans/2026-03-26-commit-guard.md`, `specs/2026-03-26-commit-guard-design.md`) so future passes have the reasoning, not just the diff.
+
 ## [agency-1.13.0] - 2026-05-18
 
 ### Added

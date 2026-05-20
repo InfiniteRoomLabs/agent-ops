@@ -82,6 +82,18 @@ _JS_WORKSPACE_FILES = (
     "rush.json",
 )
 
+_JAVA_MANIFESTS = (
+    "build.gradle",
+    "build.gradle.kts",
+    "settings.gradle",
+    "settings.gradle.kts",
+    "pom.xml",
+    "gradlew",
+    "mvnw",
+    "gradle.properties",
+    "gradle-wrapper.properties",
+)
+
 
 def _git_ls_files(root: Path) -> list[str]:
     """Return tracked files in the repo, or empty list on failure."""
@@ -146,6 +158,39 @@ def _has_js_workspace_evidence(root: Path) -> bool:
     return False
 
 
+def _has_java_evidence(root: Path) -> bool:
+    """True when the repo shows real Gradle/Maven project signals.
+
+    Looks for build manifests anywhere in the tracked tree, plus quick
+    filesystem checks at the root. Disambiguates Java's 'build/' output
+    directory from non-Java repos that use 'build/' for shell scripts,
+    Docker build contexts, CI helpers, etc.
+    """
+    for name in _JAVA_MANIFESTS:
+        if (root / name).exists():
+            return True
+        # Multi-module: manifest can live under any module dir.
+        if list(root.glob(f"**/{name}")):
+            return True
+    tracked = _git_ls_files(root)
+    for tracked_path in tracked:
+        basename = Path(tracked_path).name
+        if basename in _JAVA_MANIFESTS:
+            return True
+    return False
+
+
+def _build_dir_predicate(root: Path) -> bool:
+    """Flag 'build/' only when Gradle/Maven signals exist.
+
+    Reasoning: 'build/' is the canonical Gradle output directory, but many
+    non-Java repos use 'build/' for shell scripts, Docker build contexts,
+    or CI helpers (e.g. amborle/featmap which ships build/build_webapp.sh).
+    The basename alone cannot disambiguate.
+    """
+    return _has_java_evidence(root)
+
+
 def _packages_dir_predicate(root: Path) -> bool:
     """Flag 'packages/' only when .NET signals exist and JS workspace doesn't.
 
@@ -181,7 +226,15 @@ PATTERNS: list[IgnoredPattern] = [
     IgnoredPattern("target/", "Rust"),
     # Java / JVM
     IgnoredPattern(".gradle/", "Java"),
-    IgnoredPattern("build/", "Java"),
+    IgnoredPattern(
+        "build/",
+        "Java",
+        message=(
+            "'build/' looks like a Gradle output directory. "
+            "Add 'build/' to .gitignore and unstage."
+        ),
+        requires=_build_dir_predicate,
+    ),
     # .NET
     IgnoredPattern("bin/", ".NET"),
     IgnoredPattern("obj/", ".NET"),
