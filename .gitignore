@@ -1,5 +1,8 @@
 # Agent runtime directories
-.claude/
+# .claude/ contents are ignored, except shared project config we deliberately commit.
+.claude/*
+!.claude/.gitignore
+!.claude/settings.json
 .codex/
 .gemini/
 .cursor/

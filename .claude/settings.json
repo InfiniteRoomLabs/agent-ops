@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run \"$CLAUDE_PROJECT_DIR/scripts/test-coverage-guard.py\" hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
