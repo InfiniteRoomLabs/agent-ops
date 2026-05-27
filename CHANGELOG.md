@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **`.gitignore`** -- `.claude/` contents stay ignored, but `.claude/settings.json` (and `.claude/.gitignore`) are now re-included so the shared project hook config is committed; `.claude/settings.local.json` remains personal/ignored.
 - **`CLAUDE.md`, `README.md`** -- point to `TESTING.md` for testing and standards.
+- **`.claude/settings.json`** -- consolidated the repo's dev-time PreToolUse guards (changelog-guard, version_guard) from personal `settings.local.json` into the shared, committed `settings.json` alongside test-coverage-guard, so every clone dogfoods the same guards while developing agent-ops.
 
 ## [agency-1.14.0] - 2026-05-27
 

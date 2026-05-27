@@ -6,6 +6,16 @@
         "hooks": [
           {
             "type": "command",
+            "command": "uv run \"$CLAUDE_PROJECT_DIR/scripts/changelog-guard.py\" hook",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "uv run \"$CLAUDE_PROJECT_DIR/scripts/version_guard.py\" hook",
+            "timeout": 15
+          },
+          {
+            "type": "command",
             "command": "uv run \"$CLAUDE_PROJECT_DIR/scripts/test-coverage-guard.py\" hook",
             "timeout": 10
           }
