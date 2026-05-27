@@ -5,7 +5,12 @@
 
 Usage:
   Human:  uv run changelog-guard.py check
+  Human:  uv run changelog-guard.py push-check --command "git push origin main"
   Hook:   uv run changelog-guard.py hook  (reads JSON from stdin)
+
+The hook guards two events on protected branches (main/master/release/*):
+  * git commit -- requires CHANGELOG.md be staged in the commit.
+  * git push   -- requires CHANGELOG.md exist as a tracked file in the repo.
 """
 
 from __future__ import annotations
@@ -128,6 +133,140 @@ def evaluate(branch: str, root: Path | None = None) -> tuple[bool, str]:
     )
 
 
+# -- Push-time logic --
+
+
+def changelog_tracked(root: Path | None = None) -> bool:
+    """True if CHANGELOG.md is tracked by git (committed, not just on disk)."""
+    result = subprocess.run(
+        ["git", "ls-files", "--error-unmatch", "CHANGELOG.md"],
+        capture_output=True,
+        text=True,
+        cwd=root,
+    )
+    return result.returncode == 0
+
+
+def local_branches(root: Path | None = None) -> set[str]:
+    """Return the set of local branch names."""
+    result = subprocess.run(
+        ["git", "branch", "--format=%(refname:short)"],
+        capture_output=True,
+        text=True,
+        cwd=root,
+    )
+    return {line.strip() for line in result.stdout.splitlines() if line.strip()}
+
+
+def resolve_push_targets(
+    command: str, current_branch: str, root: Path | None = None
+) -> list[str] | None:
+    """Resolve the branch ref(s) a `git push` command targets.
+
+    Returns a list of target branch names, or None to signal the push needs no
+    CHANGELOG check (a deletion or a tags-only push).
+    """
+    # Tokens after the `push` subcommand.
+    tokens = command.split()
+    try:
+        push_idx = tokens.index("push")
+    except ValueError:
+        # Match the loose `git\s+push` the hook used; fall back to current branch.
+        return [current_branch]
+    args = tokens[push_idx + 1 :]
+
+    has_tags = False
+    expand_all = False
+    positionals: list[str] = []
+    for tok in args:
+        if tok.startswith("-"):
+            if tok in ("--delete", "-d"):
+                return None  # deletion -- no changelog requirement
+            if tok == "--tags":
+                has_tags = True
+            elif tok in ("--all", "--mirror"):
+                expand_all = True
+            # Other flags are boolean for our purposes; ignore.
+            continue
+        positionals.append(tok)
+
+    if expand_all:
+        # Pushing all branches -- require a changelog if a protected branch exists.
+        return sorted(local_branches(root))
+
+    # First positional is the remote; the rest are refspecs.
+    refspecs = positionals[1:] if positionals else []
+
+    if not refspecs:
+        if has_tags:
+            return None  # `git push --tags` (no branch refspec) -- tags only
+        return [current_branch]
+
+    targets: list[str] = []
+    for spec in refspecs:
+        if ":" in spec:
+            src, _, dst = spec.partition(":")
+            if src == "":
+                continue  # `:dst` is a delete of dst -- skip
+            target = dst
+        else:
+            target = spec
+        if target in ("HEAD", ""):
+            target = current_branch
+        targets.append(target)
+
+    if not targets:
+        return None  # only deletions were specified
+    return targets
+
+
+def evaluate_push(
+    command: str, current_branch: str, root: Path | None = None
+) -> tuple[bool, str]:
+    """Check if a `git push` is allowed. Returns (allowed, message).
+
+    Blocks when the push targets a protected branch and no CHANGELOG.md is
+    tracked in the repo. When CHANGELOG.md is missing from disk entirely, an
+    example template is generated so the agent has a starting point.
+    """
+    root = root or repo_root()
+    targets = resolve_push_targets(command, current_branch, root)
+
+    if targets is None:
+        return True, "Push is a delete/tags-only operation. No CHANGELOG requirement."
+
+    protected = [t for t in targets if PROTECTED_BRANCHES.match(t)]
+    if not protected:
+        return True, "Push targets no protected branch. No CHANGELOG requirement."
+
+    if changelog_tracked(root):
+        return True, f"CHANGELOG.md is tracked. Good to push to {protected}."
+
+    changelog = root / "CHANGELOG.md"
+    if not changelog.exists():
+        generate_changelog(changelog)
+        hint = (
+            f"No CHANGELOG.md existed, so an EXAMPLE template was generated at:\n"
+            f"  {changelog}\n"
+            "Edit it (keep the first five header lines, delete the example block),\n"
+            "then commit it:\n"
+        )
+    else:
+        hint = "CHANGELOG.md exists on disk but is not committed. Commit it:\n"
+
+    return (
+        False,
+        f"BLOCKED: Pushing to protected branch {protected} but no CHANGELOG.md is\n"
+        f"tracked in the repo.\n\n"
+        f"{hint}"
+        "  1. git add CHANGELOG.md\n"
+        '  2. git commit -m "docs: add changelog"\n'
+        "  3. re-run your push\n\n"
+        "A generated-but-uncommitted file does NOT unblock the push -- it must be\n"
+        "tracked. If this is intentional, push to a feature branch instead.",
+    )
+
+
 # -- Commands --
 
 
@@ -150,17 +289,41 @@ def check(
     raise typer.Exit(0 if allowed else 1)
 
 
+@app.command("push-check")
+def push_check(
+    command: Annotated[
+        str,
+        typer.Option("--command", "-c", help="The git push command to evaluate."),
+    ],
+) -> None:
+    """Check if a `git push` command is allowed on the current branch."""
+    branch = get_current_branch()
+    allowed, message = evaluate_push(command, branch)
+    typer.echo(message)
+    raise typer.Exit(0 if allowed else 1)
+
+
 @app.command()
 def hook() -> None:
     """Claude Code PreToolUse hook entry point. Reads JSON from stdin."""
     payload = HookPayload.model_validate_json(sys.stdin.read())
+    command = payload.tool_input.command
 
-    if not re.search(r"git\s+commit", payload.tool_input.command):
+    # Push guard: require a tracked CHANGELOG before pushing to a protected branch.
+    if re.search(r"git\s+push", command):
+        branch = get_current_branch()
+        allowed, message = evaluate_push(command, branch)
+        if not allowed:
+            typer.echo(message, err=True)
+            raise typer.Exit(2)
+        raise typer.Exit(0)
+
+    if not re.search(r"git\s+commit", command):
         raise typer.Exit(0)
 
     # Reject combined add+commit in a single command -- staging must be
     # a separate step so the hook can inspect what's actually staged.
-    if re.search(r"git\s+add\b", payload.tool_input.command):
+    if re.search(r"git\s+add\b", command):
         typer.echo(
             "BLOCKED: Run 'git add' and 'git commit' as separate Bash calls.\n"
             "The changelog guard needs to inspect staged files between the two steps.\n"

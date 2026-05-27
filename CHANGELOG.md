@@ -5,6 +5,11 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.14.0] - 2026-05-27
+
+### Added
+- **`scripts/changelog-guard.py`** now guards `git push` in addition to `git commit`. When a push targets a protected branch (`main`/`master`/`release/*`) and the repo has no **tracked** `CHANGELOG.md`, the PreToolUse hook blocks it (exit 2). Closes the gap where you clone an existing repo with no changelog, branch, merge locally into `main`, and push -- none of those commits ever tripped the commit-time guard on a protected branch. The push check is laxer than the commit check by design: it only requires the changelog *exist as a tracked file*, since push time can't cheaply diff against the remote. New `resolve_push_targets()` parses the refspec (handles `git push`, `origin main`, `HEAD:main`, `:main` deletes, `--delete`, `--tags`, `--all`/`--mirror`), `evaluate_push()` runs the check, and a `push-check --command "..."` CLI command supports manual runs. A template is generated when `CHANGELOG.md` is absent from disk; the block message spells out the add/commit/push sequence (a generated-but-uncommitted file does not unblock the push).
+
 ## [agency-1.13.1] - 2026-05-20
 
 ### Fixed
