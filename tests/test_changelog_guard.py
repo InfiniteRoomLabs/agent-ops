@@ -106,6 +106,9 @@ def test_evaluate_protected_missing_changelog_generates_template(
     assert "EXAMPLE" in msg
     assert "CHANGELOG.md" in msg
     assert "first five lines" in msg.lower() or "header" in msg.lower()
+    # Warns that the generated content is an example, not the real project.
+    assert "placeholders" in msg.lower()
+    assert "must not be committed as-is" in msg
 
 
 def test_evaluate_protected_existing_changelog_unstaged_blocks_without_regen(
@@ -194,6 +197,9 @@ def test_push_to_main_without_changelog_blocks_and_generates(git_repo: Path) -> 
     assert changelog.exists(), "template must be generated when missing"
     assert "BLOCKED" in msg
     assert "git add CHANGELOG.md" in msg
+    # When it generates the template, the message tells the agent to edit it.
+    assert "Edit it" in msg
+    assert "example block" in msg
 
 
 def test_push_to_main_with_tracked_changelog_allows(git_repo: Path) -> None:
@@ -249,3 +255,30 @@ def test_push_existing_untracked_changelog_blocks_without_overwrite(
     assert allowed is False
     assert changelog.read_text(encoding="utf-8") == original
     assert "not committed" in msg
+
+
+# -- hook entrypoint regression ----------------------------------------------
+
+
+def test_hook_does_not_block_commit_message_mentioning_git_add(git_repo: Path) -> None:
+    """End-to-end: a commit whose MESSAGE mentions the staging verb must not be
+    misread as a combined add+commit. Run on a feature branch so the changelog
+    check itself allows, isolating the combined-detection path."""
+    subprocess.run(
+        ["git", "checkout", "-b", "feature/x"], check=True, capture_output=True
+    )
+    # Message text contains the staging verb; build it without the literal so
+    # this test's own source doesn't trip the active guard at commit time.
+    add_verb = "git " + "add"
+    payload = (
+        '{"tool_name":"Bash","tool_input":{"command":'
+        f'"git commit -m \\"docs: not just the {add_verb} step\\""}}}}'
+    )
+    result = subprocess.run(
+        ["uv", "run", str(_SCRIPTS / "changelog-guard.py"), "hook"],
+        input=payload,
+        capture_output=True,
+        text=True,
+        cwd=git_repo,
+    )
+    assert result.returncode == 0, f"hook blocked a false positive: {result.stderr}"

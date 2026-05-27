@@ -5,6 +5,11 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.15.1] - 2026-05-27
+
+### Fixed
+- **Guard command detection no longer false-triggers on message text.** `changelog-guard`, `version_guard`, and `commit_guard` detected `git commit`/`git add` by substring-matching the raw command, so a commit whose *message* mentioned "git add" (or an echoed JSON payload containing "git commit") was misread -- e.g. the combined-add+commit rejection firing on a commit message that merely said "the git add step". New shared helpers in `_shared/git_ops.py` (`shell_command_skeleton`, `runs_git_command`, `is_combined_add_commit`) strip heredoc bodies and quoted spans before the detection regexes run, so they see command structure rather than argument/message text. All three guards now route their `git add`/`git commit`/`git tag`/`git push` detection and the combined-add+commit check through these helpers. Note: `git commit -a`/`-am` still bypass the combined check (no literal `git add` token) -- a pre-existing gap, documented in the helper, not addressed here.
+
 ## [agency-1.15.0] - 2026-05-27
 
 ### Added
@@ -15,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`.gitignore`** -- `.claude/` contents stay ignored, but `.claude/settings.json` (and `.claude/.gitignore`) are now re-included so the shared project hook config is committed; `.claude/settings.local.json` remains personal/ignored.
 - **`CLAUDE.md`, `README.md`** -- point to `TESTING.md` for testing and standards.
 - **`.claude/settings.json`** -- consolidated the repo's dev-time PreToolUse guards (changelog-guard, version_guard) from personal `settings.local.json` into the shared, committed `settings.json` alongside test-coverage-guard, so every clone dogfoods the same guards while developing agent-ops.
+- **`tests/test_changelog_guard.py`** -- assert the block messages actually instruct editing the generated template: the commit path warns the example is a placeholder (`placeholders`, `must not be committed as-is`), and the push generate-path tells the agent to `Edit it` and delete the `example block`.
 
 ## [agency-1.14.0] - 2026-05-27
 
