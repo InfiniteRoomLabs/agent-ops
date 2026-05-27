@@ -134,3 +134,118 @@ def test_evaluate_release_branch_is_protected(git_repo: Path) -> None:
     )
     allowed, _ = cg.evaluate("release/1.2.0", root=git_repo)
     assert allowed is False
+
+
+# -- resolve_push_targets ----------------------------------------------------
+
+
+def test_resolve_bare_push_uses_current_branch() -> None:
+    assert cg.resolve_push_targets("git push", "main") == ["main"]
+
+
+def test_resolve_push_remote_only_uses_current_branch() -> None:
+    assert cg.resolve_push_targets("git push origin", "main") == ["main"]
+
+
+def test_resolve_push_explicit_ref() -> None:
+    assert cg.resolve_push_targets("git push origin main", "feature/x") == ["main"]
+
+
+def test_resolve_push_refspec_uses_destination() -> None:
+    assert cg.resolve_push_targets("git push origin HEAD:main", "feature/x") == ["main"]
+
+
+def test_resolve_push_bare_head_is_current_branch() -> None:
+    assert cg.resolve_push_targets("git push origin HEAD", "main") == ["main"]
+
+
+def test_resolve_push_delete_colon_form_skips() -> None:
+    assert cg.resolve_push_targets("git push origin :main", "main") is None
+
+
+def test_resolve_push_delete_flag_skips() -> None:
+    assert cg.resolve_push_targets("git push --delete origin main", "main") is None
+
+
+def test_resolve_push_tags_only_skips() -> None:
+    assert cg.resolve_push_targets("git push --tags", "main") is None
+
+
+def test_resolve_push_set_upstream_flag_ignored() -> None:
+    assert cg.resolve_push_targets("git push -u origin main", "feature/x") == ["main"]
+
+
+# -- evaluate_push -----------------------------------------------------------
+
+
+def _commit_changelog(repo: Path, text: str = "# Changelog\n\nNotes.\n") -> None:
+    (repo / "CHANGELOG.md").write_text(text)
+    subprocess.run(["git", "add", "CHANGELOG.md"], check=True, capture_output=True)
+    subprocess.run(
+        ["git", "commit", "-m", "docs: changelog"], check=True, capture_output=True
+    )
+
+
+def test_push_to_main_without_changelog_blocks_and_generates(git_repo: Path) -> None:
+    changelog = git_repo / "CHANGELOG.md"
+    assert not changelog.exists()
+    allowed, msg = cg.evaluate_push("git push origin main", "main", root=git_repo)
+    assert allowed is False
+    assert changelog.exists(), "template must be generated when missing"
+    assert "BLOCKED" in msg
+    assert "git add CHANGELOG.md" in msg
+
+
+def test_push_to_main_with_tracked_changelog_allows(git_repo: Path) -> None:
+    _commit_changelog(git_repo)
+    allowed, msg = cg.evaluate_push("git push origin main", "main", root=git_repo)
+    assert allowed is True
+    assert "tracked" in msg
+
+
+def test_push_to_feature_branch_allows(git_repo: Path) -> None:
+    allowed, msg = cg.evaluate_push(
+        "git push origin feature/x", "feature/x", root=git_repo
+    )
+    assert allowed is True
+    assert "no protected branch" in msg.lower()
+
+
+def test_push_origin_main_from_feature_branch_blocks(git_repo: Path) -> None:
+    allowed, _ = cg.evaluate_push("git push origin main", "feature/x", root=git_repo)
+    assert allowed is False
+
+
+def test_push_head_to_main_blocks(git_repo: Path) -> None:
+    allowed, _ = cg.evaluate_push(
+        "git push origin HEAD:main", "feature/x", root=git_repo
+    )
+    assert allowed is False
+
+
+def test_push_delete_main_allows(git_repo: Path) -> None:
+    allowed, _ = cg.evaluate_push("git push origin :main", "main", root=git_repo)
+    assert allowed is True
+
+
+def test_push_tags_only_allows(git_repo: Path) -> None:
+    allowed, _ = cg.evaluate_push("git push --tags", "main", root=git_repo)
+    assert allowed is True
+
+
+def test_push_all_without_changelog_blocks(git_repo: Path) -> None:
+    # git_repo is on 'main', which is protected and exists locally.
+    allowed, _ = cg.evaluate_push("git push --all origin", "main", root=git_repo)
+    assert allowed is False
+
+
+def test_push_existing_untracked_changelog_blocks_without_overwrite(
+    git_repo: Path,
+) -> None:
+    changelog = git_repo / "CHANGELOG.md"
+    original = "# Changelog\n\nUncommitted draft.\n"
+    changelog.write_text(original)  # on disk but never `git add`ed
+    allowed, msg = cg.evaluate_push("git push origin main", "main", root=git_repo)
+    assert allowed is False
+    assert changelog.read_text(encoding="utf-8") == original
+    assert "not committed" in msg
