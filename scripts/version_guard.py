@@ -20,7 +20,12 @@ from typing import Annotated, Optional
 
 sys.path.insert(0, str(Path(__file__).parent))
 from _shared.dotted import resolve_dotted  # noqa: E402
-from _shared.git_ops import get_current_branch, get_latest_tag  # noqa: E402
+from _shared.git_ops import (  # noqa: E402
+    get_current_branch,
+    get_latest_tag,
+    is_combined_add_commit,
+    runs_git_command,
+)
 
 import semver
 import typer
@@ -414,14 +419,14 @@ def hook() -> None:
     payload = HookPayload.model_validate_json(sys.stdin.read())
     cmd = payload.tool_input.command
 
-    is_commit = bool(re.search(r"git\s+commit", cmd))
-    is_tag_cmd = bool(re.search(r"git\s+tag\s", cmd))
+    is_commit = runs_git_command(cmd, "commit")
+    is_tag_cmd = runs_git_command(cmd, "tag")
 
     if not is_commit and not is_tag_cmd:
         raise typer.Exit(0)
 
     # Block combined add+commit
-    if is_commit and re.search(r"git\s+add\b", cmd):
+    if is_commit and is_combined_add_commit(cmd):
         typer.echo(
             "BLOCKED: Run 'git add' and 'git commit' as separate Bash calls.\n"
             "The version guard needs to inspect staged files between the two steps.\n"

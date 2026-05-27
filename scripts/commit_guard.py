@@ -24,6 +24,9 @@ from typing import Callable, Optional
 import typer
 from pydantic import BaseModel
 
+sys.path.insert(0, str(Path(__file__).parent))
+from _shared.git_ops import runs_git_command  # noqa: E402
+
 app = typer.Typer(
     help="Guard against committing files that should be gitignored.",
     no_args_is_help=True,
@@ -369,7 +372,7 @@ def post() -> None:
     except Exception:
         raise typer.Exit(0)
 
-    if not re.search(r"git\s+add\b", payload.tool_input.command):
+    if not runs_git_command(payload.tool_input.command, "add"):
         raise typer.Exit(0)
 
     staged = get_staged_files()
@@ -395,7 +398,7 @@ def pre() -> None:
     except Exception:
         raise typer.Exit(0)
 
-    if not re.search(r"git\s+commit\b", payload.tool_input.command):
+    if not runs_git_command(payload.tool_input.command, "commit"):
         raise typer.Exit(0)
 
     staged = get_staged_files()
