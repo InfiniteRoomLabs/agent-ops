@@ -111,6 +111,13 @@ Use the `new-agent` skill, or manually:
 
 **Entropy** (`agents/engineering/entropy.md`) -- Secrets lifecycle manager. Tracks rotation schedules, reports overdue secrets, and coordinates with `bw-sync.sh` for Bitwarden-to-Ansible/K8s sync. Invoke when auditing secret age, planning a rotation sprint, or responding to a compromised credential. Tags: `engineering`, `secrets`, `compliance`.
 
+## Testing
+
+Run `uv run pytest` before committing. Testing conventions, the five testing standards
+(S1-S5), and the not-yet-automated manual checks live in **`TESTING.md`**. Standard S1
+(every new top-level `scripts/*.py` ships with its `tests/test_<name>.py`) is
+machine-enforced by `scripts/test-coverage-guard.py`, wired in `.claude/settings.json`.
+
 ## Release Workflow
 
 This repo tracks three independent versions:
