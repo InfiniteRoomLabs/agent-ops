@@ -23,7 +23,11 @@ from pathlib import Path
 from typing import Annotated, Optional
 
 sys.path.insert(0, str(Path(__file__).parent))
-from _shared.git_ops import get_current_branch  # noqa: E402
+from _shared.git_ops import (  # noqa: E402
+    get_current_branch,
+    is_combined_add_commit,
+    runs_git_command,
+)
 
 import typer
 from pydantic import BaseModel
@@ -310,7 +314,7 @@ def hook() -> None:
     command = payload.tool_input.command
 
     # Push guard: require a tracked CHANGELOG before pushing to a protected branch.
-    if re.search(r"git\s+push", command):
+    if runs_git_command(command, "push"):
         branch = get_current_branch()
         allowed, message = evaluate_push(command, branch)
         if not allowed:
@@ -318,12 +322,12 @@ def hook() -> None:
             raise typer.Exit(2)
         raise typer.Exit(0)
 
-    if not re.search(r"git\s+commit", command):
+    if not runs_git_command(command, "commit"):
         raise typer.Exit(0)
 
     # Reject combined add+commit in a single command -- staging must be
     # a separate step so the hook can inspect what's actually staged.
-    if re.search(r"git\s+add\b", command):
+    if is_combined_add_commit(command):
         typer.echo(
             "BLOCKED: Run 'git add' and 'git commit' as separate Bash calls.\n"
             "The changelog guard needs to inspect staged files between the two steps.\n"
