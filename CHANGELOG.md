@@ -5,6 +5,16 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.15.0] - 2026-05-27
+
+### Added
+- **`TESTING.md`** -- first testing documentation for the repo: how to run the suite, the layout/loader conventions, how to drive hook entrypoints, five testing standards (S1 coverage, S2 pure-core/thin-adapter, S3 hook exit-code contract, S4 hermetic+deterministic, S5 manual tests as tracked debt), and a "Manual Tests" section. First manual entry M1 documents the changelog-guard push protection end-to-end check (real repo + bare remote on `/dev/shm`), which S4 keeps out of the automated suite until a hermetic remote fixture exists.
+- **`scripts/test-coverage-guard.py`** -- machine-enforces standard S1: blocks a commit that adds a top-level `scripts/*.py` without its matching `tests/test_<name>.py` (tracked or staged). Renames/modifies and `scripts/_shared/` are skipped; an `EXEMPT` set allows opt-outs. Pure core `evaluate(added, present)` with an injected presence check (S2/S4); covered by `tests/test_test_coverage_guard.py`. Wired **only** in this repo's `.claude/settings.json` (PreToolUse/Bash) -- deliberately NOT in the plugin's `hooks/hooks.json`, so the agent-ops-specific convention never fires in the other repos the agency plugin is installed in.
+
+### Changed
+- **`.gitignore`** -- `.claude/` contents stay ignored, but `.claude/settings.json` (and `.claude/.gitignore`) are now re-included so the shared project hook config is committed; `.claude/settings.local.json` remains personal/ignored.
+- **`CLAUDE.md`, `README.md`** -- point to `TESTING.md` for testing and standards.
+
 ## [agency-1.14.0] - 2026-05-27
 
 ### Added

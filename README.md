@@ -270,6 +270,10 @@ This repo follows a single-plugin architecture. Claude Code discovers agents via
 
 NEXUS orchestration is implemented as skills rather than agents, providing three deployment scales (Full/Sprint/Micro) with reference material in `strategy/`.
 
+## Testing
+
+Run `uv run pytest`. Conventions, the testing standards, and manual end-to-end checks are documented in [`TESTING.md`](TESTING.md).
+
 ## Origins
 
 This agency merges two sources:
