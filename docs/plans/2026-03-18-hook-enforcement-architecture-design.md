@@ -166,8 +166,10 @@ Manages enforcement propagation into and cleanup of git worktrees.
 
 **On WorktreeRemove**:
 1. Log worktree removal to audit trail
-2. Check for orphaned local branches associated with the worktree
-3. Optionally clean orphaned branches (only if `clean_branches: true`)
+
+(A `clean_branches` option for deleting orphaned branches was designed here
+but dropped in 2026-06: orphaned merged branches are a non-problem and the
+hook fires too late to resolve a branch from the worktree path.)
 
 **Important**: WorktreeRemove exit 2 is advisory-only and warnings only surface in debug mode. User-visible blocking of worktree removal is not supported by this event. If blocking is needed in the future, use a PreToolUse hook matching `git worktree remove`.
 
@@ -176,7 +178,6 @@ Manages enforcement propagation into and cleanup of git worktrees.
 worktree:
   propagate_hooks: true       # default: true
   check_uncommitted: true     # default: true (logged to audit, not user-visible)
-  clean_branches: false       # default: false (destructive, opt-in only)
 ```
 
 **Exit behavior**:
@@ -492,7 +493,6 @@ compaction:
 worktree:
   propagate_hooks: true             # Copy .git/hooks into worktrees
   check_uncommitted: true           # Warn on uncommitted work at removal
-  clean_branches: false             # Delete orphaned branches (destructive, opt-in)
 
 # Audit -- stop-failure-audit
 audit:

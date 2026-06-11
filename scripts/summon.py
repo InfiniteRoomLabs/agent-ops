@@ -81,19 +81,14 @@ def get_root() -> Path:
 def get_state_dir() -> Path:
     """Return the effective state directory.
 
-    Default: derive from the project directory using Claude Code's project
-    memory path pattern -- ``~/.claude/projects/-{slug}/memory/summon/``
-    where *slug* is the project dir with ``/`` replaced by ``-``.
-
-    Prefers ``CLAUDE_PROJECT_DIR`` (the session's project root) over the
-    live process cwd: hooks and subshells can run from subdirectories or
-    worktrees, which would otherwise scatter state across multiple slugs.
+    Default: ``~/.claude/projects/{slug}/memory/summon/`` where *slug* comes
+    from :func:`_shared.paths.cwd_slug` (which prefers ``CLAUDE_PROJECT_DIR``
+    over the live process cwd -- see its docstring for the slug rule).
     """
     if _state_dir_override is not None:
         return _state_dir_override
 
-    slug = cwd_slug(os.environ.get("CLAUDE_PROJECT_DIR") or None)
-    return Path.home() / ".claude" / "projects" / slug / "memory" / "summon"
+    return Path.home() / ".claude" / "projects" / cwd_slug() / "memory" / "summon"
 
 
 # ---------------------------------------------------------------------------

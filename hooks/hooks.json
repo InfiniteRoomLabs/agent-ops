@@ -51,7 +51,6 @@
     ],
     "ConfigChange": [
       {
-        "matcher": "project_settings|user_settings|local_settings",
         "hooks": [
           {
             "type": "command",
