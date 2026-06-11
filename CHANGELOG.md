@@ -5,6 +5,12 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **`agents/research/calm-company-underwriter.md`** -- first persona-forge graduate, promoted per the skill's "promote proven specs" path after the 2026-06-10 Employa-Bot viability engagement: a bootstrap-business viability underwriter with scar-derived heuristics (churn-on-success cohort math, structural-vs-keynote-away differentiator sort, attention-runway audit, institutional B2B2C costing), declared retained biases, named blind spots, and an out-of-character contract (bias footnote + personal-context-never-enters-repos rule). Registered in `registry.yaml`.
+- **`skills/persona-forge/SKILL.md`** -- new skill: forge the right worker before working. For any role-shaped task (analysis, review, writing, architecture, negotiation, teaching), generates 3-5 candidate personas, antagonistically attacks each for bias/blind spots, evolves survivors through at least two merge-attack-refine rounds into one optimal persona spec (with declared retained biases and named blind spots), then the parent agent adopts it for the work phase and closes with an out-of-character bias footnote. Proven specs can be promoted to permanent `agents/{division}/` definitions. Registered in `registry.yaml`.
+
 ## [agency-1.15.1] - 2026-05-27
 
 ### Fixed
