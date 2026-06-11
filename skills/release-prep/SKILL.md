@@ -23,6 +23,24 @@ Before starting the release cycle, check for a **Release Readiness Certificate**
 - If no certificate is present, ask the user whether to request one by invoking Reality Checker first. Do not block if the user explicitly opts to skip, but warn that releasing without certification bypasses the final quality gate.
 - If a certificate is present but its status is **NOT READY**, stop and surface the blocking reasons. Do not proceed until the blockers are resolved and a new certificate with READY status is provided.
 
+## Step 0: Check for Repo-Local Release Tooling
+
+The target repo may ship its own bump/release scripts and conventions that
+OVERRIDE the generic steps below. Before anything else:
+
+1. **Read the target repo's CLAUDE.md** (it is NOT auto-loaded when the repo
+   was attached via `/add-dir` -- read it explicitly) and look for a release
+   or versioning section.
+2. Look for bump tooling: `tools/`, `scripts/`, `bin/` entries matching
+   `*version*`/`*bump*`/`*release*`, plus `mise.toml`/`Makefile`/`justfile`
+   release tasks.
+3. If found, use the repo's tooling for Step 4 (and any other step it
+   covers) instead of hand-editing manifests. Repo convention wins.
+
+Example: this marketplace repo itself mandates `tools/version_bump.py`
+(syncs plugin.json + pyproject.toml, refreshes uv.lock) -- hand-editing
+those files violates its CLAUDE.md and risks a version-guard block.
+
 ## Step 1: Detect Current Version
 
 Read the package manifest to find the current version:
@@ -84,7 +102,9 @@ Edit CHANGELOG.md to insert the new entry below `## [Unreleased]` (or at the top
 
 ## Step 4: Bump Version
 
-Update the version in all relevant manifest files. Common multi-file cases:
+If Step 0 found repo-local bump tooling, use it and skip the manual edits
+below. Otherwise update the version in all relevant manifest files. Common
+multi-file cases:
 
 - Node.js: `package.json` and `package-lock.json`
 - Rust: `Cargo.toml` and `Cargo.lock`
