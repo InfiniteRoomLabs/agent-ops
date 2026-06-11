@@ -22,6 +22,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from _shared.audit import write_audit_entry  # noqa: E402
+from _shared.git_ops import get_repo_root  # noqa: E402
 from _shared.paths import get_audit_dir  # noqa: E402
 from frontmatter_config import resolve_typed  # noqa: E402
 
@@ -51,7 +52,11 @@ class WorktreeConfig(BaseModel):
 
 class CreatePayload(BaseModel):
     worktree_name: str
-    branch: str
+    # Optional: a branchless payload creates the worktree from HEAD (git
+    # names the new branch after the worktree directory). The create command
+    # already guards `if payload.branch:` -- requiring it here just crashed
+    # worktree creation on branchless payloads.
+    branch: str = ""
 
 
 class RemovePayload(BaseModel):
@@ -155,8 +160,11 @@ def create() -> None:
     payload = CreatePayload.model_validate_json(sys.stdin.read())
     config = resolve_typed(WorktreeConfig, "worktree")
 
-    # Determine worktree path: sibling .worktrees/ directory
-    repo_root = Path.cwd()
+    # Determine worktree path: sibling .worktrees/ directory at the REPO
+    # ROOT. Sessions started in a subdirectory must not grow a nested
+    # .worktrees/ there (and hook propagation would silently no-op against
+    # a non-root "main repo" path).
+    repo_root = get_repo_root(Path.cwd())
     wt_base = repo_root / ".worktrees"
     wt_base.mkdir(parents=True, exist_ok=True)
     wt_path = wt_base / payload.worktree_name

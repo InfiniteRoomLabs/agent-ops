@@ -17,7 +17,6 @@ Usage:
 
 from __future__ import annotations
 
-import re
 import subprocess
 import sys
 from pathlib import Path
@@ -25,6 +24,9 @@ from typing import Callable
 
 import typer
 from pydantic import BaseModel
+
+sys.path.insert(0, str(Path(__file__).parent))
+from _shared.git_ops import resolve_repo_root, runs_git_command  # noqa: E402
 
 app = typer.Typer(
     help="Block committing a new scripts/*.py without a matching tests/test_*.py.",
@@ -42,6 +44,7 @@ class ToolInput(BaseModel):
 class HookPayload(BaseModel):
     tool_name: str = ""
     tool_input: ToolInput = ToolInput()
+    cwd: str = ""
 
 
 # -- Pure helpers --
@@ -93,12 +96,13 @@ def evaluate(
 # -- Git collaborators (impure) --
 
 
-def staged_added_scripts() -> list[str]:
+def staged_added_scripts(root: Path | None = None) -> list[str]:
     """Paths added (status A) in the staged tree. Renames/modifies are skipped."""
     result = subprocess.run(
         ["git", "diff", "--cached", "--name-status", "-M"],
         capture_output=True,
         text=True,
+        cwd=root,
     )
     added: list[str] = []
     for line in result.stdout.splitlines():
@@ -108,25 +112,32 @@ def staged_added_scripts() -> list[str]:
     return added
 
 
-def _staged_paths() -> set[str]:
+def _staged_paths(root: Path | None = None) -> set[str]:
     result = subprocess.run(
         ["git", "diff", "--cached", "--name-only"],
         capture_output=True,
         text=True,
+        cwd=root,
     )
     return set(result.stdout.splitlines())
 
 
-def default_present(test_path: str) -> bool:
-    """True if the test file is tracked OR staged in this commit."""
-    tracked = subprocess.run(
-        ["git", "ls-files", "--error-unmatch", test_path],
-        capture_output=True,
-        text=True,
-    )
-    if tracked.returncode == 0:
-        return True
-    return test_path in _staged_paths()
+def make_present(root: Path | None = None) -> Callable[[str], bool]:
+    """Build the `present(test_path)` predicate for the repo at `root`:
+    True if the test file is tracked OR staged in this commit."""
+
+    def present(test_path: str) -> bool:
+        tracked = subprocess.run(
+            ["git", "ls-files", "--error-unmatch", test_path],
+            capture_output=True,
+            text=True,
+            cwd=root,
+        )
+        if tracked.returncode == 0:
+            return True
+        return test_path in _staged_paths(root)
+
+    return present
 
 
 # -- Commands --
@@ -135,7 +146,7 @@ def default_present(test_path: str) -> bool:
 @app.command()
 def check() -> None:
     """Check the current staged tree for new scripts missing tests."""
-    allowed, message = evaluate(staged_added_scripts(), default_present)
+    allowed, message = evaluate(staged_added_scripts(), make_present())
     typer.echo(message)
     raise typer.Exit(0 if allowed else 1)
 
@@ -145,10 +156,15 @@ def hook() -> None:
     """Claude Code PreToolUse hook entry point. Reads JSON from stdin."""
     payload = HookPayload.model_validate_json(sys.stdin.read())
 
-    if not re.search(r"git\s+commit", payload.tool_input.command):
+    # Skeleton-based detection: a commit MESSAGE mentioning 'git commit'
+    # must not trigger evaluation (same fix class as v1.15.1's guards).
+    if not runs_git_command(payload.tool_input.command, "commit"):
         raise typer.Exit(0)
 
-    allowed, message = evaluate(staged_added_scripts(), default_present)
+    # Judge the repo the command targets, not the hook process cwd.
+    root = resolve_repo_root(payload.tool_input.command, payload.cwd)
+
+    allowed, message = evaluate(staged_added_scripts(root), make_present(root))
     if not allowed:
         typer.echo(message, err=True)
         raise typer.Exit(2)

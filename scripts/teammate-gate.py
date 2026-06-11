@@ -18,12 +18,11 @@ import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import Annotated, Optional
 
 sys.path.insert(0, str(Path(__file__).parent))
 
 import typer
-from _shared.encoding import ENCODING_ARTIFACTS, find_encoding_artifacts  # noqa: E402
+from _shared.encoding import find_encoding_artifacts  # noqa: E402
 from frontmatter_config import resolve_typed  # noqa: E402
 from pydantic import BaseModel, Field
 
@@ -155,41 +154,75 @@ CHECK_REGISTRY: dict[str, type] = {
 }
 
 
-def _get_changed_files() -> list[Path]:
-    """Discover changed files via ``git status --porcelain``."""
+def _payload_cwd() -> Path:
+    """Read the hook's stdin JSON payload and return its ``cwd``.
+
+    Teammates run in worktrees: validating the PROCESS cwd inspects the wrong
+    tree (security checks silently bypassed, or a clean teammate blocked for
+    other people's files). Missing/malformed payloads fall back to the
+    process cwd.
+    """
+    try:
+        payload = json.loads(sys.stdin.read())
+        raw = payload.get("cwd", "") if isinstance(payload, dict) else ""
+        if raw:
+            return Path(raw)
+    except Exception:
+        pass
+    return Path.cwd()
+
+
+def _get_changed_files(cwd: Path | None = None) -> list[Path]:
+    """Discover changed files (repo-relative) for the repo at ``cwd``.
+
+    Uses ``-z`` (NUL-separated, no quoting -- spaced/quoted paths survive)
+    and ``--untracked-files=all`` (files inside new untracked directories
+    are listed individually instead of as ``dir/``).
+    """
     result = subprocess.run(
-        ["git", "status", "--porcelain"],
+        ["git", "status", "--porcelain", "-z", "--untracked-files=all"],
         capture_output=True,
         text=True,
+        cwd=cwd,
     )
     files: list[Path] = []
-    for line in result.stdout.splitlines():
-        if len(line) < 4:
+    fields = result.stdout.split("\0")
+    i = 0
+    while i < len(fields):
+        entry = fields[i]
+        i += 1
+        if len(entry) < 4:
             continue
-        # porcelain format: XY <path>  or  XY <orig> -> <path>
-        path_part = line[3:]
-        if " -> " in path_part:
-            path_part = path_part.split(" -> ", 1)[1]
+        status, path_part = entry[:2], entry[3:]
         files.append(Path(path_part))
+        # Renames/copies: the ORIGINAL path follows as its own NUL field.
+        if "R" in status or "C" in status:
+            i += 1
     return files
 
 
-def _validate() -> None:
-    """Run all configured checks and exit appropriately."""
-    config = resolve_typed(EnforcementConfig, "enforcement")
+def _validate(cwd: Path) -> None:
+    """Run all configured checks against the tree at ``cwd`` and exit."""
+    config = resolve_typed(EnforcementConfig, "enforcement", cwd=cwd)
 
     if not config.teammate_validation:
         raise typer.Exit(0)
 
-    files = _get_changed_files()
-    if not files:
+    rel_files = _get_changed_files(cwd)
+    if not rel_files:
         raise typer.Exit(0)
+
+    # Absolute paths for checks that read file contents / report locations;
+    # repo-relative paths for the agent-dir check so directory components of
+    # the worktree's own location can never false-match AGENT_DIRS.
+    abs_files = [cwd / f for f in rel_files]
 
     all_violations: list[dict] = []
     for check_name in config.teammate_checks:
         check_fn = CHECK_REGISTRY.get(check_name)
         if check_fn is not None:
-            all_violations.extend(check_fn(files))
+            target = rel_files if check_name == "agent_dirs" else abs_files
+            all_violations.extend(check_fn(target))
 
     if not all_violations:
         raise typer.Exit(0)
@@ -226,14 +259,14 @@ def _validate() -> None:
 
 @app.command()
 def idle() -> None:
-    """TeammateIdle hook entry point."""
-    _validate()
+    """TeammateIdle hook entry point. Reads JSON payload from stdin."""
+    _validate(_payload_cwd())
 
 
 @app.command()
 def completed() -> None:
-    """TaskCompleted hook entry point."""
-    _validate()
+    """TaskCompleted hook entry point. Reads JSON payload from stdin."""
+    _validate(_payload_cwd())
 
 
 if __name__ == "__main__":

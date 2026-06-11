@@ -24,9 +24,14 @@ from typing import Annotated, Optional
 
 sys.path.insert(0, str(Path(__file__).parent))
 from _shared.git_ops import (  # noqa: E402
+    PROTECTED_BRANCHES_DEFAULT,
+    STAGING_SEPARATION_MESSAGE,
     get_current_branch,
-    is_combined_add_commit,
+    get_repo_root,
+    get_staged_files,
+    resolve_repo_root,
     runs_git_command,
+    stages_at_commit_time,
 )
 
 import typer
@@ -37,7 +42,7 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 
-PROTECTED_BRANCHES = re.compile(r"^(main|master|release/.+)$")
+PROTECTED_BRANCHES = re.compile(PROTECTED_BRANCHES_DEFAULT)
 
 TEMPLATE_PATH = Path(__file__).parent / "templates" / "CHANGELOG.template.md"
 
@@ -52,29 +57,14 @@ class ToolInput(BaseModel):
 class HookPayload(BaseModel):
     tool_name: str = ""
     tool_input: ToolInput = ToolInput()
+    cwd: str = ""
 
 
 # -- Shared logic --
 
 
-def changelog_is_staged() -> bool:
-    result = subprocess.run(
-        ["git", "diff", "--cached", "--name-only"],
-        capture_output=True,
-        text=True,
-    )
-    return "CHANGELOG.md" in result.stdout.splitlines()
-
-
-def repo_root() -> Path:
-    result = subprocess.run(
-        ["git", "rev-parse", "--show-toplevel"],
-        capture_output=True,
-        text=True,
-    )
-    if result.returncode != 0:
-        return Path.cwd()
-    return Path(result.stdout.strip())
+def changelog_is_staged(root: Path | None = None) -> bool:
+    return "CHANGELOG.md" in get_staged_files(root)
 
 
 def render_template(today: str | None = None) -> str:
@@ -100,10 +90,11 @@ def evaluate(branch: str, root: Path | None = None) -> tuple[bool, str]:
     if not PROTECTED_BRANCHES.match(branch):
         return True, f"Branch '{branch}' is not protected. No CHANGELOG requirement."
 
-    if changelog_is_staged():
+    root = root or get_repo_root()
+
+    if changelog_is_staged(root):
         return True, f"CHANGELOG.md is staged. Good to go on '{branch}'."
 
-    root = root or repo_root()
     changelog = root / "CHANGELOG.md"
 
     if not changelog.exists():
@@ -233,7 +224,7 @@ def evaluate_push(
     tracked in the repo. When CHANGELOG.md is missing from disk entirely, an
     example template is generated so the agent has a starting point.
     """
-    root = root or repo_root()
+    root = root or get_repo_root()
     targets = resolve_push_targets(command, current_branch, root)
 
     if targets is None:
@@ -315,8 +306,9 @@ def hook() -> None:
 
     # Push guard: require a tracked CHANGELOG before pushing to a protected branch.
     if runs_git_command(command, "push"):
-        branch = get_current_branch()
-        allowed, message = evaluate_push(command, branch)
+        root = resolve_repo_root(command, payload.cwd)
+        branch = get_current_branch(root)
+        allowed, message = evaluate_push(command, branch, root)
         if not allowed:
             typer.echo(message, err=True)
             raise typer.Exit(2)
@@ -325,19 +317,18 @@ def hook() -> None:
     if not runs_git_command(command, "commit"):
         raise typer.Exit(0)
 
-    # Reject combined add+commit in a single command -- staging must be
-    # a separate step so the hook can inspect what's actually staged.
-    if is_combined_add_commit(command):
-        typer.echo(
-            "BLOCKED: Run 'git add' and 'git commit' as separate Bash calls.\n"
-            "The changelog guard needs to inspect staged files between the two steps.\n"
-            "Stage your files first, then commit in a follow-up command.",
-            err=True,
-        )
+    root = resolve_repo_root(command, payload.cwd)
+    branch = get_current_branch(root)
+    if not PROTECTED_BRANCHES.match(branch):
+        raise typer.Exit(0)  # no CHANGELOG requirement -> no staging rules either
+
+    # Reject commands where the staged index the hook inspects is not the
+    # index the commit will record. Staging must be a separate step.
+    if stages_at_commit_time(command):
+        typer.echo(STAGING_SEPARATION_MESSAGE.format(guard="changelog"), err=True)
         raise typer.Exit(2)
 
-    branch = get_current_branch()
-    allowed, message = evaluate(branch)
+    allowed, message = evaluate(branch, root)
 
     if not allowed:
         typer.echo(message, err=True)

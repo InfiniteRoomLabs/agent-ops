@@ -141,3 +141,67 @@ class TestCheckEnvFiles:
         (tmp_path / ".env.production").write_text("SECRET=prod\n")
         warnings = check_env_files(tmp_path)
         assert len(warnings) == 2
+
+
+class TestCreateCommand:
+    """Tests for the WorktreeCreate hook entry point."""
+
+    @pytest.fixture(autouse=True)
+    def _hermetic(self, monkeypatch: pytest.MonkeyPatch):
+        """Keep the hook hermetic: no real-home audit writes, default config."""
+        import worktree_lifecycle as wl
+
+        monkeypatch.setattr(wl, "_write_audit", lambda event: None)
+        monkeypatch.setattr(
+            wl,
+            "resolve_typed",
+            lambda model, namespace, **kw: wl.WorktreeConfig(),
+        )
+
+    def test_create_from_subdirectory_uses_repo_root(
+        self, git_repo: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Invoked from a subdir, .worktrees/ must land at the REPO ROOT,
+        not nested inside the subdirectory."""
+        import json
+
+        from typer.testing import CliRunner
+
+        import worktree_lifecycle as wl
+
+        subdir = git_repo / "src" / "nested"
+        subdir.mkdir(parents=True)
+        monkeypatch.chdir(subdir)
+
+        result = CliRunner().invoke(
+            wl.app,
+            ["create"],
+            input=json.dumps({"worktree_name": "feat-wt", "branch": "feat-x"}),
+        )
+        assert result.exit_code == 0, result.output
+
+        root_wt = git_repo / ".worktrees" / "feat-wt"
+        assert root_wt.is_dir()
+        assert not (subdir / ".worktrees").exists()
+        # Hook contract: prints the absolute worktree path on stdout
+        assert str(root_wt.resolve()) in result.stdout
+
+    def test_create_branchless_payload_does_not_crash(
+        self, git_repo: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A payload without `branch` must still create the worktree."""
+        import json
+
+        from typer.testing import CliRunner
+
+        import worktree_lifecycle as wl
+
+        monkeypatch.chdir(git_repo)
+
+        result = CliRunner().invoke(
+            wl.app,
+            ["create"],
+            input=json.dumps({"worktree_name": "branchless-wt"}),
+        )
+        assert result.exit_code == 0, result.output
+        assert (git_repo / ".worktrees" / "branchless-wt").is_dir()

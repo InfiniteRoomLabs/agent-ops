@@ -81,14 +81,18 @@ def get_root() -> Path:
 def get_state_dir() -> Path:
     """Return the effective state directory.
 
-    Default: derive from CWD using Claude Code's project memory path
-    pattern -- ``~/.claude/projects/-{slug}/memory/summon/`` where
-    *slug* is the CWD with ``/`` replaced by ``-``.
+    Default: derive from the project directory using Claude Code's project
+    memory path pattern -- ``~/.claude/projects/-{slug}/memory/summon/``
+    where *slug* is the project dir with ``/`` replaced by ``-``.
+
+    Prefers ``CLAUDE_PROJECT_DIR`` (the session's project root) over the
+    live process cwd: hooks and subshells can run from subdirectories or
+    worktrees, which would otherwise scatter state across multiple slugs.
     """
     if _state_dir_override is not None:
         return _state_dir_override
 
-    slug = cwd_slug()
+    slug = cwd_slug(os.environ.get("CLAUDE_PROJECT_DIR") or None)
     return Path.home() / ".claude" / "projects" / slug / "memory" / "summon"
 
 
@@ -537,6 +541,18 @@ def _state_file() -> Path:
     return get_state_dir() / "state.json"
 
 
+def _atomic_write_text(path: Path, content: str) -> None:
+    """Write `content` to `path` atomically (tmp file + os.replace).
+
+    A reader (state check / reminder) can never observe a partially
+    written state file, and a crash mid-write leaves the previous state
+    intact.
+    """
+    tmp = path.with_name(f"{path.name}.{os.getpid()}.tmp")
+    tmp.write_text(content, encoding="utf-8")
+    os.replace(tmp, path)
+
+
 def _is_stale(state: StateData | dict) -> bool:
     """Return True if state is stale.
 
@@ -584,16 +600,22 @@ def state_create(
     sd = get_state_dir()
     sd.mkdir(parents=True, exist_ok=True)
 
+    # Use the live session's ID when available (per the implementation plan):
+    # a random UUID here would NEVER match CLAUDE_SESSION_ID at check time,
+    # making every state file instantly "stale" -- SessionStart clean would
+    # delete live personas.
+    session_id = os.environ.get("CLAUDE_SESSION_ID") or str(uuid.uuid4())
+
     state = StateData(
         active_agent=agent,
         division=division,
         source_file=source,
         loaded_at=datetime.now(timezone.utc).isoformat(),
-        session_id=str(uuid.uuid4()),
+        session_id=session_id,
     )
 
     sf = sd / "state.json"
-    sf.write_text(state.model_dump_json(), encoding="utf-8")
+    _atomic_write_text(sf, state.model_dump_json())
     print(json.dumps({"created": True, "path": str(sf)}))
 
 

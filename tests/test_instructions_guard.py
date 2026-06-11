@@ -44,3 +44,13 @@ class TestValidateFile:
         missing = tmp_path / "nonexistent.md"
         warnings = validate_file(missing)
         assert warnings == []
+
+
+class TestHookMalformedPayload:
+    """The hook is advisory: unparseable stdin must exit 0, not traceback."""
+
+    def test_hook_malformed_payload_exits_clean(self) -> None:
+        from typer.testing import CliRunner
+
+        result = CliRunner().invoke(_mod.app, ["hook"], input="not json at all")
+        assert result.exit_code == 0
