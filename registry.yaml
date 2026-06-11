@@ -344,6 +344,9 @@ agents:
       model: sonnet
 
   research:
+    - name: calm-company-underwriter
+      description: "Use when a bootstrapped/calm-company product or business model needs an honest viability verdict; underwrites inside the founder's stated constraints (persona-forge graduate)."
+      model: inherit
     - name: competitor-scanner
       description: "Use when researching competitors in a given market, product category, or industry segment."
       model: sonnet
@@ -512,6 +515,8 @@ skills:
     description: "Use for quick 1-5 day tasks with pre-built runbooks."
   - name: nexus-sprint
     description: "Use when you need to build a feature or MVP with a focused team of 15-25 agents over 2-6 weeks."
+  - name: persona-forge
+    description: "Use when role-shaped work (analysis, review, writing, architecture, negotiation) needs a purpose-built persona: generate candidates, antagonistically attack them, evolve to one optimal persona, then adopt it"
   - name: project-onboard
     description: Use when setting up a new repository or project with Infinite Room Labs conventions and marketplace integration
   - name: prompt-refiner
