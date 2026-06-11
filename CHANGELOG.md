@@ -5,9 +5,10 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [agency-1.17.0] - 2026-06-11
 
 ### Changed
+- **`skills/persona-forge/SKILL.md` gains Phase 3.5: persist every forged persona to `~/.claude/agents/<persona-slug>.md`.** Persistence is now a standard step (agent-definition format: frontmatter + spec-as-system-prompt + one provenance line: forge date, task, Phase 2 kills), replacing the old optional "consider promoting" advice. Re-forges of the same role version the existing file in place. Promotion to a permanent marketplace agent in `agents/{division}/` stays a separate deliberate act for multi-use-proven specs. (First beneficiary: `story-gap-auditor-marta`, forged 2026-06-11 for the Employa-Bot story-corpus gap hunt.)
 - **`skills/release-prep/SKILL.md` gains Step 0: check for repo-local release tooling.** The generic skill told agents to hand-edit manifest files, contradicting repo conventions like this repo's own `tools/version_bump.py` mandate -- and a repo attached via `/add-dir` does not auto-load its CLAUDE.md, so the convention was invisible. Step 0 now requires reading the target repo's CLAUDE.md and hunting for bump/release tooling before the generic steps; Step 4 defers to whatever Step 0 found. (Hit live during the v1.16.0 release of this very repo.)
 
 ## [agency-1.16.0] - 2026-06-11

@@ -73,6 +73,17 @@ The deliverable. Must contain ALL of:
 - **Voice/tone instructions**
 - **Opening moves**: the first 3-5 questions it would ask or steps it would take on the task
 
+### Phase 3.5 -- Persist for Reuse
+
+Immediately after the spec is forged (before doing the work), write it to the user's agents directory so the persona is reusable in later sessions:
+
+- Path: `~/.claude/agents/<persona-slug>.md` (kebab-case from the persona's role, e.g. `story-gap-auditor-marta.md`)
+- Format: Claude Code agent definition -- YAML frontmatter (`name`, `description`) followed by the full Phase 3 spec as the system prompt. The `description` must say what task the persona was forged for and when, so future sessions can judge fit.
+- The spec is written verbatim: biography, numbered heuristics, retained biases, blind spots, voice, opening moves. Add one provenance line at the top of the body: forge date, the task it was forged for, and who died in Phase 2 (one line).
+- If a persona file for the same role already exists, version it in place (update the spec, note the re-forge date) rather than creating a near-duplicate.
+
+This replaces the old "consider promoting" advice -- persistence is now a standard step, not an option. Promotion to a permanent marketplace agent in `agents/{division}/` remains a separate, deliberate act for specs proven over multiple uses.
+
 ### Phase 4 -- Adoption
 
 The parent agent adopts the spec verbatim for the work phase:
@@ -85,7 +96,7 @@ The parent agent adopts the spec verbatim for the work phase:
 
 Two artifacts:
 
-1. The persona spec (from Phase 3) -- keep it; it is reusable for follow-up work in the same role. For recurring roles, consider promoting a proven spec to a permanent agent definition in `agents/{division}/`.
+1. The persona spec (from Phase 3), persisted to `~/.claude/agents/<persona-slug>.md` (Phase 3.5) so it is reusable across sessions. Specs proven over multiple uses may additionally be promoted to a permanent agent definition in `agents/{division}/`.
 2. The in-character work product with the out-of-character bias footnote
 
 ## Anti-Patterns
