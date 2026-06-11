@@ -1,6 +1,6 @@
 [project]
 name = "agent-ops"
-version = "1.16.0"
+version = "1.17.0"
 description = "Dev environment for agent-ops scripts/tests. Scripts run via uv with PEP 723 inline deps; this file exists only so the editor LSP can resolve imports."
 requires-python = ">=3.12"
 dependencies = [
