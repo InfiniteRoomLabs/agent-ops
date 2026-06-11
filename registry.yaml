@@ -499,10 +499,22 @@ agents:
       model: sonnet
 
 skills:
+  - name: architecture
+    description: "Create or evaluate an architecture decision record (ADR). Use when choosing between technologies (e.g., Kafka vs SQS), documenting a design decision with trade-offs and consequences, reviewing a system design proposal, or designing a new component from requirements and constraints."
+  - name: code-review
+    description: "Review code changes for security, performance, and correctness. Trigger with a PR URL or diff, 'review this before I merge', 'is this code safe?', or when checking a change for N+1 queries, injection risks, missing edge cases, or error handling gaps."
+  - name: debug
+    description: "Structured debugging session -- reproduce, isolate, diagnose, and fix. Trigger with an error message or stack trace, 'this works in staging but not prod', 'something broke after the deploy', or when behavior diverges from expected and the cause isn't obvious."
   - name: dep-audit
     description: "Use when auditing project dependencies for license, security, or staleness issues"
+  - name: deploy-checklist
+    description: "Pre-deployment verification checklist. Use when about to ship a release, deploying a change with database migrations or feature flags, verifying CI status and approvals before going to production, or documenting rollback triggers ahead of time."
+  - name: documentation
+    description: "Write and maintain technical documentation. Trigger with 'write docs for', 'document this', 'create a README', 'write a runbook', 'onboarding guide', or when the user needs help with any form of technical writing -- API docs, architecture docs, or operational runbooks."
   - name: end-agent-session
     description: Use when the user wants to unload a currently active agent persona and return to the default orchestrator.
+  - name: incident-response
+    description: "Run an incident response workflow -- triage, communicate, and write postmortem. Trigger with 'we have an incident', 'production is down', an alert that needs severity assessment, a status update mid-incident, or when writing a blameless postmortem after resolution."
   - name: load-agent
     description: "Use when the user wants to load an agent-ops agent as the primary session persona."
   - name: market-scan
@@ -527,6 +539,14 @@ skills:
     description: "Use ONLY when the user explicitly asks to visualize, render, view, open, or display a mermaid diagram as an image or PDF. Does not trigger when merely writing or editing mermaid syntax."
   - name: secrets-sync
     description: "Sync secrets from Bitwarden to Ansible Vault and Kubernetes"
+  - name: standup
+    description: "Generate a standup update from recent activity. Use when preparing for daily standup, summarizing yesterday's commits and PRs and ticket moves, formatting work into yesterday/today/blockers, or structuring a few rough notes into a shareable update."
+  - name: system-design
+    description: "Design systems, services, and architectures. Trigger with 'design a system for', 'how should we architect', 'system design for', 'what's the right architecture for', or when the user needs help with API design, data modeling, or service boundaries."
+  - name: tech-debt
+    description: "Identify, categorize, and prioritize technical debt. Trigger with 'tech debt', 'technical debt audit', 'what should we refactor', 'code health', or when the user asks about code quality, refactoring priorities, or maintenance backlog."
+  - name: testing-strategy
+    description: "Design test strategies and test plans. Trigger with 'how should we test', 'test strategy for', 'write tests for', 'test plan', 'what tests do we need', or when the user needs help with testing approaches, coverage, or test architecture."
 
 commands:
   - name: end-agent-session
