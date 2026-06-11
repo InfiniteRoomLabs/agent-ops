@@ -264,6 +264,39 @@ Private Claude Code plugin providing 148 specialized AI agents with NEXUS multi-
 | `/publish-package` | Package publishing workflow |
 | `/trend-watch` | Quick trend check for technologies/markets |
 
+## Output Styles
+
+The plugin ships output styles from `output-styles/` (declared via `outputStyles` in `.claude-plugin/plugin.json`).
+
+| Style | Description |
+|-------|-------------|
+| `agency:ADHD Accessibility` | ADHD-friendly communication: micro-chunking, reduced decisions, momentum preservation, progress tracking |
+
+### Registering an Output Style
+
+Plugin-shipped styles register under a **plugin-namespaced name** (`agency:<style name>`). The plain style name only matches files in `~/.claude/output-styles/` -- if the name does not resolve, Claude Code silently falls back to the default style with no warning.
+
+Activate from inside a session (persists to settings):
+
+```
+/output-style agency:ADHD Accessibility
+```
+
+Or set it directly in `~/.claude/settings.json`:
+
+```json
+{
+  "outputStyle": "agency:ADHD Accessibility"
+}
+```
+
+Two gotchas:
+
+- **Use the namespaced name.** `"outputStyle": "ADHD Accessibility"` (no `agency:` prefix) silently resolves to the default style.
+- **Project settings override user settings.** An `outputStyle` key in a repo's `.claude/settings.local.json` or `.claude/settings.json` beats the user-level setting in that repo. Remove it if the style mysteriously stays off in one project.
+
+Output styles resolve at session start -- restart the session after changing the setting.
+
 ## Architecture
 
 This repo follows a single-plugin architecture. Claude Code discovers agents via explicit path declarations in `.claude-plugin/plugin.json`. The SUMMON system (`scripts/summon.py`) handles runtime agent persona loading and session state management.

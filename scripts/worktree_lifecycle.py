@@ -13,7 +13,6 @@ Usage:
 
 from __future__ import annotations
 
-import json
 import os
 import shutil
 import subprocess
@@ -42,7 +41,6 @@ app = typer.Typer(
 class WorktreeConfig(BaseModel):
     propagate_hooks: bool = True
     check_uncommitted: bool = True
-    clean_branches: bool = False
 
 
 # ---------------------------------------------------------------------------

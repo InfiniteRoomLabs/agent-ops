@@ -10,6 +10,7 @@ import pytest
 from typer.testing import CliRunner
 
 import summon
+from _shared.paths import cwd_slug
 
 runner = CliRunner()
 
@@ -174,9 +175,8 @@ def test_get_state_dir_prefers_claude_project_dir(
     monkeypatch.chdir(other)
 
     sd = summon.get_state_dir()
-    expected_slug = str(project.resolve()).replace("/", "-")
-    assert expected_slug in str(sd)
-    assert str(other.resolve()).replace("/", "-") not in str(sd)
+    assert cwd_slug(project) in str(sd)
+    assert cwd_slug(other) not in str(sd)
 
 
 def test_get_state_dir_falls_back_to_cwd(
@@ -187,4 +187,4 @@ def test_get_state_dir_falls_back_to_cwd(
     monkeypatch.chdir(tmp_path)
 
     sd = summon.get_state_dir()
-    assert str(tmp_path.resolve()).replace("/", "-") in str(sd)
+    assert cwd_slug(tmp_path) in str(sd)
