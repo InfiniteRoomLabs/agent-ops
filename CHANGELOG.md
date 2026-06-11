@@ -5,6 +5,11 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.18.0] - 2026-06-11
+
+### Added
+- **10 engineering workflow skills imported from Anthropic's `engineering` Cowork plugin v1.2.0** (installed via Claude Desktop, vendored from its local plugin cache): `architecture`, `code-review`, `debug`, `deploy-checklist`, `documentation`, `incident-response`, `standup`, `system-design`, `tech-debt`, `testing-strategy`. Each SKILL.md is upstream-verbatim plus marketplace `tags:` frontmatter (function/scenario/custom). `CONNECTORS.md` (the connector-placeholder reference the skills link to as `../../CONNECTORS.md`) is vendored at the repo root to keep those links resolving.
+
 ## [agency-1.17.0] - 2026-06-11
 
 ### Changed
