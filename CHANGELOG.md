@@ -9,7 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **`agents/research/calm-company-underwriter.md`** -- first persona-forge graduate, promoted per the skill's "promote proven specs" path after the 2026-06-10 Employa-Bot viability engagement: a bootstrap-business viability underwriter with scar-derived heuristics (churn-on-success cohort math, structural-vs-keynote-away differentiator sort, attention-runway audit, institutional B2B2C costing), declared retained biases, named blind spots, and an out-of-character contract (bias footnote + personal-context-never-enters-repos rule). Registered in `registry.yaml`.
+- **`docs/plans/2026-05-27-shellcheck-lint-hook-explore.md`** -- exploration prompt (not a committed plan): surface shellcheck findings automatically when agents write/edit `*.sh` -- investigate bash-language-server LSP vs a PostToolUse hook; pick up in a fresh session.
+- **`docs/superpowers/plans/2026-05-27-changelog-merge-guard.md`** -- idea capture: `changelog-guard.py` guards `git commit` and `git push` on protected branches but a `git merge` into a protected branch sidesteps both (hit live). Sketches PostToolUse nudge + PreToolUse veto approaches.
 - **`skills/persona-forge/SKILL.md`** -- new skill: forge the right worker before working. For any role-shaped task (analysis, review, writing, architecture, negotiation, teaching), generates 3-5 candidate personas, antagonistically attacks each for bias/blind spots, evolves survivors through at least two merge-attack-refine rounds into one optimal persona spec (with declared retained biases and named blind spots), then the parent agent adopts it for the work phase and closes with an out-of-character bias footnote. Proven specs can be promoted to permanent `agents/{division}/` definitions. Registered in `registry.yaml`.
+
+### Changed
+- **`hooks/pre-deploy-secrets-sync.sh`** -- aligned with the 2026-05 fnox migration: Bitwarden session resolution now goes env `BW_SESSION` -> `fnox get BW_SESSION` (age-backed) -> the fish `bw-unlock` cache at `~/.bw_session` (the old `~/.secrets/bw-session` path is gone); when `with-secrets.sh` exists the ansible sync runs through the fnox-exec wrapper so it sees all declared secrets.
 
 ## [agency-1.15.1] - 2026-05-27
 
