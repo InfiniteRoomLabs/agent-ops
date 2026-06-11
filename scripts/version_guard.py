@@ -21,10 +21,13 @@ from typing import Annotated, Optional
 sys.path.insert(0, str(Path(__file__).parent))
 from _shared.dotted import resolve_dotted  # noqa: E402
 from _shared.git_ops import (  # noqa: E402
+    PROTECTED_BRANCHES_DEFAULT,
+    STAGING_SEPARATION_MESSAGE,
     get_current_branch,
     get_latest_tag,
-    is_combined_add_commit,
+    resolve_repo_root,
     runs_git_command,
+    stages_at_commit_time,
 )
 
 import semver
@@ -47,7 +50,7 @@ class ManifestSpec(BaseModel):
 
 class VersionGuardConfig(BaseModel):
     manifests: list[ManifestSpec] = Field(default_factory=list)
-    protected_branches: str = r"^(main|master|release/.+)$"
+    protected_branches: str = PROTECTED_BRANCHES_DEFAULT
     strategy: str = "manifest-only"
     changelog: str = "CHANGELOG.md"
     tag_prefix: str = "v"
@@ -62,6 +65,7 @@ class ToolInput(BaseModel):
 class HookPayload(BaseModel):
     tool_name: str = ""
     tool_input: ToolInput = ToolInput()
+    cwd: str = ""
 
 
 # -- Config loading --
@@ -163,8 +167,8 @@ def check_manifest_consistency(project_dir: Path, specs: list[ManifestSpec]) -> 
 # -- Git helpers --
 
 
-def get_latest_tag_version(prefix: str = "v") -> semver.Version | None:
-    tag = get_latest_tag(prefix)
+def get_latest_tag_version(prefix: str = "v", cwd: Path | None = None) -> semver.Version | None:
+    tag = get_latest_tag(prefix, cwd)
     if tag is None:
         return None
     raw = tag[len(prefix):] if tag.startswith(prefix) else tag
@@ -202,11 +206,13 @@ def _parse_bump_from_message(message: str) -> str:
     return COMMIT_TYPE_BUMP.get(commit_type, "none")
 
 
-def compute_next_version(base: semver.Version, tag_prefix: str = "v") -> semver.Version:
+def compute_next_version(
+    base: semver.Version, tag_prefix: str = "v", cwd: Path | None = None
+) -> semver.Version:
     tag_ref = f"{tag_prefix}{base}"
     result = subprocess.run(
         ["git", "log", f"{tag_ref}..HEAD", "--format=%B---COMMIT_END---", "--max-count=500"],
-        capture_output=True, text=True,
+        capture_output=True, text=True, cwd=cwd,
     )
     highest = "none"
     for block in result.stdout.split("---COMMIT_END---"):
@@ -243,9 +249,10 @@ def evaluate(
     commit_message: str,
     is_tag: bool,
     tag_version: str | None = None,
+    branch: str | None = None,
 ) -> EvalResult:
     """Core enforcement logic. Returns evaluation result."""
-    branch = get_current_branch()
+    branch = branch if branch is not None else get_current_branch(project_dir)
     protected_re = re.compile(config.protected_branches)
 
     # Non-protected branches: exit silently
@@ -297,7 +304,7 @@ def evaluate(
             break
 
     # Get latest tag
-    latest_tag = get_latest_tag_version(config.tag_prefix)
+    latest_tag = get_latest_tag_version(config.tag_prefix, project_dir)
 
     # No tags: advisory only, never block
     if latest_tag is None:
@@ -312,7 +319,7 @@ def evaluate(
 
     # --- Tier 2: Conventional commits analysis (opt-in) ---
     if config.strategy == "conventional":
-        computed = compute_next_version(latest_tag, config.tag_prefix)
+        computed = compute_next_version(latest_tag, config.tag_prefix, project_dir)
 
         if is_release and manifest_version_str:
             try:
@@ -425,18 +432,21 @@ def hook() -> None:
     if not is_commit and not is_tag_cmd:
         raise typer.Exit(0)
 
-    # Block combined add+commit
-    if is_commit and is_combined_add_commit(cmd):
-        typer.echo(
-            "BLOCKED: Run 'git add' and 'git commit' as separate Bash calls.\n"
-            "The version guard needs to inspect staged files between the two steps.\n"
-            "Stage your files first, then commit in a follow-up command.",
-            err=True,
-        )
-        raise typer.Exit(2)
-
-    project_dir = Path.cwd()
+    # Resolve the repo the git command actually targets (payload cwd + any
+    # `cd <path> &&` hops or `git -C <path>`), not the hook process cwd.
+    project_dir = resolve_repo_root(cmd, payload.cwd)
     config = load_config(project_dir)
+    branch = get_current_branch(project_dir)
+
+    # Block staging-at-commit-time forms (combined add+commit, -a/-am/--all),
+    # but only where the guard has something to enforce: protected branches.
+    if (
+        is_commit
+        and stages_at_commit_time(cmd)
+        and re.match(config.protected_branches, branch)
+    ):
+        typer.echo(STAGING_SEPARATION_MESSAGE.format(guard="version"), err=True)
+        raise typer.Exit(2)
 
     # Extract commit message for release detection.
     # Handles both -m "msg" and HEREDOC patterns (cat <<'EOF' ... EOF).
@@ -475,6 +485,7 @@ def hook() -> None:
         commit_message=commit_message,
         is_tag=is_tag_cmd,
         tag_version=tag_version,
+        branch=branch,
     )
 
     if result.message:

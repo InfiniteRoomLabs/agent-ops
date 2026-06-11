@@ -97,11 +97,36 @@ def write_elicitation_audit(
 # -- Typer commands --
 
 
+def _emit_decline() -> None:
+    """Decline via hookSpecificOutput on stdout (exit stays 0 per contract)."""
+    typer.echo(
+        json.dumps(
+            {
+                "hookSpecificOutput": {
+                    "hookEventName": "Elicitation",
+                    "action": "decline",
+                }
+            }
+        )
+    )
+
+
 @app.command()
 def request() -> None:
     """Elicitation hook: audit the request, block if patterns match."""
-    raw = sys.stdin.read()
-    payload = json.loads(raw)
+    try:
+        payload = json.loads(sys.stdin.read())
+        if not isinstance(payload, dict):
+            raise ValueError("payload is not a JSON object")
+    except Exception:
+        # Unparseable payload: we cannot run the pattern check. If blocking
+        # is configured, fail CLOSED (decline) -- a malformed payload must
+        # not become a bypass. With no patterns configured, allow (exit 0),
+        # matching the documented contract.
+        cfg = resolve_typed(McpConfig, "mcp")
+        if cfg.block_patterns:
+            _emit_decline()
+        raise typer.Exit(0)
 
     server_name = payload.get("server_name", "")
     request_type = payload.get("request_type", "")
@@ -143,16 +168,7 @@ def request() -> None:
             )
 
         # Decline via hookSpecificOutput on stdout, exit 0
-        typer.echo(
-            json.dumps(
-                {
-                    "hookSpecificOutput": {
-                        "hookEventName": "Elicitation",
-                        "action": "decline",
-                    }
-                }
-            )
-        )
+        _emit_decline()
 
     raise typer.Exit(0)
 
@@ -160,8 +176,13 @@ def request() -> None:
 @app.command()
 def result() -> None:
     """ElicitationResult hook: audit only."""
-    raw = sys.stdin.read()
-    payload = json.loads(raw)
+    try:
+        payload = json.loads(sys.stdin.read())
+        if not isinstance(payload, dict):
+            raise ValueError("payload is not a JSON object")
+    except Exception:
+        # Audit-only path: nothing to audit if we can't parse. Exit cleanly.
+        raise typer.Exit(0)
 
     server_name = payload.get("server_name", "")
     result_data = payload.get("result", {})

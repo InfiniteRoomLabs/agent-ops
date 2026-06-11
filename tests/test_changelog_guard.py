@@ -282,3 +282,78 @@ def test_hook_does_not_block_commit_message_mentioning_git_add(git_repo: Path) -
         cwd=git_repo,
     )
     assert result.returncode == 0, f"hook blocked a false positive: {result.stderr}"
+
+
+def test_hook_judges_cd_target_repo_not_session_repo(
+    git_repo: Path, tmp_path: Path
+) -> None:
+    """End-to-end regression for the cross-repo false block: the session repo
+    sits on 'main' with no CHANGELOG (would block), but the command cd's into a
+    second repo on a feature branch (must allow). The guard must judge the cd
+    target, not the hook process cwd. Observed live 2026-06-10."""
+    other = tmp_path / "other-repo"
+    other.mkdir()
+    subprocess.run(
+        ["git", "-C", str(other), "init", "-b", "feature/x"],
+        check=True, capture_output=True,
+    )
+    payload = (
+        '{"tool_name":"Bash","tool_input":{"command":'
+        f'"cd {other} && git commit -m \\"docs: cross-repo\\""}},'
+        f'"cwd":"{git_repo}"}}'
+    )
+    result = subprocess.run(
+        ["uv", "run", str(_SCRIPTS / "changelog-guard.py"), "hook"],
+        input=payload,
+        capture_output=True,
+        text=True,
+        cwd=git_repo,  # hook process runs in the session repo, like Claude Code
+    )
+    assert result.returncode == 0, (
+        f"guard judged the session repo instead of the cd target: {result.stderr}"
+    )
+    assert not (git_repo / "CHANGELOG.md").exists(), (
+        "guard must not generate a template in the session repo"
+    )
+
+
+def test_hook_blocks_self_staging_commit_on_main(git_repo: Path) -> None:
+    """`git commit -am` stages at commit time -- the index the guard inspects
+    is stale, so it must be rejected on protected branches like a combined
+    add+commit."""
+    payload = (
+        '{"tool_name":"Bash","tool_input":{"command":'
+        f'"git commit -am \\"docs: sneaky self-stage\\""}},'
+        f'"cwd":"{git_repo}"}}'
+    )
+    result = subprocess.run(
+        ["uv", "run", str(_SCRIPTS / "changelog-guard.py"), "hook"],
+        input=payload,
+        capture_output=True,
+        text=True,
+        cwd=git_repo,
+    )
+    assert result.returncode == 2
+    assert "separate Bash calls" in result.stderr
+
+
+def test_hook_allows_combined_add_commit_on_feature_branch(git_repo: Path) -> None:
+    """The staging-separation rule serves the CHANGELOG check, which only
+    applies to protected branches -- feature branches must not be blocked."""
+    subprocess.run(
+        ["git", "checkout", "-b", "feature/free"], check=True, capture_output=True
+    )
+    add_verb = "git " + "add"
+    payload = (
+        '{"tool_name":"Bash","tool_input":{"command":'
+        f'"{add_verb} . && git commit -m \\"wip\\""}},'
+        f'"cwd":"{git_repo}"}}'
+    )
+    result = subprocess.run(
+        ["uv", "run", str(_SCRIPTS / "changelog-guard.py"), "hook"],
+        input=payload,
+        capture_output=True,
+        text=True,
+        cwd=git_repo,
+    )
+    assert result.returncode == 0, f"feature branch wrongly blocked: {result.stderr}"

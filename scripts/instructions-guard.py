@@ -118,7 +118,12 @@ def check(
 @app.command()
 def hook() -> None:
     """Claude Code InstructionsLoaded hook entry point. Reads JSON from stdin."""
-    payload = HookPayload.model_validate_json(sys.stdin.read())
+    try:
+        payload = HookPayload.model_validate_json(sys.stdin.read())
+    except Exception:
+        # Malformed payload: this hook is advisory (warnings only, always
+        # exit 0) -- exit cleanly instead of crashing on the traceback.
+        raise typer.Exit(0)
 
     if not payload.file_path:
         raise typer.Exit(0)

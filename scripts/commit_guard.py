@@ -25,7 +25,12 @@ import typer
 from pydantic import BaseModel
 
 sys.path.insert(0, str(Path(__file__).parent))
-from _shared.git_ops import runs_git_command  # noqa: E402
+from _shared.git_ops import (  # noqa: E402
+    get_repo_root,
+    get_staged_files,
+    resolve_repo_root,
+    runs_git_command,
+)
 
 app = typer.Typer(
     help="Guard against committing files that should be gitignored.",
@@ -269,6 +274,7 @@ class ToolInput(BaseModel):
 class HookPayload(BaseModel):
     tool_name: str = ""
     tool_input: ToolInput = ToolInput()
+    cwd: str = ""
 
 
 # ---------------------------------------------------------------------------
@@ -301,23 +307,6 @@ def matches(file_path: str, pattern: str) -> bool:
     return fnmatch(Path(file_path).name, pattern)
 
 
-def _repo_root() -> Path:
-    """Best-effort repo root. Falls back to cwd when not in a git repo."""
-    try:
-        result = subprocess.run(
-            ["git", "rev-parse", "--show-toplevel"],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-    except (FileNotFoundError, OSError):
-        return Path.cwd()
-    top = result.stdout.strip()
-    if result.returncode != 0 or not top:
-        return Path.cwd()
-    return Path(top)
-
-
 def find_violations(
     staged_files: list[str],
     root: Optional[Path] = None,
@@ -328,7 +317,7 @@ def find_violations(
     skipped when the predicate returns False.
     """
     if root is None:
-        root = _repo_root()
+        root = get_repo_root()
     predicate_cache: dict[int, bool] = {}
     violations: list[tuple[str, IgnoredPattern]] = []
     for filepath in staged_files:
@@ -349,16 +338,6 @@ def find_violations(
     return violations
 
 
-def get_staged_files() -> list[str]:
-    """Return the list of currently staged file paths."""
-    result = subprocess.run(
-        ["git", "diff", "--cached", "--name-only"],
-        capture_output=True,
-        text=True,
-    )
-    return [line for line in result.stdout.strip().splitlines() if line]
-
-
 # ---------------------------------------------------------------------------
 # Commands
 # ---------------------------------------------------------------------------
@@ -375,11 +354,12 @@ def post() -> None:
     if not runs_git_command(payload.tool_input.command, "add"):
         raise typer.Exit(0)
 
-    staged = get_staged_files()
+    root = resolve_repo_root(payload.tool_input.command, payload.cwd)
+    staged = get_staged_files(root)
     if not staged:
         raise typer.Exit(0)
 
-    violations = find_violations(staged)
+    violations = find_violations(staged, root)
     for filepath, pat in violations:
         msg = pat.message or (
             f"'{filepath}' is a typically gitignored path ({pat.ecosystem}). "
@@ -401,11 +381,12 @@ def pre() -> None:
     if not runs_git_command(payload.tool_input.command, "commit"):
         raise typer.Exit(0)
 
-    staged = get_staged_files()
+    root = resolve_repo_root(payload.tool_input.command, payload.cwd)
+    staged = get_staged_files(root)
     if not staged:
         raise typer.Exit(0)
 
-    violations = find_violations(staged)
+    violations = find_violations(staged, root)
     if not violations:
         raise typer.Exit(0)
 

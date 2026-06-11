@@ -20,7 +20,7 @@ def get_latest_changelog_version(
     if not path.is_file():
         return None
 
-    text = path.read_text()
+    text = path.read_text(encoding="utf-8")
     for match in CHANGELOG_VERSION_RE.finditer(text):
         raw = match.group(1)
         if raw.lower() == "unreleased":
@@ -48,7 +48,7 @@ def has_content_under_header(
         return False
 
     header_tag = f"{prefix}{version}" if prefix else version
-    text = path.read_text()
+    text = path.read_text(encoding="utf-8")
     lines = text.splitlines()
 
     # Find the ## [prefix+version] header line

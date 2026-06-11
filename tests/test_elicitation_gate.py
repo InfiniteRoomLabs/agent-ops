@@ -69,3 +69,41 @@ class TestWriteElicitationAudit:
         assert entry["server_name"] == "test-server"
         assert entry["event_type"] == "elicitation_request"
         assert "timestamp" in entry
+
+
+class TestMalformedPayload:
+    """Hook entrypoints must honor their exit-0 contract on unparseable stdin."""
+
+    @staticmethod
+    def _patch_config(monkeypatch, block_patterns):
+        def fake_resolve_typed(model, namespace, **kw):
+            return _mod.McpConfig(
+                audit_elicitations=False, block_patterns=block_patterns
+            )
+
+        monkeypatch.setattr(_mod, "resolve_typed", fake_resolve_typed)
+
+    def test_request_malformed_no_patterns_exits_clean(self, monkeypatch) -> None:
+        from typer.testing import CliRunner
+
+        self._patch_config(monkeypatch, [])
+        result = CliRunner().invoke(_mod.app, ["request"], input="not json")
+        assert result.exit_code == 0
+        assert "decline" not in result.stdout
+
+    def test_request_malformed_with_patterns_declines(self, monkeypatch) -> None:
+        """With blocking configured, an unparseable payload fails CLOSED."""
+        from typer.testing import CliRunner
+
+        self._patch_config(monkeypatch, ["delete_.*"])
+        result = CliRunner().invoke(_mod.app, ["request"], input="not json")
+        assert result.exit_code == 0
+        data = json.loads(result.stdout)
+        assert data["hookSpecificOutput"]["action"] == "decline"
+
+    def test_result_malformed_exits_clean(self, monkeypatch) -> None:
+        from typer.testing import CliRunner
+
+        self._patch_config(monkeypatch, [])
+        result = CliRunner().invoke(_mod.app, ["result"], input="{broken")
+        assert result.exit_code == 0
