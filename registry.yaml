@@ -547,6 +547,8 @@ skills:
     description: "Identify, categorize, and prioritize technical debt. Trigger with 'tech debt', 'technical debt audit', 'what should we refactor', 'code health', or when the user asks about code quality, refactoring priorities, or maintenance backlog."
   - name: testing-strategy
     description: "Design test strategies and test plans. Trigger with 'how should we test', 'test strategy for', 'write tests for', 'test plan', 'what tests do we need', or when the user needs help with testing approaches, coverage, or test architecture."
+  - name: tsdoc
+    description: "Write or fix doc comments in TypeScript using TSDoc conventions. Use when adding JSDoc/docblocks to .ts files, cleaning up AI-generated or wordy comments, documenting interfaces/types/functions, or when a comment uses @property or {Type} annotations that should be TSDoc instead."
 
 commands:
   - name: end-agent-session

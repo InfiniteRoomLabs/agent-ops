@@ -5,6 +5,11 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.19.0] - 2026-06-22
+
+### Added
+- **`skills/tsdoc/` -- a skill for writing TypeScript doc comments the TS toolchain actually reads.** Codifies TSDoc conventions: one doc comment per declaration (interface/type/function **and** every member), no `@property` headers, no redundant `{Type}` annotations, `@param name - desc` / `@returns` form, `{@link}` cross-refs, ASCII-only. Explains the *why* -- the IDE (via the TypeScript language server) and TypeDoc both read per-declaration comments and ignore `@property`/`{Type}`; only the unused legacy `jsdoc` CLI consumes them, so a tidy consolidated `@property` header documents nothing the IDE shows on hover. Includes a before/after conversion, a diff-first workflow (recover substance from AI/JetBrains-generated comments before rewriting), and an optional `eslint-plugin-tsdoc` enforcement note. Registered in `registry.yaml`.
+
 ## [agency-1.18.0] - 2026-06-11
 
 ### Added
