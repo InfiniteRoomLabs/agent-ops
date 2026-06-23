@@ -27,7 +27,7 @@ agents/                            # 156+ agent definitions organized by divisio
   spatial-computing/               # XR, visionOS, Metal, immersive specialists
   game-development/                # Unity, Unreal, Godot, Roblox, narrative design
   specialized/                     # Cross-cutting: compliance, blockchain, data, MCP
-skills/                            # 24 user-invocable workflows
+skills/                            # 26 user-invocable workflows
   nexus/                           # Full multi-agent orchestration (replaces devops-team)
   nexus-sprint/                    # 2-6 week feature/MVP builds
   nexus-micro/                     # 1-5 day tasks with pre-built runbooks
