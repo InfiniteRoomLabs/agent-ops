@@ -22,8 +22,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 import typer
-from _shared.encoding import find_encoding_artifacts  # noqa: E402
-from frontmatter_config import resolve_typed  # noqa: E402
+from _shared.encoding import find_encoding_artifacts, format_artifact_codepoints  # noqa: E402
+from _shared.frontmatter_config import resolve_typed  # noqa: E402
 from pydantic import BaseModel, Field
 
 app = typer.Typer(
@@ -82,7 +82,7 @@ def check_encoding(files: list[Path]) -> list[dict]:
             continue
         found = find_encoding_artifacts(content)
         if found:
-            chars_desc = ", ".join(f"U+{ord(c):04X}" for c in sorted(found))
+            chars_desc = format_artifact_codepoints(found)
             violations.append(
                 {
                     "type": "encoding",

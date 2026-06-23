@@ -19,6 +19,7 @@ from typing import Annotated, Any, Optional
 
 sys.path.insert(0, str(Path(__file__).parent))
 from _shared.changelog import get_latest_changelog_version, has_content_under_header  # noqa: E402
+from _shared.hook_payload import BashHookPayload  # noqa: E402
 from _shared.git_ops import (  # noqa: E402
     get_latest_tag,
     resolve_repo_root,
@@ -45,14 +46,7 @@ class AutoTagResult(BaseModel):
     manifest_mismatch: bool = False
 
 
-class ToolInput(BaseModel):
-    command: str = ""
-
-
-class HookPayload(BaseModel):
-    tool_name: str = ""
-    tool_input: ToolInput = ToolInput()
-    cwd: str = ""
+class HookPayload(BashHookPayload):
     # PostToolUse fires for FAILED commands too. Shape varies by harness
     # version, so accept anything and interpret it in tool_call_succeeded().
     tool_response: Any = None

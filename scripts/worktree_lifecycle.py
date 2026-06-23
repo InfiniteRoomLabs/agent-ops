@@ -23,7 +23,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from _shared.audit import write_audit_entry  # noqa: E402
 from _shared.git_ops import get_repo_root  # noqa: E402
 from _shared.paths import get_audit_dir  # noqa: E402
-from frontmatter_config import resolve_typed  # noqa: E402
+from _shared.frontmatter_config import resolve_typed  # noqa: E402
 
 import typer
 from pydantic import BaseModel
@@ -114,7 +114,7 @@ def copy_git_hooks(*, main_repo: Path, worktree: Path) -> list[str]:
     return copied
 
 
-def check_env_files(worktree: Path) -> list[str]:
+def check_worktree_env_files(worktree: Path) -> list[str]:
     """Check for .env files in the worktree root.
 
     Skips ``.env.example`` and ``.envrc``. Returns a list of warning strings.
@@ -187,7 +187,7 @@ def create() -> None:
             )
 
     # Check for .env files
-    env_warnings = check_env_files(wt_path)
+    env_warnings = check_worktree_env_files(wt_path)
     for warning in env_warnings:
         typer.echo(warning, err=True)
 

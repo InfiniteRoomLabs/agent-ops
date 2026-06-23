@@ -106,40 +106,40 @@ class TestCopyHooksToWorktree:
 
 
 class TestCheckEnvFiles:
-    """Tests for check_env_files()."""
+    """Tests for check_worktree_env_files()."""
 
-    def test_check_env_files_finds_env(self, tmp_path: Path) -> None:
+    def test_check_worktree_env_files_finds_env(self, tmp_path: Path) -> None:
         """Create .env file, verify 1 warning."""
-        from worktree_lifecycle import check_env_files
+        from worktree_lifecycle import check_worktree_env_files
 
         (tmp_path / ".env").write_text("SECRET=hunter2\n")
-        warnings = check_env_files(tmp_path)
+        warnings = check_worktree_env_files(tmp_path)
         assert len(warnings) == 1
         assert ".env" in warnings[0]
 
-    def test_check_env_files_clean(self, tmp_path: Path) -> None:
+    def test_check_worktree_env_files_clean(self, tmp_path: Path) -> None:
         """No .env files, 0 warnings."""
-        from worktree_lifecycle import check_env_files
+        from worktree_lifecycle import check_worktree_env_files
 
-        warnings = check_env_files(tmp_path)
+        warnings = check_worktree_env_files(tmp_path)
         assert len(warnings) == 0
 
-    def test_check_env_files_skips_example_and_envrc(self, tmp_path: Path) -> None:
+    def test_check_worktree_env_files_skips_example_and_envrc(self, tmp_path: Path) -> None:
         """Should skip .env.example and .envrc."""
-        from worktree_lifecycle import check_env_files
+        from worktree_lifecycle import check_worktree_env_files
 
         (tmp_path / ".env.example").write_text("SECRET=placeholder\n")
         (tmp_path / ".envrc").write_text("use flake\n")
-        warnings = check_env_files(tmp_path)
+        warnings = check_worktree_env_files(tmp_path)
         assert len(warnings) == 0
 
-    def test_check_env_files_finds_dotenv_variants(self, tmp_path: Path) -> None:
+    def test_check_worktree_env_files_finds_dotenv_variants(self, tmp_path: Path) -> None:
         """Should detect .env.local, .env.production, etc."""
-        from worktree_lifecycle import check_env_files
+        from worktree_lifecycle import check_worktree_env_files
 
         (tmp_path / ".env.local").write_text("SECRET=local\n")
         (tmp_path / ".env.production").write_text("SECRET=prod\n")
-        warnings = check_env_files(tmp_path)
+        warnings = check_worktree_env_files(tmp_path)
         assert len(warnings) == 2
 
 

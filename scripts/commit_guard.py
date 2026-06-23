@@ -22,7 +22,6 @@ from pathlib import Path
 from typing import Callable, Optional
 
 import typer
-from pydantic import BaseModel
 
 sys.path.insert(0, str(Path(__file__).parent))
 from _shared.git_ops import (  # noqa: E402
@@ -31,6 +30,7 @@ from _shared.git_ops import (  # noqa: E402
     resolve_repo_root,
     runs_git_command,
 )
+from _shared.hook_payload import BashHookPayload  # noqa: E402
 
 app = typer.Typer(
     help="Guard against committing files that should be gitignored.",
@@ -263,21 +263,6 @@ PATTERNS: list[IgnoredPattern] = [
 ]
 
 # ---------------------------------------------------------------------------
-# Pydantic models for hook JSON payload
-# ---------------------------------------------------------------------------
-
-
-class ToolInput(BaseModel):
-    command: str = ""
-
-
-class HookPayload(BaseModel):
-    tool_name: str = ""
-    tool_input: ToolInput = ToolInput()
-    cwd: str = ""
-
-
-# ---------------------------------------------------------------------------
 # Matching logic
 # ---------------------------------------------------------------------------
 
@@ -347,7 +332,7 @@ def find_violations(
 def post() -> None:
     """PostToolUse hook: warn if staged files match ignored patterns after git add."""
     try:
-        payload = HookPayload.model_validate_json(sys.stdin.read())
+        payload = BashHookPayload.model_validate_json(sys.stdin.read())
     except Exception:
         raise typer.Exit(0)
 
@@ -374,7 +359,7 @@ def post() -> None:
 def pre() -> None:
     """PreToolUse hook: block commit if staged files match ignored patterns."""
     try:
-        payload = HookPayload.model_validate_json(sys.stdin.read())
+        payload = BashHookPayload.model_validate_json(sys.stdin.read())
     except Exception:
         raise typer.Exit(0)
 

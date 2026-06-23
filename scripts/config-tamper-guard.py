@@ -43,7 +43,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from _shared.audit import write_audit_entry  # noqa: E402
 from _shared.dotted import resolve_dotted  # noqa: E402
 from _shared.paths import get_audit_dir, project_dir  # noqa: E402
-from frontmatter_config import resolve_typed  # noqa: E402
+from _shared.frontmatter_config import resolve_typed  # noqa: E402
 
 import typer
 from pydantic import BaseModel, Field

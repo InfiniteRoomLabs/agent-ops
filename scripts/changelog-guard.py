@@ -33,9 +33,9 @@ from _shared.git_ops import (  # noqa: E402
     runs_git_command,
     stages_at_commit_time,
 )
+from _shared.hook_payload import BashHookPayload  # noqa: E402
 
 import typer
-from pydantic import BaseModel
 
 app = typer.Typer(
     help="Guard against commits on protected branches without a CHANGELOG.md update.",
@@ -45,19 +45,6 @@ app = typer.Typer(
 PROTECTED_BRANCHES = re.compile(PROTECTED_BRANCHES_DEFAULT)
 
 TEMPLATE_PATH = Path(__file__).parent / "templates" / "CHANGELOG.template.md"
-
-
-# -- Pydantic models for hook JSON payload --
-
-
-class ToolInput(BaseModel):
-    command: str = ""
-
-
-class HookPayload(BaseModel):
-    tool_name: str = ""
-    tool_input: ToolInput = ToolInput()
-    cwd: str = ""
 
 
 # -- Shared logic --
@@ -301,7 +288,7 @@ def push_check(
 @app.command()
 def hook() -> None:
     """Claude Code PreToolUse hook entry point. Reads JSON from stdin."""
-    payload = HookPayload.model_validate_json(sys.stdin.read())
+    payload = BashHookPayload.model_validate_json(sys.stdin.read())
     command = payload.tool_input.command
 
     # Push guard: require a tracked CHANGELOG before pushing to a protected branch.
