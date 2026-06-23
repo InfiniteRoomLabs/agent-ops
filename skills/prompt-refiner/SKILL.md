@@ -187,7 +187,7 @@ Present three options:
 When the raw prompt contains phrases like "let's brainstorm," "let's plan," "generate a plan," or references a specific workflow, recognize these as implicit skill invocations. Adjust the Execute option:
 
 - "Let's brainstorm" -> Execute feeds the refined prompt into the brainstorming skill
-- "Generate a plan" -> Execute feeds into spec-kitty.plan or writing-plans
+- "Generate a plan" -> Execute feeds into writing-plans
 - No skill reference -> Execute runs the refined prompt directly in conversation
 
 Note the target skill in the Execute option so the user knows what will happen.

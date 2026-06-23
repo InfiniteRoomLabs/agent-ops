@@ -245,7 +245,7 @@ Before advancing to Phase 4 (Quality & Hardening), the Orchestrator must verify 
 |---|-----------|----------------|--------|
 | 1 | All sprint tasks implemented (checklist complete) | Sprint Prioritizer backlog shows 100% of in-scope tasks marked done | ☐ |
 | 2 | All PRs reviewed and merged | Git history shows no open PRs targeting the main/release branch for in-scope work | ☐ |
-| 3 | Test plan exists | Test Strategist test plan or test plan section in Spec Kitty spec (`kitty-specs/NNN-feature/spec.md`) | ☐ |
+| 3 | Test plan exists | Test Strategist test plan or equivalent test plan document | ☐ |
 | 4 | No blocking code review issues open | All code review comments resolved or explicitly deferred with documented rationale | ☐ |
 | 5 | CI pipeline passes | Latest CI run on the main/release branch is green (all stages pass) | ☐ |
 
@@ -255,7 +255,7 @@ The Orchestrator verifies each criterion by confirming the artifact or state exi
 
 1. **All sprint tasks implemented**: Every task in the sprint backlog has a PASS verdict from the Evidence Collector. Deferred tasks are explicitly documented with rationale and approved by the Sprint Prioritizer. No task is in "in progress" or "blocked" state.
 2. **All PRs reviewed and merged**: The git log shows that every feature branch opened during the build phase has been reviewed (at least one approval), merged, and the branch cleaned up. No orphaned branches with unmerged work remain.
-3. **Test plan exists**: A test plan document exists that covers the implemented features. This may come from a dedicated Test Strategist deliverable, a test plan section in the Spec Kitty spec, or an equivalent artifact. The plan must include at minimum: test scope, test types (unit, integration, e2e), critical user paths to test, and acceptance criteria mapping.
+3. **Test plan exists**: A test plan document exists that covers the implemented features. This may come from a dedicated Test Strategist deliverable or an equivalent artifact. The plan must include at minimum: test scope, test types (unit, integration, e2e), critical user paths to test, and acceptance criteria mapping.
 4. **No blocking code review issues open**: All review threads on merged PRs are resolved. Any deferred items are captured as backlog tasks with priority assigned by Sprint Prioritizer. "Resolved" means the author addressed the feedback or the reviewer explicitly approved deferral.
 5. **CI pipeline passes**: The CI pipeline for the main/release branch passes all stages (lint, build, test, security scan if configured). Flaky tests that were skipped must be documented. No test failures are suppressed without documented justification.
 

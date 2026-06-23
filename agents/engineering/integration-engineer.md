@@ -100,7 +100,7 @@ When integrations require ongoing data synchronization rather than one-off API c
 
 ### Storage: S3-Compatible
 
-- **Garage** (IRL's object storage): S3-compatible API at `<your-s3-endpoint>`. Bucket-based access at `<bucket>.<your-s3-endpoint>`. Use any S3-compatible SDK. Configure endpoint URL, access key, and secret key. Garage supports presigned URLs for temporary access.
+- **Garage** (IRL's object storage): S3-compatible API at `<your-s3-endpoint>`. Bucket-based access at `<your-s3-endpoint>/<bucket>`. Use any S3-compatible SDK. Configure endpoint URL, access key, and secret key. Garage supports presigned URLs for temporary access.
 - **MinIO**: S3-compatible. Same SDK patterns as Garage. Commonly used for local development when Garage is not available.
 - **AWS S3**: The reference implementation. All S3-compatible integrations should be written against the standard S3 SDK and tested against both the target provider and a local MinIO instance.
 
@@ -117,7 +117,7 @@ When building integrations for IRL projects, use these internal services:
 - **Auth provider**: Authentik at `<your-auth-provider>`. All IRL applications should authenticate against Authentik via OIDC.
 - **Object storage**: Garage S3 API at `<your-s3-endpoint>`. Use for file uploads, media storage, backups.
 - **Database**: PostgreSQL via CNPG in the IRL homelab k3s cluster. Connection details via Kubernetes Secrets.
-- **Secrets flow**: Bitwarden is the source of truth. Secrets sync to Kubernetes Secrets and Ansible Vault via `bw-sync.sh`. Integration credentials (API keys, OAuth client secrets, webhook signing secrets) follow this flow. Coordinate with the Entropy agent for rotation schedules.
+- **Secrets flow**: Bitwarden is the source of truth. Secrets sync to Kubernetes Secrets and Ansible Vault via `<your-infra-repo>/scripts/bw-sync.sh`. Integration credentials (API keys, OAuth client secrets, webhook signing secrets) follow this flow. Coordinate with the Entropy agent for rotation schedules.
 - **Cache/Queue**: Valkey (Redis-compatible) in the IRL cluster for caching and lightweight message queuing.
 
 ## Security
@@ -126,7 +126,7 @@ When building integrations for IRL projects, use these internal services:
 
 - Store all API keys and client secrets in Bitwarden under the appropriate `IRL/Services/` subfolder.
 - Application code reads credentials from environment variables. Never from config files, never from command-line arguments.
-- Use Kubernetes Secrets (populated by `bw-sync.sh`) as the injection mechanism for deployed services.
+- Use Kubernetes Secrets (populated by `<your-infra-repo>/scripts/bw-sync.sh`) as the injection mechanism for deployed services.
 - Document every required environment variable in the integration module's README and in a `.env.example` file.
 
 ### Webhook Signature Verification
@@ -149,7 +149,7 @@ Every webhook handler must verify the request authenticity before processing:
 ### Credential Rotation
 
 - All integration credentials have a rotation policy managed by the Entropy agent.
-- When implementing an integration, document the rotation procedure: which Bitwarden item to update, which `bw-sync.sh` target to run, and whether the service needs a restart or if it picks up new credentials dynamically.
+- When implementing an integration, document the rotation procedure: which Bitwarden item to update, which `<your-infra-repo>/scripts/bw-sync.sh` target to run, and whether the service needs a restart or if it picks up new credentials dynamically.
 - Prefer integrations that support key rotation without downtime (e.g., Stripe allows multiple webhook signing secrets during rotation).
 
 ## Testing

@@ -229,14 +229,6 @@ Track and report these metrics. Produce a Quality Metrics Report when requested 
 | test-strategist | Receives risk scores to calibrate severity baseline per component. |
 | support-responder | Receives user-reported bugs. Sends resolution status for user communication. |
 
-### Spec Kitty Integration
-
-When operating within a Spec Kitty workflow:
-- Read `kitty-specs/{id}/test-strategy.md` for component risk scores and coverage targets
-- Track defects discovered during the Review phase
-- Produce the Quality Metrics Report as input to the Accept phase gate
-- A project with open Blocker or Critical defects cannot pass the Accept gate
-
 ## Handoff Protocol
 
 ### Inputs You Accept

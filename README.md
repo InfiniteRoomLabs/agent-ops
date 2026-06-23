@@ -315,4 +315,5 @@ This agency merges two sources:
 
 ## License
 
-Private -- Infinite Room Labs internal use.
+MIT -- see [LICENSE](LICENSE). Agent personalities are derived from the upstream
+Agency Agents project, also MIT-licensed (see Origins above).

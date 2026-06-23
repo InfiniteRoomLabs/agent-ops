@@ -225,7 +225,7 @@ The Scoping-Complete Gate verifies that onboarding and requirements work is done
 
 | Criterion | Threshold | Evidence Required |
 |-----------|-----------|-------------------|
-| Requirements document exists | PRD or Spec Kitty spec with acceptance criteria | Requirements Engineer or `kitty-specs/` artifact |
+| Requirements document exists | PRD with acceptance criteria | Requirements Engineer output |
 | Stakeholder map defined | All actors, roles, and decision authority documented | Project Shepherd or Requirements Engineer output |
 | Project charter completed | Scope, objectives, success criteria, sponsor sign-off | Project Shepherd charter document |
 | Communication cadence established | Frequency, channels, and escalation paths agreed | Project Shepherd communication plan |
@@ -237,9 +237,7 @@ The Scoping-Complete Gate verifies that onboarding and requirements work is done
 
 **Gate Keeper**: Agents Orchestrator
 **Triggered**: After architecture work completes, before Phase 2 activation
-**Applies to**: Projects not using Spec Kitty (which has its own plan/tasks phases)
-
-The Planning-Complete Gate verifies that planning artifacts are sufficient to begin the Build phase. For projects using Spec Kitty, the `plan` and `tasks` phases handle this verification. For all other projects, this gate prevents the pipeline from entering Build without documented decisions about architecture, milestones, resourcing, and technology.
+The Planning-Complete Gate verifies that planning artifacts are sufficient to begin the Build phase. This gate prevents the pipeline from entering Build without documented decisions about architecture, milestones, resourcing, and technology.
 
 | Criterion | Threshold | Evidence Required |
 |-----------|-----------|-------------------|
@@ -742,7 +740,7 @@ When a task exceeds 3 retry attempts:
 |-------|-----------|-------------|---------------|
 | 0 -> 1 | Discovery Gate | Executive Summary Generator | Market validated, user need confirmed, regulatory path clear |
 | 1 (internal) | Scoping-Complete Gate | Agents Orchestrator | Requirements doc exists, stakeholder map defined, project charter completed, communication cadence established, timeline/milestone plan exists |
-| 1 (internal) | Planning-Complete Gate | Agents Orchestrator | Architecture document reviewed, sprint/milestone plan exists, resource assignments defined, tech stack decisions documented (for projects not using Spec Kitty) |
+| 1 (internal) | Planning-Complete Gate | Agents Orchestrator | Architecture document reviewed, sprint/milestone plan exists, resource assignments defined, tech stack decisions documented |
 | 1 -> 2 | Architecture Gate | Studio Producer + Reality Checker | Architecture complete, brand defined, budget approved, sprint plan realistic |
 | 2 -> 3 | Foundation Gate | DevOps Automator + Evidence Collector | CI/CD working, skeleton app running, monitoring active |
 | 3 (internal) | Build-Complete Gate | Agents Orchestrator | All sprint tasks implemented, PRs reviewed and merged, test plan exists, no blocking review issues, CI passes |

@@ -108,7 +108,6 @@ ADHD mode stacks with other agency features:
 | Feature | Interaction |
 |---------|-------------|
 | Agent sessions (`/load-agent`) | ADHD rules apply to the loaded agent's communication style |
-| Spec Kitty workflows | Micro-chunking and progress tracking integrate naturally with task phases |
 | Plan mode | Plans auto-chunk into 5-minute steps |
 
 ADHD mode does **not** override:

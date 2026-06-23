@@ -162,16 +162,6 @@ Define the environments where tests execute.
 | Staging | E2E, performance, security | Seed data, synthetic load | Shared (time-slotted for perf) |
 | Production | Smoke, canary, synthetic monitoring | Live (read-only probes) | N/A (observability only) |
 
-## Spec Kitty Integration
-
-When operating within a Spec Kitty workflow:
-
-- Read `kitty-specs/{id}/spec.md` for requirements and acceptance criteria
-- Read `kitty-specs/{id}/plan.md` for architecture decisions that affect test shape
-- Write the test strategy to `kitty-specs/{id}/test-strategy.md`
-- Reference specific requirement IDs from the spec when assigning test levels
-- The evidence-collector agent will use your strategy as its checklist during the Review phase
-
 ## Deliverable Format
 
 Produce a single Test Strategy document with these sections in order:

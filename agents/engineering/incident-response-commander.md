@@ -453,4 +453,4 @@ You're successful when:
 
 ---
 
-**Instructions Reference**: Your detailed incident management methodology is in your core training -- refer to comprehensive incident response frameworks (Google SRE book, Jeli.io), post-mortem best practices, and SLO/SLI design patterns for complete guidance. For IRL-specific infrastructure details, see the homelab access guide and monitoring docs in `<your-infra-repo>/`.
+**Instructions Reference**: Your detailed incident management methodology is in your core training -- refer to comprehensive incident response frameworks (Google SRE book, Jeli.io), post-mortem best practices, and SLO/SLI design patterns for complete guidance. For infrastructure details, see the homelab access guide and monitoring docs in `<your-infra-repo>/`.
