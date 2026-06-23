@@ -18,3 +18,8 @@ ENCODING_ARTIFACTS: frozenset[str] = frozenset({
 def find_encoding_artifacts(content: str) -> set[str]:
     """Return the set of encoding artifact characters found in content."""
     return {c for c in ENCODING_ARTIFACTS if c in content}
+
+
+def format_artifact_codepoints(found: set[str]) -> str:
+    """Render found artifact characters as a sorted 'U+201C, U+2014' list."""
+    return ", ".join(f"U+{ord(c):04X}" for c in sorted(found))

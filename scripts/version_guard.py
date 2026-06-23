@@ -29,6 +29,7 @@ from _shared.git_ops import (  # noqa: E402
     runs_git_command,
     stages_at_commit_time,
 )
+from _shared.hook_payload import BashHookPayload  # noqa: E402
 
 import semver
 import typer
@@ -56,16 +57,6 @@ class VersionGuardConfig(BaseModel):
     tag_prefix: str = "v"
     release_pattern: str = r"^(release:|chore\(release\):)"
     base_version: str | None = None
-
-
-class ToolInput(BaseModel):
-    command: str = ""
-
-
-class HookPayload(BaseModel):
-    tool_name: str = ""
-    tool_input: ToolInput = ToolInput()
-    cwd: str = ""
 
 
 # -- Config loading --
@@ -423,7 +414,7 @@ def check(
 @app.command()
 def hook() -> None:
     """Claude Code PreToolUse hook entry point. Reads JSON from stdin."""
-    payload = HookPayload.model_validate_json(sys.stdin.read())
+    payload = BashHookPayload.model_validate_json(sys.stdin.read())
     cmd = payload.tool_input.command
 
     is_commit = runs_git_command(cmd, "commit")

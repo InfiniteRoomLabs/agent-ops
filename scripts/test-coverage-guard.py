@@ -23,28 +23,19 @@ from pathlib import Path
 from typing import Callable
 
 import typer
-from pydantic import BaseModel
 
 sys.path.insert(0, str(Path(__file__).parent))
-from _shared.git_ops import resolve_repo_root, runs_git_command  # noqa: E402
+from _shared.git_ops import (  # noqa: E402
+    get_staged_files,
+    resolve_repo_root,
+    runs_git_command,
+)
+from _shared.hook_payload import BashHookPayload  # noqa: E402
 
 app = typer.Typer(
     help="Block committing a new scripts/*.py without a matching tests/test_*.py.",
     no_args_is_help=True,
 )
-
-
-# -- Pydantic models for hook JSON payload --
-
-
-class ToolInput(BaseModel):
-    command: str = ""
-
-
-class HookPayload(BaseModel):
-    tool_name: str = ""
-    tool_input: ToolInput = ToolInput()
-    cwd: str = ""
 
 
 # -- Pure helpers --
@@ -112,16 +103,6 @@ def staged_added_scripts(root: Path | None = None) -> list[str]:
     return added
 
 
-def _staged_paths(root: Path | None = None) -> set[str]:
-    result = subprocess.run(
-        ["git", "diff", "--cached", "--name-only"],
-        capture_output=True,
-        text=True,
-        cwd=root,
-    )
-    return set(result.stdout.splitlines())
-
-
 def make_present(root: Path | None = None) -> Callable[[str], bool]:
     """Build the `present(test_path)` predicate for the repo at `root`:
     True if the test file is tracked OR staged in this commit."""
@@ -135,7 +116,7 @@ def make_present(root: Path | None = None) -> Callable[[str], bool]:
         )
         if tracked.returncode == 0:
             return True
-        return test_path in _staged_paths(root)
+        return test_path in get_staged_files(root)
 
     return present
 
@@ -154,7 +135,7 @@ def check() -> None:
 @app.command()
 def hook() -> None:
     """Claude Code PreToolUse hook entry point. Reads JSON from stdin."""
-    payload = HookPayload.model_validate_json(sys.stdin.read())
+    payload = BashHookPayload.model_validate_json(sys.stdin.read())
 
     # Skeleton-based detection: a commit MESSAGE mentioning 'git commit'
     # must not trigger evaluation (same fix class as v1.15.1's guards).
