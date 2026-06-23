@@ -5,6 +5,30 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.20.0] - 2026-06-23
+
+Public-release preparation: the repository is now open-source under MIT.
+
+### Added
+- **MIT `LICENSE`** at the repo root; README license section updated to match (was "Private -- internal use").
+- **`skills/public-readiness/`** -- a skill that codifies the pre-public-release audit: secret/topology leak scanning across the working tree **and** git history, license + OSS-health checks, doc-accuracy verification, and `git-filter-repo` history-scrub guidance. Registered in `registry.yaml`.
+- **`.github/workflows/test.yml`** -- a Tests workflow that runs `uv run pytest` on every push and pull request. The suite was previously never executed in CI.
+- **`scripts/_shared/hook_payload.py`** (`BashHookPayload`) and **`scripts/_shared/encoding.format_artifact_codepoints`** -- shared helpers extracted from duplicated code.
+
+### Changed
+- Humanized the README prose (replaced em-dashes, corrected the Architecture section to describe how agents are actually discovered).
+- Corrected the agent count to `156+` across README, CLAUDE.md, `plugin.json`, and `marketplace.json`; fixed the ZK Steward role (Zettelkasten knowledge management, not zero-knowledge proofs); dropped "private marketplace" framing now that the repo is public.
+- Moved `frontmatter_config.py` into `scripts/_shared/` to match the shared-module convention (7 importers updated).
+- Renamed `worktree_lifecycle.check_env_files` to `check_worktree_env_files` to remove a name collision with the teammate-gate check.
+
+### Removed
+- **Spec Kitty** (`.kittify/`, 59 files) and all references in agent/skill/strategy docs -- no longer used.
+- Two environment-specific deploy-secrets hooks (`pre-deploy-secrets-sync.sh`, `post-deploy-secrets-verify.sh`) and their `hooks.json` entries -- operator-specific glue that no-opped for every other user.
+- Duplicated `ToolInput`/`HookPayload` models in five guards, `test-coverage-guard`'s private `_staged_paths()` (now reuses `_shared.git_ops.get_staged_files`), and several dead imports.
+
+### Security
+- Scrubbed internal infrastructure details from agent definitions **and rewrote git history** (`git-filter-repo`) so no past commit retains them: homelab IP address, internal `*.lab` domains, private sister-repo paths, and a personal identifier are now placeholders. No credentials were ever committed; the scrubbed values were network-topology and path disclosures.
+
 ## [agency-1.19.0] - 2026-06-22
 
 ### Added
