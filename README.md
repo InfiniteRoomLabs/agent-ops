@@ -274,7 +274,7 @@ The plugin ships output styles from `output-styles/` (declared via `outputStyles
 
 ### Registering an Output Style
 
-Plugin-shipped styles register under a **plugin-namespaced name** (`agency:<style name>`). The plain style name only matches files in `~/.claude/output-styles/` -- if the name does not resolve, Claude Code silently falls back to the default style with no warning.
+Plugin-shipped styles register under a **plugin-namespaced name** (`agency:<style name>`). The plain style name only matches files in `~/.claude/output-styles/`. If the name does not resolve, Claude Code silently falls back to the default style with no warning.
 
 Activate from inside a session (persists to settings):
 
@@ -295,11 +295,11 @@ Two gotchas:
 - **Use the namespaced name.** `"outputStyle": "ADHD Accessibility"` (no `agency:` prefix) silently resolves to the default style.
 - **Project settings override user settings.** An `outputStyle` key in a repo's `.claude/settings.local.json` or `.claude/settings.json` beats the user-level setting in that repo. Remove it if the style mysteriously stays off in one project.
 
-Output styles resolve at session start -- restart the session after changing the setting.
+Output styles resolve at session start, so restart the session after changing the setting.
 
 ## Architecture
 
-This repo follows a single-plugin architecture. Claude Code discovers agents via explicit path declarations in `.claude-plugin/plugin.json`. The SUMMON system (`scripts/summon.py`) handles runtime agent persona loading and session state management.
+This repo is a single plugin. Claude Code loads every agent definition under `agents/`, grouped by division. The SUMMON system (`scripts/summon.py`) handles runtime persona loading and session state.
 
 NEXUS orchestration is implemented as skills rather than agents, providing three deployment scales (Full/Sprint/Micro) with reference material in `strategy/`.
 
@@ -315,5 +315,5 @@ This agency merges two sources:
 
 ## License
 
-MIT -- see [LICENSE](LICENSE). Agent personalities are derived from the upstream
+MIT. See [LICENSE](LICENSE). Agent personalities are derived from the upstream
 Agency Agents project, also MIT-licensed (see Origins above).
