@@ -533,6 +533,8 @@ skills:
     description: Use when setting up a new repository or project with Infinite Room Labs conventions and marketplace integration
   - name: prompt-refiner
     description: "Use when the user asks to refine, improve, restructure, or clarify a prompt for Claude Code."
+  - name: public-readiness
+    description: "Use when taking a private repo public, open-sourcing internal tooling, or auditing a repo before flipping its visibility. Covers secret/topology leak scanning (working tree and git history), license and OSS-health checks, doc accuracy, and history-scrub guidance."
   - name: release-prep
     description: Use when preparing a new version release of a library or project
   - name: render-mermaid
