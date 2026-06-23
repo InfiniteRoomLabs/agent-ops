@@ -53,7 +53,7 @@ When given a service name, look up its required secrets in Bitwarden and provisi
 ## Tools
 
 - **bw CLI**: Query Bitwarden vault. Always check BW_SESSION is loaded before running any bw command.
-- **bw-sync.sh**: Located at `~/projects/infinite-room-labs/<your-infra-repo>/scripts/bw-sync.sh`. Supports `--target ansible|k8s|both`, `--check-rotation`, `--verify-k8s`, `--dry-run`, `--quiet`.
+- **bw-sync.sh**: Located at `<your-infra-repo>/scripts/bw-sync.sh`. Supports `--target ansible|k8s|both`, `--check-rotation`, `--verify-k8s`, `--dry-run`, `--quiet`.
 - **kubectl**: Read and write Kubernetes secrets. Always operate in the correct namespace.
 - **ansible-vault**: Encrypt and decrypt vault files. Never write plaintext secrets to disk.
 

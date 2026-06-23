@@ -84,20 +84,12 @@ If the project is open source, verify or create:
 - `.github/ISSUE_TEMPLATE/` -- bug report and feature request templates
 - `.github/PULL_REQUEST_TEMPLATE.md`
 
-### Spec Kitty (if applicable)
-
-If the user wants spec-driven development, initialize Spec Kitty:
-
-```bash
-spec-kitty init
-```
-
 ## After Onboarding
 
 Report what was created and suggest next steps:
 - Install marketplace plugins: `/plugin marketplace add InfiniteRoomLabs/agent-ops`
 - Run claude-automation-recommender for additional setup suggestions
-- Start first feature with spec-kitty or superpowers:brainstorming
+- Start first feature with superpowers:brainstorming
 
 ## Anti-Patterns
 

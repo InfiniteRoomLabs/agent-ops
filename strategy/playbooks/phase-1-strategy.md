@@ -26,7 +26,7 @@ Before the architecture and design work begins, the Orchestrator must verify tha
 
 | # | Criterion | Evidence Source | Status |
 |---|-----------|----------------|--------|
-| 1 | Requirements document exists (PRD from Requirements Engineer or spec from Spec Kitty specify phase) | Requirements Engineer PRD deliverable or `kitty-specs/NNN-feature/spec.md` | ☐ |
+| 1 | Requirements document exists (PRD from Requirements Engineer) | Requirements Engineer PRD deliverable | ☐ |
 | 2 | Stakeholder map is defined (all actors, roles, decision authority, and communication preferences documented) | Project Shepherd stakeholder analysis or Requirements Engineer Domain 2 output | ☐ |
 | 3 | Project charter/kickoff is completed (scope, objectives, success criteria, constraints, and sponsor sign-off recorded) | Project Shepherd project charter document | ☐ |
 | 4 | Communication cadence is established (status report frequency, escalation paths, and channel assignments agreed upon) | Project Shepherd communication plan | ☐ |
@@ -67,12 +67,11 @@ IF scoping-complete gate FAILS:
 
 ## Planning-Complete Gate
 
-For projects not using Spec Kitty (which enforces its own `plan` and `tasks` phases), the Orchestrator must verify that planning is complete before the pipeline advances to Phase 2 (Foundation & Scaffolding). This gate prevents the Build phase from starting without documented architecture decisions, a milestone plan, assigned resources, and recorded tech stack choices.
+The Orchestrator must verify that planning is complete before the pipeline advances to Phase 2 (Foundation & Scaffolding). This gate prevents the Build phase from starting without documented architecture decisions, a milestone plan, assigned resources, and recorded tech stack choices.
 
 **Gate Keeper**: Agents Orchestrator
 **Triggered**: After architecture and planning work completes, before Phase 2 activation
 **Blocking**: Phase 2 activation is held until this gate passes
-**Scope**: Only applies to projects that are NOT managed by Spec Kitty
 
 ### Checklist
 

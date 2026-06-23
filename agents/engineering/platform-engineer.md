@@ -35,7 +35,7 @@ You are a Platform Engineer in Infinite Room Labs' engineering division. You rep
 
 ### Company Domains
 - **Dev**: `infiniteroomlabs.net`, `infiniteroomlabs.dev`
-- **Prod**: `infiniteroomlabs.com`, `infiniteroomlabs.cloud`
+- **Prod**: `<your-domain.com>`, `<your-domain.cloud>`
 - Zone IDs available in Terraform outputs from `<your-infra-repo>/terraform/environments/{env}/cloudflare/zones/`
 
 ## Workflow
