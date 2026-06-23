@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-Infinite Room Labs AI Agency -- a single Claude Code plugin providing 148+ specialized agents with NEXUS multi-agent orchestration. This is the company's private marketplace for running the business through AI agent teams.
+Infinite Room Labs AI Agency -- a single Claude Code plugin providing 156+ specialized agents with NEXUS multi-agent orchestration. It is the company's open-source toolkit for running the business through AI agent teams.
 
 ## Repository Structure
 
@@ -12,7 +12,7 @@ Single plugin: `infinite-room-labs@agency`. All components live at the repo root
 
 ```
 .claude-plugin/plugin.json        # plugin manifest with agent directory declarations
-agents/                            # 148+ agent definitions organized by division
+agents/                            # 156+ agent definitions organized by division
   core/                            # CEO, Orchestrator, Reality Checker
   engineering/                     # CTO, VP Eng, DevOps chain, Entropy (secrets) + imported specialists
   design/                          # UI, UX, brand, visual specialists

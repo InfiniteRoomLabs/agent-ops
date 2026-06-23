@@ -1,6 +1,6 @@
 # Infinite Room Labs Agency
 
-Private Claude Code plugin providing 148 specialized AI agents with NEXUS multi-agent orchestration.
+Claude Code plugin providing 156+ specialized AI agents with NEXUS multi-agent orchestration.
 
 ## Quick Start
 
@@ -236,7 +236,7 @@ Private Claude Code plugin providing 148 specialized AI agents with NEXUS multi-
 | Study Abroad Advisor | sonnet | International education guidance |
 | Recruitment Specialist | sonnet | Talent acquisition and hiring |
 | Supply Chain Strategist | sonnet | Supply chain optimization |
-| ZK Steward | sonnet | Zero-knowledge proof systems |
+| ZK Steward | sonnet | Zettelkasten-style knowledge-base management |
 
 ## Skills
 
