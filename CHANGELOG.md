@@ -5,6 +5,12 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.20.1] - 2026-06-24
+
+### Changed
+- **README now tours the features, not just the agent catalog.** Added a Features section leading with the guardrail-hook enforcement layer (version, changelog, commit, config-tamper, test-coverage, and teammate gates), specialized agents, workflow skills, and output styles. Completed the Skills table to all 26 skills, grouped by purpose.
+- **Aligned the install-time description** in `plugin.json` and the marketplace listing to match the README framing: "156+ specialized agents, guardrail hooks, and reusable engineering workflows." NEXUS orchestration and the SUMMON persona loader are now presented as experimental rather than headline features, since their future in this repo is unsettled.
+
 ## [agency-1.20.0] - 2026-06-23
 
 Public-release preparation: the repository is now open-source under MIT.
