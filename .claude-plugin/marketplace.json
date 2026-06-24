@@ -7,8 +7,8 @@
     {
       "name": "agency",
       "source": "./",
-      "description": "Infinite Room Labs AI agency - 156+ specialized agents with NEXUS orchestration",
-      "version": "1.4.0",
+      "description": "Infinite Room Labs AI agency for Claude Code: 156+ specialized agents, guardrail hooks, and reusable engineering workflows",
+      "version": "1.4.1",
       "keywords": [
         "agency",
         "agents",
