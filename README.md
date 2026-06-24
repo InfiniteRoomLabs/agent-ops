@@ -1,22 +1,61 @@
 # Infinite Room Labs Agency
 
-Claude Code plugin providing 156+ specialized AI agents with NEXUS multi-agent orchestration.
+A Claude Code plugin for running a software company with AI agents. It bundles 156+ specialized agent roles with a layer of guardrail hooks and reusable engineering workflows.
+
+It packages the agents, skills, commands, and enforcement hooks Infinite Room Labs uses internally. The pieces work independently: run the guardrail hooks without the agents, or load an agent without the orchestration.
 
 ## Quick Start
 
 ```bash
-# Install the plugin
+# Install
 /plugin install agency@infinite-room-labs
 
-# Activate full orchestration
-/nexus
+# Find an agent, skill, or command by keyword or tag
+/find-agent security review
 
-# Sprint mode (2-6 week builds)
-/nexus-sprint build user auth system
+# Load a specialist as your session persona
+/load-agent backend-architect
 
-# Micro mode (1-5 day tasks)
-/nexus-micro fix login timeout bug
+# Run a workflow skill
+/code-review <PR URL or diff>
 ```
+
+Experimental: `/nexus`, `/nexus-sprint`, and `/nexus-micro` coordinate multiple
+agents across a project. They work today but are the least settled part of the
+plugin; see [Features](#features).
+
+## Features
+
+### Specialized agents
+
+156+ agents across 14 divisions, from engineering and design through game development and spatial computing. Each one carries a focused system prompt and a scoped tool set, pinned to a model tier. Browse the full [Agent Catalog](#agent-catalog) below, or search by tag or keyword with `/find-agent`.
+
+### Guardrail hooks
+
+The plugin ships Python hooks that enforce repository hygiene while you work. They run on Claude Code's hook events and fail safe, so a malformed payload never blocks you.
+
+| Hook | Runs on | Enforces |
+|------|---------|----------|
+| version-guard | commit | semver stays consistent across manifests, tags, and CHANGELOG on protected branches |
+| changelog-guard | commit | protected-branch commits include a CHANGELOG update |
+| commit-guard | git add / commit | staged files don't match gitignored or secret patterns |
+| config-tamper-guard | settings change | protected settings stay append-only; silent weakening is blocked |
+| test-coverage-guard | commit | a new `scripts/*.py` ships with its `tests/test_*.py` |
+| teammate-gate | subagent finish | subagent output passes encoding, env-file, and agent-directory checks |
+
+Beyond the table, the suite handles UTF-8 validation, worktree setup, post-compaction recovery, and release auto-tagging. Every hook has tests, and the suite runs in CI.
+
+### Workflow skills and commands
+
+26 invocable skills cover recurring engineering work: architecture decisions, code review, debugging, dependency audits, release prep, incident response, testing strategy, and public-release readiness. Five slash commands handle discovery and packaging. See [Skills](#skills) and [Commands](#commands).
+
+### Output styles
+
+Activate a shipped output style per session or per project, such as an ADHD-friendly mode that chunks work into small steps and tracks progress. See [Output Styles](#output-styles).
+
+### Experimental: orchestration and personas
+
+`/nexus` and its `-sprint` and `-micro` variants coordinate teams of agents across a project, and the persona loader (`/load-agent`, `/end-agent-session`) makes one agent your session voice. Both work today, but they are the least settled part of the plugin and their shape may change.
 
 ## Agent Catalog
 
@@ -240,19 +279,48 @@ Claude Code plugin providing 156+ specialized AI agents with NEXUS multi-agent o
 
 ## Skills
 
-| Skill | Description |
-|-------|-------------|
-| `/nexus` | Full multi-agent orchestration (all phases, all divisions) |
-| `/nexus-sprint` | Focused 2-6 week feature/MVP builds |
-| `/nexus-micro` | Lightweight 1-5 day tasks with pre-built runbooks |
-| `/load-agent` | Load an agent as primary session persona |
-| `/end-agent-session` | Unload agent persona |
+26 skills you invoke with a slash command. Each is a focused workflow.
+
+**Engineering and delivery**
+
+| Skill | Purpose |
+|-------|---------|
+| `/architecture` | Create or evaluate an architecture decision record (ADR) |
+| `/system-design` | Design a system, service, or API |
+| `/code-review` | Review a change for security, performance, and correctness |
+| `/debug` | Reproduce, isolate, diagnose, and fix a bug |
+| `/testing-strategy` | Design a test strategy and plan |
+| `/tech-debt` | Identify and prioritize technical debt |
+| `/dep-audit` | Audit dependencies for license, security, and staleness |
+| `/documentation` | Write and maintain technical documentation |
+| `/tsdoc` | Write or fix TypeScript doc comments (TSDoc) |
+| `/deploy-checklist` | Verify readiness before shipping |
+| `/release-prep` | Run a version bump, CHANGELOG, tag, and release |
+| `/incident-response` | Triage, communicate, and write a postmortem |
+
+**Repository, research, and meta**
+
+| Skill | Purpose |
+|-------|---------|
 | `/new-agent` | Scaffold a new agent, skill, or command |
-| `/project-onboard` | Set up a new repo with IRL conventions |
-| `/prompt-refiner` | Transform vague prompts into structured instructions |
-| `/release-prep` | Guide through release cycle |
-| `/dep-audit` | Audit project dependencies |
-| `/market-scan` | Structured market analysis |
+| `/project-onboard` | Set up a repo with IRL conventions |
+| `/public-readiness` | Audit a repo before making it public (leaks, license, history scrub) |
+| `/secrets-sync` | Sync secrets from Bitwarden to Ansible Vault and Kubernetes |
+| `/prompt-refiner` | Restructure a vague prompt into clear instructions |
+| `/persona-forge` | Generate and refine a purpose-built persona for a task |
+| `/render-mermaid` | Render a mermaid diagram to an image or PDF |
+| `/market-scan` | Analyze a market segment and its competitors |
+| `/standup` | Generate a standup update from recent activity |
+
+**Personas and orchestration (experimental)**
+
+| Skill | Purpose |
+|-------|---------|
+| `/load-agent` | Load an agent as your session persona |
+| `/end-agent-session` | Unload the active persona |
+| `/nexus` | Coordinate all divisions across a full project lifecycle |
+| `/nexus-sprint` | Build a feature or MVP with a focused team |
+| `/nexus-micro` | Run a quick 1-5 day task with a runbook |
 
 ## Commands
 
