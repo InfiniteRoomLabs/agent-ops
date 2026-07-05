@@ -5,6 +5,12 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.21.0] - 2026-07-04
+
+### Added
+- **`skills/orchestration-cost-policy/`** -- global standing rule: choose orchestration mechanism (inline / subagent fan-out / workflow) and model tier by results-per-token for the specific task. Includes a model-tier decision table, mechanism selection guidance, and token-hygiene rules. Registered in `registry.yaml`.
+- **SessionStart context injection** for the policy: `hooks/orchestration-cost-policy.md` is emitted into context at session start via a new SessionStart hook entry, so every session carries the terse rule and a pointer to the full skill.
+
 ## [agency-1.20.1] - 2026-06-24
 
 ### Changed
