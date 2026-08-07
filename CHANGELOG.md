@@ -5,6 +5,15 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.22.0] - 2026-08-07
+
+### Added
+- **Configurable redaction terms for `public-readiness`.** The skill now resolves its personal red-flag / redaction term list from configuration instead of the operator's session memory: `public_readiness.redaction_terms` / `redaction_terms_file` in CLAUDE.md YAML frontmatter at any scope (global -> parent -> project, set-UNION across scopes), plus a `PUBLIC_READINESS_TERMS_FILE` env override. New helper `scripts/resolve-redaction-terms.py` prints the unioned list (`--json` for source scopes and mappings); `old==>new` mapping-form terms feed `git filter-repo --replace-text` directly, unmapped terms default to flag-for-human-review. Design doc: `docs/plans/2026-08-07-public-readiness-redaction-term-config.md`.
+
+### Changed
+- **Scrubbed residual private strings from the working tree**: the `public-readiness` SKILL.md example now uses a placeholder IP instead of a real one; historical plan docs and a test docstring no longer embed the author's home directory path.
+- `pyproject.toml` version resynced with `plugin.json` (had drifted at 1.20.1 vs 1.21.0).
+
 ## [agency-1.21.0] - 2026-07-04
 
 ### Added

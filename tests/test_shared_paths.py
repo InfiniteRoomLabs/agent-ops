@@ -34,7 +34,7 @@ def test_cwd_slug_dotted_dir_double_dash() -> None:
 
 
 def test_cwd_slug_preserves_case() -> None:
-    """Case is preserved (live evidence: -home-<user>-Downloads)."""
+    """Case is preserved (live evidence: -home-user-Downloads)."""
     assert cwd_slug("/home/user/Downloads") == "-home-user-Downloads"
 
 

@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 ```
 This ensures `uv run scripts/foo.py` can find `scripts/frontmatter_config.py`.
 
-**IMPORTANT -- Audit slug format:** Claude Code project directories use the full path with `/` replaced by `-`, prefixed with `-` (e.g., `-home-<user>-projects-agent-ops`). When computing audit paths, derive the slug as:
+**IMPORTANT -- Audit slug format:** Claude Code project directories use the full path with `/` replaced by `-`, prefixed with `-` (e.g., `-home-user-projects-agent-ops`). When computing audit paths, derive the slug as:
 ```python
 slug = cwd.replace("/", "-")  # e.g., "/home/user/project" -> "-home-user-project"
 audit_dir = Path.home() / ".claude" / "projects" / slug / "memory" / "audit"
@@ -112,7 +112,7 @@ def test_parse_frontmatter_nested():
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_frontmatter_config.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_frontmatter_config.py -v`
 Expected: FAIL with `ModuleNotFoundError` or `ImportError`
 
 - [ ] **Step 3: Write `parse_frontmatter()` and `find_claude_md_files()`**
@@ -190,7 +190,7 @@ def find_claude_md_files(cwd: Path | None = None) -> list[Path]:
 
 - [ ] **Step 4: Run tests to verify `parse_frontmatter` tests pass**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_frontmatter_config.py -v -k parse`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_frontmatter_config.py -v -k parse`
 Expected: 4 PASS
 
 - [ ] **Step 5: Write failing tests for `resolve_frontmatter()` and `resolve_config()`**
@@ -328,7 +328,7 @@ def resolve_config(
 
 - [ ] **Step 7: Run all frontmatter tests**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_frontmatter_config.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_frontmatter_config.py -v`
 Expected: 7 PASS
 
 - [ ] **Step 8: Write failing test for `resolve_typed()`**
@@ -394,7 +394,7 @@ def resolve_typed(
 
 - [ ] **Step 10: Run all tests**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_frontmatter_config.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_frontmatter_config.py -v`
 Expected: 9 PASS
 
 - [ ] **Step 11: Write edge case tests**
@@ -443,13 +443,13 @@ def test_resolve_frontmatter_skips_unreadable(tmp_path: Path):
 
 - [ ] **Step 12: Run full test suite**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_frontmatter_config.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_frontmatter_config.py -v`
 Expected: 13 PASS
 
 - [ ] **Step 13: Commit**
 
 ```bash
-cd /home/<user>/projects/infinite-room-labs/agent-ops
+cd ~/projects/infinite-room-labs/agent-ops
 git add scripts/frontmatter_config.py tests/test_frontmatter_config.py
 git commit -m "feat: add shared frontmatter config library (idea 73)"
 ```
@@ -466,7 +466,7 @@ This refactor replaces the inline hierarchy walker with a call to the shared lib
 
 - [ ] **Step 1: Verify existing behavior (baseline)**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run scripts/accessibility-config.py`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run scripts/accessibility-config.py`
 Expected: JSON output with ADHD config (since global CLAUDE.md has `accessibility.adhd.enabled: true`)
 
 Save the output for comparison after refactor.
@@ -580,16 +580,16 @@ if __name__ == "__main__":
 
 - [ ] **Step 3: Verify behavior is identical**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run scripts/accessibility-config.py`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run scripts/accessibility-config.py`
 Expected: Identical JSON output to Step 1 baseline.
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run scripts/accessibility-config.py --check && echo "enabled" || echo "disabled"`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run scripts/accessibility-config.py --check && echo "enabled" || echo "disabled"`
 Expected: `enabled`
 
 - [ ] **Step 4: Commit**
 
 ```bash
-cd /home/<user>/projects/infinite-room-labs/agent-ops
+cd ~/projects/infinite-room-labs/agent-ops
 git add scripts/accessibility-config.py
 git commit -m "refactor: accessibility-config uses shared frontmatter library"
 ```
@@ -671,7 +671,7 @@ def test_missing_file_no_crash(tmp_path: Path):
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_instructions_guard.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_instructions_guard.py -v`
 Expected: FAIL with ImportError
 
 - [ ] **Step 3: Implement `instructions-guard.py`**
@@ -821,13 +821,13 @@ if __name__ == "__main__":
 
 - [ ] **Step 4: Run tests**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_instructions_guard.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_instructions_guard.py -v`
 Expected: 5 PASS
 
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /home/<user>/projects/infinite-room-labs/agent-ops
+cd ~/projects/infinite-room-labs/agent-ops
 git add scripts/instructions-guard.py tests/test_instructions_guard.py
 git commit -m "feat: add instructions-guard for InstructionsLoaded hook"
 ```
@@ -915,7 +915,7 @@ def test_agent_name_present_in_summary():
 
 - [ ] **Step 2: Run tests to verify failure**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_postcompact_recovery.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_postcompact_recovery.py -v`
 Expected: FAIL with ImportError
 
 - [ ] **Step 3: Implement `postcompact-recovery.py`**
@@ -1068,13 +1068,13 @@ if __name__ == "__main__":
 
 - [ ] **Step 4: Run tests**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_postcompact_recovery.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_postcompact_recovery.py -v`
 Expected: 5 PASS
 
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /home/<user>/projects/infinite-room-labs/agent-ops
+cd ~/projects/infinite-room-labs/agent-ops
 git add scripts/postcompact-recovery.py tests/test_postcompact_recovery.py
 git commit -m "feat: add postcompact-recovery for PostCompact hook"
 ```
@@ -1164,7 +1164,7 @@ def test_no_tamper_on_unprotected_changes():
 
 - [ ] **Step 2: Run tests to verify failure**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_config_tamper_guard.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_config_tamper_guard.py -v`
 Expected: FAIL with ImportError
 
 - [ ] **Step 3: Implement `config-tamper-guard.py`**
@@ -1353,13 +1353,13 @@ if __name__ == "__main__":
 
 - [ ] **Step 4: Run tests**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_config_tamper_guard.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_config_tamper_guard.py -v`
 Expected: 5 PASS
 
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /home/<user>/projects/infinite-room-labs/agent-ops
+cd ~/projects/infinite-room-labs/agent-ops
 git add scripts/config-tamper-guard.py tests/test_config_tamper_guard.py
 git commit -m "feat: add config-tamper-guard for ConfigChange hook"
 ```
@@ -1455,7 +1455,7 @@ def test_check_env_files_clean(tmp_path: Path):
 
 - [ ] **Step 2: Run tests to verify failure**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_worktree_lifecycle.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_worktree_lifecycle.py -v`
 Expected: FAIL with ImportError
 
 - [ ] **Step 3: Implement `worktree-lifecycle.py`**
@@ -1690,13 +1690,13 @@ if __name__ == "__main__":
 
 - [ ] **Step 4: Run tests**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_worktree_lifecycle.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_worktree_lifecycle.py -v`
 Expected: 3 PASS
 
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /home/<user>/projects/infinite-room-labs/agent-ops
+cd ~/projects/infinite-room-labs/agent-ops
 git add scripts/worktree-lifecycle.py tests/test_worktree_lifecycle.py
 git commit -m "feat: add worktree-lifecycle for WorktreeCreate/Remove hooks"
 ```
@@ -1888,13 +1888,13 @@ if __name__ == "__main__":
     app()
 ```
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_stop_failure_audit.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_stop_failure_audit.py -v`
 Expected: 3 PASS
 
 - [ ] **Step 3: Commit**
 
 ```bash
-cd /home/<user>/projects/infinite-room-labs/agent-ops
+cd ~/projects/infinite-room-labs/agent-ops
 git add scripts/stop-failure-audit.py tests/test_stop_failure_audit.py
 git commit -m "feat: add stop-failure-audit for StopFailure hook"
 ```
@@ -2178,13 +2178,13 @@ if __name__ == "__main__":
     app()
 ```
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_teammate_gate.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_teammate_gate.py -v`
 Expected: 5 PASS
 
 - [ ] **Step 3: Commit**
 
 ```bash
-cd /home/<user>/projects/infinite-room-labs/agent-ops
+cd ~/projects/infinite-room-labs/agent-ops
 git add scripts/teammate-gate.py tests/test_teammate_gate.py
 git commit -m "feat: add teammate-gate for TeammateIdle/TaskCompleted hooks"
 ```
@@ -2425,13 +2425,13 @@ if __name__ == "__main__":
     app()
 ```
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_elicitation_gate.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run pytest tests/test_elicitation_gate.py -v`
 Expected: 4 PASS
 
 - [ ] **Step 3: Commit**
 
 ```bash
-cd /home/<user>/projects/infinite-room-labs/agent-ops
+cd ~/projects/infinite-room-labs/agent-ops
 git add scripts/elicitation-gate.py tests/test_elicitation_gate.py
 git commit -m "feat: add elicitation-gate for Elicitation/ElicitationResult hooks"
 ```
@@ -2451,7 +2451,7 @@ Use the exact JSON from the design spec section 4. The complete file is defined 
 
 - [ ] **Step 2: Verify JSON is valid**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run python -c "import json; json.load(open('hooks/hooks.json'))"`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run python -c "import json; json.load(open('hooks/hooks.json'))"`
 Expected: No error
 
 - [ ] **Step 3: Bump version in `.claude-plugin/plugin.json` to 1.3.0**
@@ -2469,13 +2469,13 @@ Add a new entry at the top under `## [1.3.0]` documenting:
 
 - [ ] **Step 5: Run full test suite**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run pytest tests/ -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run pytest tests/ -v`
 Expected: All tests pass (existing + new)
 
 - [ ] **Step 6: Commit**
 
 ```bash
-cd /home/<user>/projects/infinite-room-labs/agent-ops
+cd ~/projects/infinite-room-labs/agent-ops
 git add hooks/hooks.json .claude-plugin/plugin.json CHANGELOG.md
 git commit -m "feat: expand hook registry to 13 events, bump to 1.3.0"
 ```

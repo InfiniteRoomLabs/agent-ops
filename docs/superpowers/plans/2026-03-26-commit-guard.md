@@ -175,7 +175,7 @@ def get_staged_files() -> list[str]:
 
 - [ ] **Step 5: Verify the file parses cleanly**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run python -c "import ast; ast.parse(open('scripts/commit_guard.py').read()); print('OK')"`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run python -c "import ast; ast.parse(open('scripts/commit_guard.py').read()); print('OK')"`
 Expected: `OK`
 
 - [ ] **Step 6: Commit**
@@ -311,17 +311,17 @@ if __name__ == "__main__":
 
 - [ ] **Step 5: Verify all four commands are registered**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run scripts/commit_guard.py --help`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run scripts/commit_guard.py --help`
 Expected output should list: `check`, `post`, `pre`, `rules`
 
 - [ ] **Step 6: Test the `rules` command**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run scripts/commit_guard.py rules`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run scripts/commit_guard.py rules`
 Expected: Pattern table grouped by ecosystem, starting with `Python:` and listing `__pycache__/`, `.venv/`, etc.
 
 - [ ] **Step 7: Test the `check` command with clean staging area**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run scripts/commit_guard.py check`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run scripts/commit_guard.py check`
 Expected: `No files staged.` with exit code 0.
 
 - [ ] **Step 8: Commit**
@@ -375,7 +375,7 @@ The PostToolUse Bash hooks array should now be (in order):
 
 - [ ] **Step 3: Validate hooks.json is valid JSON**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && python -c "import json; json.load(open('hooks/hooks.json')); print('OK')"`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && python -c "import json; json.load(open('hooks/hooks.json')); print('OK')"`
 Expected: `OK`
 
 - [ ] **Step 4: Commit**
@@ -393,17 +393,17 @@ git commit -m "feat(commit-guard): register pre and post hooks in hooks.json"
 
 - [ ] **Step 1: Test `pre` with a clean staging area (should pass)**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && echo '{"tool_name":"Bash","tool_input":{"command":"git commit -m \"test\""}}' | uv run scripts/commit_guard.py pre; echo "exit: $?"`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && echo '{"tool_name":"Bash","tool_input":{"command":"git commit -m \"test\""}}' | uv run scripts/commit_guard.py pre; echo "exit: $?"`
 Expected: exit 0, no output.
 
 - [ ] **Step 2: Test `pre` with non-commit command (should pass silently)**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && echo '{"tool_name":"Bash","tool_input":{"command":"ls -la"}}' | uv run scripts/commit_guard.py pre; echo "exit: $?"`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && echo '{"tool_name":"Bash","tool_input":{"command":"ls -la"}}' | uv run scripts/commit_guard.py pre; echo "exit: $?"`
 Expected: exit 0, no output.
 
 - [ ] **Step 3: Test `post` with non-add command (should pass silently)**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && echo '{"tool_name":"Bash","tool_input":{"command":"git status"}}' | uv run scripts/commit_guard.py post; echo "exit: $?"`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && echo '{"tool_name":"Bash","tool_input":{"command":"git status"}}' | uv run scripts/commit_guard.py post; echo "exit: $?"`
 Expected: exit 0, no output.
 
 - [ ] **Step 4: Test matching logic via `check` command with a dummy staged file**
@@ -417,7 +417,7 @@ echo "test" > node_modules/index.js
 echo "test" > __pycache__/foo.cpython-312.pyc
 echo "test" > clean_file.py
 git add .
-cd /home/<user>/projects/infinite-room-labs/agent-ops
+cd ~/projects/infinite-room-labs/agent-ops
 GIT_DIR=/tmp/commit-guard-test/.git GIT_WORK_TREE=/tmp/commit-guard-test uv run scripts/commit_guard.py check
 ```
 
@@ -436,7 +436,7 @@ cd /tmp && git init commit-guard-test && cd commit-guard-test
 mkdir -p vendor
 echo "test" > vendor/autoload.php
 git add .
-cd /home/<user>/projects/infinite-room-labs/agent-ops
+cd ~/projects/infinite-room-labs/agent-ops
 echo '{"tool_name":"Bash","tool_input":{"command":"git commit -m \"test\""}}' | GIT_DIR=/tmp/commit-guard-test/.git GIT_WORK_TREE=/tmp/commit-guard-test uv run scripts/commit_guard.py pre 2>&1; echo "exit: $?"
 ```
 

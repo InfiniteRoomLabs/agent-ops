@@ -144,7 +144,7 @@ def repo_with_manifest(tagged_repo: Path) -> Path:
 
 - [ ] **Step 3: Verify pytest discovers the fixtures**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run --with pytest pytest tests/test_version_guard.py --collect-only`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run --with pytest pytest tests/test_version_guard.py --collect-only`
 Expected: "no tests ran" (0 items collected), no import errors.
 
 - [ ] **Step 4: Commit**
@@ -215,7 +215,7 @@ def test_load_config_detects_commitlint(git_repo: Path) -> None:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v`
 Expected: FAIL with `ModuleNotFoundError: No module named 'version_guard'`
 
 - [ ] **Step 3: Write the script skeleton with config models**
@@ -325,7 +325,7 @@ if __name__ == "__main__":
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v`
 Expected: 3 passed
 
 - [ ] **Step 5: Commit**
@@ -407,7 +407,7 @@ def test_detect_multiple_manifests(git_repo: Path) -> None:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py::test_detect_package_json -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py::test_detect_package_json -v`
 Expected: FAIL with `cannot import name 'detect_manifests'`
 
 - [ ] **Step 3: Implement detect_manifests()**
@@ -437,7 +437,7 @@ def detect_manifests(project_dir: Path) -> list[ManifestSpec]:
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k detect`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k detect`
 Expected: 5 passed
 
 - [ ] **Step 5: Commit**
@@ -541,7 +541,7 @@ def test_manifest_consistency_mismatch(git_repo: Path) -> None:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "read_version or manifest_consistency"`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "read_version or manifest_consistency"`
 Expected: FAIL with `cannot import name 'read_manifest_version'`
 
 - [ ] **Step 3: Implement version reading and consistency check**
@@ -620,7 +620,7 @@ Note: Python 3.11+ is required (tomllib is stdlib). No tomli fallback needed.
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "read_version or manifest_consistency"`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "read_version or manifest_consistency"`
 Expected: 6 passed
 
 - [ ] **Step 5: Commit**
@@ -684,7 +684,7 @@ def test_get_latest_tag_version_multiple(tagged_repo: Path) -> None:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "get_latest_tag"`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "get_latest_tag"`
 Expected: FAIL with `cannot import name 'get_latest_tag_version'`
 
 - [ ] **Step 3: Implement get_latest_tag_version()**
@@ -726,7 +726,7 @@ def get_latest_tag_version(prefix: str = "v") -> semver.Version | None:
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "get_latest_tag"`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "get_latest_tag"`
 Expected: 3 passed
 
 - [ ] **Step 5: Commit**
@@ -839,7 +839,7 @@ def test_compute_bump_no_commits_since_tag(tagged_repo: Path) -> None:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "compute_bump"`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "compute_bump"`
 Expected: FAIL with `cannot import name 'compute_next_version'`
 
 - [ ] **Step 3: Implement conventional commits parser**
@@ -916,7 +916,7 @@ def compute_next_version(
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "compute_bump"`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "compute_bump"`
 Expected: 7 passed
 
 - [ ] **Step 5: Commit**
@@ -1117,7 +1117,7 @@ def test_evaluate_no_tags_advisory(git_repo: Path) -> None:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "evaluate"`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "evaluate"`
 Expected: FAIL with `cannot import name 'evaluate'`
 
 - [ ] **Step 3: Implement the evaluate() function**
@@ -1281,12 +1281,12 @@ def evaluate(
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "evaluate"`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "evaluate"`
 Expected: 9 passed
 
 - [ ] **Step 5: Run all tests together**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v`
 Expected: All tests pass (20+ tests)
 
 - [ ] **Step 6: Commit**
@@ -1404,7 +1404,7 @@ def test_hook_handles_heredoc_release_commit(repo_with_manifest: Path) -> None:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "check_command or hook_"`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "check_command or hook_"`
 Expected: FAIL
 
 - [ ] **Step 3: Implement check and hook commands**
@@ -1527,12 +1527,12 @@ if __name__ == "__main__":
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "check_command or hook_"`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v -k "check_command or hook_"`
 Expected: 4 passed
 
 - [ ] **Step 5: Run full test suite**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v`
 Expected: All tests pass
 
 - [ ] **Step 6: Commit**
@@ -1612,7 +1612,7 @@ git commit -m "feat(version-guard): register hook in hooks.json and registry"
 
 - [ ] **Step 1: Run the full test suite one final time**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops && PYTHONPATH=scripts uv run --with pytest --with pydantic --with typer --with semver --with pyyaml pytest tests/test_version_guard.py -v`
 Expected: All tests pass (24+ tests)
 
 - [ ] **Step 2: Manual smoke test of the hook command**

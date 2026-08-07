@@ -29,7 +29,38 @@ Check visibility first. The fix is free before publication and lossy after.
 gh repo view OWNER/REPO --json visibility,isPrivate,forkCount,pushedAt
 ```
 
+## Redaction term configuration
+
+Personal red-flag terms (former employers, correspondents, private project names) live in **configuration**, not session memory -- a fresh subagent with no operator context must still find them. Terms resolve from CLAUDE.md YAML frontmatter at any scope, plus a 12-factor env override:
+
+```yaml
+---
+public_readiness:
+  redaction_terms:
+    - "some-term"                 # flag-only: reviewed wherever found
+    - "old-string==>replacement"  # mapping form: feeds git-filter-repo --replace-text directly
+  redaction_terms_file: ~/.claude/public-readiness-terms.txt   # one term/mapping per line, # comments
+---
+```
+
+Resolution order (first -> last, **UNION not override** -- terms are a denylist, so every scope contributes):
+
+1. `PUBLIC_READINESS_TERMS_FILE` env var (points at a terms file)
+2. Global `~/.claude/CLAUDE.md` frontmatter -- where personal terms belong
+3. Parent-scope CLAUDE.md files between home and the repo (org-wide terms, e.g. private sister-repo names)
+4. The audited repo's own CLAUDE.md -- **ONLY for non-sensitive repo-specific strings**: project-scope terms are visible in the very repo being published
+
+Resolve the list with the helper (prints one term per line; `--json` adds source scope and mapping info; empty output = fall back to generic scans only):
+
+```bash
+uv run ${CLAUDE_PLUGIN_ROOT}/scripts/resolve-redaction-terms.py [--json]
+```
+
+**The term list itself is radioactive.** It must NEVER appear in the audited repo, in any project-scope CLAUDE.md of a repo being prepared for publication (self-leak), or in any plan, commit message, or test fixture. Real terms belong in the operator's global `~/.claude/` scope only. Test fixtures use obviously fake terms (`acme-corp`, `dr-fictional`).
+
 ## Step 1: Leak scan (the blocker)
+
+**First resolve the configured redaction terms** (section above) and run them as an additional grep pass over the working tree, all history, and commit messages -- alongside, not replacing, the generic credential/topology greps below.
 
 Scan **both the working tree and history**. Sort findings by category; only real credentials are "rotate now", the rest are "scrub before public".
 
@@ -94,11 +125,14 @@ Verify described structure, commands, and skills exist; verify any "discovers X 
 # 1. Commit the working-tree fixes first (filter-repo needs a clean tree).
 # 2. Write a replacement map (one per line, old==>new):
 cat > /tmp/redactions.txt <<'EOF'
-<HOMELAB_IP>==><HOMELAB_IP>
+100.101.102.103==><HOMELAB_IP>
 internal.example.com==><your-internal-domain>
 chairman-jane==>on-call-human
 EOF
 # Put the most-specific strings first (auth.host before host).
+# Any configured redaction term in old==>new mapping form goes straight into this file.
+# Terms WITHOUT a mapping default to flag-for-human-review, not auto-redact -- a term
+# like a former employer's name may need judgment (anonymize vs delete the file).
 
 # 3. Rewrite ALL commits + tags:
 git filter-repo --replace-text /tmp/redactions.txt --force

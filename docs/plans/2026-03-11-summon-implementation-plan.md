@@ -213,7 +213,7 @@ Append to `.gitignore`:
 
 **Step 5: Verify test infrastructure works**
 
-Run: `cd /home/<user>/projects/infinite-room-labs/agent-ops/plugins/core && uv run --extra test pytest tests/ -v`
+Run: `cd ~/projects/infinite-room-labs/agent-ops/plugins/core && uv run --extra test pytest tests/ -v`
 
 Expected: 0 tests collected, no errors.
 
