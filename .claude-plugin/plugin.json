@@ -1,6 +1,6 @@
 {
   "name": "agency",
-  "version": "1.22.0",
+  "version": "1.23.0",
   "description": "Infinite Room Labs AI agency for Claude Code: 156+ specialized agents, guardrail hooks, and reusable engineering workflows",
   "author": {
     "name": "Infinite Room Labs"

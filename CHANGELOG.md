@@ -5,6 +5,12 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.23.0] - 2026-08-07
+
+### Added
+- **`skills/tmux-session-capture/`** -- ingest the user's pre-agent terminal context by capturing tmux pane scrollback with `tdump`. Covers the inline-composition pattern (`(tdump)`), the Claude Code TUI repaint caveat (agent conversations never land in tmux scrollback -- use session transcripts instead), and per-pane capture limits. Registered in `registry.yaml`.
+- **`AGENTS.md`** -- Codex-facing repo brief pointing at `CLAUDE.md` as the authoritative convention source, with notes on translating Claude Code mechanisms to Codex equivalents.
+
 ## [agency-1.22.0] - 2026-08-07
 
 ### Added
