@@ -121,6 +121,13 @@ def _apply_path(base: Path, raw: str) -> Path:
     return Path(os.path.normpath(p))
 
 
+def _apply_path_if_dir(base: Path, raw: str) -> Path:
+    """`_apply_path`, but an unresolvable hop (unset shell var, missing dir)
+    keeps `base` so later relative hops stay anchored to a real directory."""
+    target = _apply_path(base, raw)
+    return target if target.is_dir() else base
+
+
 def effective_cwd(command: str, payload_cwd: str | Path | None = None) -> Path:
     """Resolve the directory a git invocation inside `command` actually runs in.
 
@@ -137,7 +144,9 @@ def effective_cwd(command: str, payload_cwd: str | Path | None = None) -> Path:
     quoted text cannot inject phantom `cd`s. Limitations (accepted): `cd` with
     no argument, `cd -`, and shell variables that are not plain $VAR/${VAR}
     expansions are ignored; a `cd` AFTER the git invocation is not applied only
-    when git appears first.
+    when git appears first. A hop whose target is not an existing directory
+    (e.g. `P=~/x; cd $P` -- `$P` is assigned inside the command, not in the
+    hook's env) is ignored rather than poisoning the cwd.
     """
     base = Path(payload_cwd) if payload_cwd else Path.cwd()
     text = _HEREDOC_RE.sub(" ", command)
@@ -170,14 +179,14 @@ def effective_cwd(command: str, payload_cwd: str | Path | None = None) -> Path:
         raw = m.group(2)
         if _unquote(raw) == "-":
             continue  # previous-dir bounce: unknowable here, keep current
-        cur = _apply_path(cur, raw)
+        cur = _apply_path_if_dir(cur, raw)
 
     c_match = next(
         (m for m in _GIT_C_RE.finditer(text) if _structural(m.start(1), "git")),
         None,
     )
     if c_match:
-        cur = _apply_path(cur, c_match.group(2))
+        cur = _apply_path_if_dir(cur, c_match.group(2))
     return cur
 
 
@@ -185,6 +194,8 @@ def get_repo_root(cwd: str | Path | None = None) -> Path:
     """Repo toplevel for `cwd` (or process cwd). Falls back to `cwd` itself
     when git is unavailable or the directory is not a repo."""
     fallback = Path(cwd) if cwd else Path.cwd()
+    if not fallback.is_dir():
+        fallback = Path.cwd()  # never hand subprocess a cwd it cannot chdir into
     try:
         result = subprocess.run(
             ["git", "rev-parse", "--show-toplevel"],

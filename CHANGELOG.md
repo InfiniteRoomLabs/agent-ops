@@ -5,6 +5,11 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.23.1] - 2026-08-21
+
+### Fixed
+- **`scripts/_shared/git_ops.py`** -- the three git guard hooks (`changelog-guard`, `version_guard`, `commit_guard`) no longer traceback on commands like `P=~/repo; cd $P && git commit`: a `cd`/`git -C` hop whose target is not an existing directory (unset in-command shell var, missing dir) is now ignored instead of poisoning the resolved cwd, and `get_repo_root` never hands `subprocess` a directory it cannot chdir into. Regression tests in `tests/test_shared_git_ops.py`.
+
 ## [agency-1.23.0] - 2026-08-07
 
 ### Added
