@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [agency-1.24.0] - 2026-08-23
 
 ### Added
+- **`docs/plans/2026-08-23-goal-loop-dynamic-workflow.md`** -- parked exploration plan for a workflow-native GOAL treadmill: the outer phase loop as a dynamic-workflow interpreter over GOAL.md (fresh context per agent() call), with the verified harness limits (attended stages, one-level nesting, resume cache staleness, plugin distribution) and a pilot plan.
 - **`skills/new-goal-loop/`** -- installs the GOAL.md treadmill in any repo: a prescribed planning session (search-before-build, verified facts, locked-decisions spec), phase roadmap with model-tier rules (reviewers one tier above implementer; haiku never where approval is needed), and templates for every artifact -- GOAL.md, CLAUDE.md sections, progress doc, seed lessons, and the four-lane review-gate work orders (implementer, code-review, simplify, security, QA). Distilled from hoyle-re and freshbooks-tools. Registered in `registry.yaml`.
 
 ## [agency-1.23.1] - 2026-08-21
