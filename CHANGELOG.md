@@ -5,6 +5,11 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.24.0] - 2026-08-23
+
+### Added
+- **`skills/new-goal-loop/`** -- installs the GOAL.md treadmill in any repo: a prescribed planning session (search-before-build, verified facts, locked-decisions spec), phase roadmap with model-tier rules (reviewers one tier above implementer; haiku never where approval is needed), and templates for every artifact -- GOAL.md, CLAUDE.md sections, progress doc, seed lessons, and the four-lane review-gate work orders (implementer, code-review, simplify, security, QA). Distilled from hoyle-re and freshbooks-tools. Registered in `registry.yaml`.
+
 ## [agency-1.23.1] - 2026-08-21
 
 ### Fixed

@@ -521,6 +521,8 @@ skills:
     description: "Use when analyzing a market segment, identifying competitors, or evaluating business opportunities"
   - name: new-agent
     description: "Use when creating a new agent, skill, or command in the agent-ops marketplace"
+  - name: new-goal-loop
+    description: "Set up the GOAL.md treadmill in a repo -- planning session, locked design spec, phase roadmap, and the artifacts (GOAL.md, CLAUDE.md sections, progress doc, four-lane review-gate work orders) to run autonomous phases via /goal. Use when starting subagent-driven phased development or retrofitting it onto an existing repo."
   - name: nexus
     description: "Use when you need coordinated multi-agent orchestration for any project."
   - name: nexus-micro
