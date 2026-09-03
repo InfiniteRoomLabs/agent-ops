@@ -5,6 +5,11 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.24.1] - 2026-09-03
+
+### Changed
+- **`skills/new-goal-loop/`** -- attended steps now park instead of poll. New lead rule and template section `## Blocked on user`: the lead writes the exact action only the user can take, commits, says so once, and stops with no further tool calls; the GOAL.md Done-when gains an "also done when blocked on user" clause so the built-in `/goal` evaluator clears the goal cleanly, and the harness's no-tool-use stop ends the loop even if it does not. Motivated by freshbooks-tools Phase 6, where a lead polling the remote for an attended tag push was re-prompted by the Stop hook every ~12 seconds for two hours (465 identical turns, about $61 at list price). Also documents the background-work deferral (30 min / 1 h / 2 h backoff) as the shape for long unattended waits, and that the model cannot clear a goal itself.
+
 ## [agency-1.24.0] - 2026-08-23
 
 ### Added

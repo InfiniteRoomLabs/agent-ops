@@ -17,7 +17,13 @@ Run with `/goal complete everything in @GOAL.md`. Each run ships exactly one pha
 > 3. **Four-lane gate** -- dispatch code-review, simplification, and security lanes in parallel (read-only), then the QA lane (the only lane that runs the gate); all `general-purpose`, **`model: "<one tier above implementer>"`**. Work orders from `docs/phases/_templates/`. Reports to `docs/phases/<n>/reports/<lane>.md` AND via `SendMessage` to `team-lead`. Triage, ONE fix commit `fix(<slug>): apply the review-gate findings`, re-run the gate, confirm `git status --porcelain` is empty.
 > 4. **Ship** -- merge `phase-<n>/<slug>` into `main` with `--no-ff` (body summarises gate results); update `CHANGELOG.md` + `docs/progress.md`; push; confirm CI green. Then **retarget THIS file to Phase <n+1>** (see *Self-advance*) and commit it with the docs.
 >
-> **Done when:** <phase-specific done criteria>, CI green, the gate green locally on a clean tree, `docs/progress.md` + changelogs updated, **and `GOAL.md` retargeted to Phase <n+1>.** **Stop only** for a genuine decision you + an advisor skill cannot confidently make, or for a permission the harness will not grant.
+> **Done when:** <phase-specific done criteria>, CI green, the gate green locally on a clean tree, `docs/progress.md` + changelogs updated, **and `GOAL.md` retargeted to Phase <n+1>.** **Also done when** the `## Blocked on user` section below names one concrete action only the user can take and the lead has committed it and stopped -- a parked attended step is a clean exit, not a failure. **Stop only** for that, for a genuine decision you + an advisor skill cannot confidently make, or for a permission the harness will not grant.
+>
+> **When blocked on the user:** write the action under `## Blocked on user`, commit, say so once, and stop **without any further tool calls** (no polling the remote, no status re-prints -- the goal hook treats tool use as progress and re-prompts every few seconds). Never poll for a human.
+
+## Blocked on user
+
+<empty when nothing is parked. When the lead needs the user: one line per action, exact command or click, and what unblocks it. The next `/goal` run reads this first, verifies the action landed, empties the section, and continues.>
 
 ### Self-advance (do this as the last Ship step, every run)
 
