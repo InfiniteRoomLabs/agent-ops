@@ -31,7 +31,13 @@ Leave `GOAL.md` pointed at the **next** phase so the following `/goal` run is pa
 - Update **"Shipped so far"** and strike the shipped row in the **Retarget table** (mark `SHIPPED`, add merge sha + one-line lesson).
 - Rewrite the **`## Goal` heading + block** for the next phase: stage 1 verifies that phase's premise; stage 2 names the branch, implementer model (from the Retarget table), work-order template, and concrete deliverables with acceptance criteria; stage 3 is the gate with the reviewer model one tier above; stage 4 is ship + retarget.
 - Append anything you learned to **Lessons** (process traps only -- feature notes go in `docs/progress.md` and spec callouts).
-- **Next default after Phase <n>: Phase <n+1> (<name>)** -- <one-line pins for it>.
+- **Advance only within the approved roadmap.** If the next row in *Approved roadmap* exists, rewrite the `## Goal` block for it. If it does not, the roadmap is exhausted: write the maintenance/park block below instead of inventing a phase.
+- Any follow-on work the lanes surfaced this run goes under *Proposed (needs user approval)*, not into the approved roadmap. It runs only after the user approves it (which moves it up into *Approved roadmap*).
+- **Next approved phase after Phase <n>: <the next Approved-roadmap row, or "none -- park">.**
+
+### Parking when the roadmap is exhausted
+
+When no approved phase remains, replace the `## Goal` block with a park block: state that the approved roadmap is done, list the *Proposed* rows (each waiting on the user to approve or on an attended input), and set **Done when** to "the user has approved a proposed row (moved it into *Approved roadmap*) and rewritten this block into that phase, or decided none runs." Mark it **Blocked on user**. A `/goal` run that lands here reads `## Blocked on user`, sees nothing approved changed, and stops after one turn with no tool call.
 
 ---
 
@@ -50,7 +56,9 @@ Leave `GOAL.md` pointed at the **next** phase so the following `/goal` run is pa
 
 ## Retarget / roadmap
 
-One row per phase; strike and mark `SHIPPED` as they land. "Attended" means the lead should have the user available.
+### Approved roadmap
+
+The phases the user signed off. This is the ceiling: the loop runs these and stops. One row per phase; strike and mark `SHIPPED` as they land. "Attended" means the lead should have the user available. Adding a row here requires the user's approval -- the lead may reorder these but never append a new one on its own.
 
 | Phase | Branch | Implementer -> Reviewers | Effort | Notes |
 |---|---|---|---|---|
@@ -58,4 +66,10 @@ One row per phase; strike and mark `SHIPPED` as they land. "Attended" means the 
 
 **Batch option:** <phases that may run together in one attended run, if any>.
 
-**Alternative phase:** <optional standing alternative, e.g. a conformance/parity pass; note if attended>.
+### Proposed (needs user approval)
+
+Follow-on work the review lanes surfaced mid-run. The lead writes rows here freely; the loop does **not** run them. Each stays here until the user promotes it into *Approved roadmap*. When the approved roadmap is exhausted and this list is non-empty, the run parks (see *Parking when the roadmap is exhausted*) rather than promoting one itself.
+
+| Proposed phase | Why (surfaced by) | Effort | Attended? |
+|---|---|---|---|
+| <name> | <lane + finding that raised it> | <trivial|low|med|high> | <yes/no> |

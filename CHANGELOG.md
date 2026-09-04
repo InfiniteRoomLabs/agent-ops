@@ -5,6 +5,11 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.24.2] - 2026-09-04
+
+### Changed
+- **`skills/new-goal-loop/`** -- the treadmill now stops when the approved roadmap is exhausted instead of mining its own backlog. Split the roadmap into *Approved roadmap* (the ceiling the loop runs) and *Proposed (needs user approval)* (follow-on work the review lanes surface, which the loop writes but does not run); self-advance only advances within approved rows and parks under `## Blocked on user` when none remain, reusing the 1.24.1 park mechanism. Motivated by freshbooks-tools, where an approved 6-phase roadmap self-extended to 11 phases and about $407 of extra teammate spend before the user retargeted GOAL.md by hand; every extension was useful, which is why nothing stopped it. Adds a failure-mode warning that an uncapped treadmill does not stop on its own.
+
 ## [agency-1.24.1] - 2026-09-03
 
 ### Changed
