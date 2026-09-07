@@ -1,99 +1,38 @@
 ---
 name: project-onboard
-description: Use when setting up a new repository or project with Infinite Room Labs conventions and marketplace integration
+description: Use when setting up a new repository or bringing an existing one up to Infinite Room Labs conventions -- routes to the template-repo cut-and-fill flow for new repos, applies the harness/toolchain delta to existing ones, and hands off to /new-goal-loop.
 tags:
   function: [engineering, operations]
   scenario: [project-setup]
-  custom: [onboarding, conventions, marketplace]
+  custom: [onboarding, conventions, marketplace, template-repo]
 ---
 
 # Project Onboard
 
-Set up a new repository with Infinite Room Labs conventions, marketplace integration, and standard tooling.
+A router, not a scaffolder. The canonical layout lives in `InfiniteRoomLabs/template-repo` and is tested there; this skill never re-implements it.
 
-## Process
+## 1. New repo
 
-1. Confirm the project name, language/framework, and whether it will be open source
-2. Create or verify the directory structure appropriate for the project type
-3. Apply the standard configuration files listed below
-4. Verify everything is in place
+1. Cut it from `InfiniteRoomLabs/template-repo` ("Use this template" on GitHub, or `gh repo create <org>/<name> --template InfiniteRoomLabs/template-repo --private`).
+2. Follow the checklist in the new repo's `README.md`, section "Using this template": replace the six placeholders, pin the toolchain in `mise.toml`, fill the gate steps in `scripts/check.sh`, describe the system in `docs/architecture/model.c4`, `mise run arch:gen`, truncate `CHANGELOG.md`, delete the section.
+3. `mise install && mise run check` must be green before the first push.
+4. Run `/new-goal-loop <what you are building>`.
 
-## Standard Configuration
+## 2. Existing repo
 
-### `.claude/settings.json` -- Marketplace Integration
+Apply the delta by copying from a fresh clone of `template-repo`; do not hand-author these:
 
-```json
-{
-  "extraKnownMarketplaces": {
-    "infinite-room-labs": {
-      "source": {
-        "source": "github",
-        "repo": "InfiniteRoomLabs/agent-ops"
-      }
-    }
-  }
-}
-```
+- `.claude/settings.json` (marketplaces + default plugins + `enabledMcpjsonServers`) and `.claude/.gitignore`; then the `.gitignore` allowlist lines (`.claude/*`, `!.claude/.gitignore`, `!.claude/settings.json`) and secret/tool wiring ignores (`fnox.toml`, `mise.local.toml`, `.env*`, `.envrc`, `.worktrees/`).
+- `.claudeignore` (must not blanket-ignore `.claude/`).
+- `mise.toml` (merge into an existing one: keep the repo's tools, add `[tasks.check]` and the `arch:*` tasks) and `scripts/check.sh`, `scripts/arch-gen.sh`, `scripts/redaction-check.sh`.
+- `docs/architecture/` (config + `spec.c4`/`model.c4`/`views.c4`) and `.mcp.json`.
+- `CHANGELOG.md` (Keep a Changelog, `[Unreleased]` on top) and `LICENSE` if missing.
+- Merge the template's `CLAUDE.md` sections (First run, Toolchain, Working conventions, Architecture, Gotchas) into the repo's own, keeping its project-specific content. Add the thin `AGENTS.md` Codex pointer.
 
-### `CLAUDE.md` -- Project Instructions
+Then `mise run check` green, and `/new-goal-loop` to install the treadmill.
 
-Create a CLAUDE.md following the quality criteria from claude-md-management. At minimum include:
+## Do not
 
-- What the project is (1-2 sentences)
-- Primary language and framework
-- Build/test/lint commands
-- Directory structure overview
-- Key conventions (naming, patterns, architecture decisions)
-
-### `.gitignore` -- Language-Appropriate Ignores
-
-Generate based on project type. Always include:
-
-```
-# Agent runtime directories
-.claude/
-.codex/
-.gemini/
-.cursor/
-
-# Environment
-.env
-.env.local
-```
-
-### `.claudeignore` -- Agent Boundary
-
-Include at minimum:
-
-```
-.claude/
-.git/
-node_modules/
-dist/
-build/
-__pycache__/
-```
-
-### Open Source Files (if applicable)
-
-If the project is open source, verify or create:
-
-- `LICENSE` -- MIT unless the user specifies otherwise
-- `CONTRIBUTING.md` -- basic contribution guidelines
-- `CHANGELOG.md` -- initialized with Keep a Changelog format
-- `.github/ISSUE_TEMPLATE/` -- bug report and feature request templates
-- `.github/PULL_REQUEST_TEMPLATE.md`
-
-## After Onboarding
-
-Report what was created and suggest next steps:
-- Install marketplace plugins: `/plugin marketplace add InfiniteRoomLabs/agent-ops`
-- Run claude-automation-recommender for additional setup suggestions
-- Start first feature with superpowers:brainstorming
-
-## Anti-Patterns
-
-- Do NOT add configuration the project does not need yet (YAGNI)
-- Do NOT install dependencies -- only create configuration files
-- Do NOT assume a specific CI/CD provider -- ask the user
-- Do NOT create a README with placeholder content -- either write a real one or skip it
+- Duplicate the treadmill artifacts (GOAL.md, `docs/phases/_templates/`, `docs/progress.md`); `skills/new-goal-loop/templates/` is their only source.
+- Blanket-ignore `.claude/` -- that hides load-bearing settings and hooks (reversed in infra 2026-08-27).
+- Add configuration the project does not need yet, install dependencies, or write a placeholder README.

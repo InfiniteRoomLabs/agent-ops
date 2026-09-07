@@ -169,17 +169,25 @@ After bumping: edit `CHANGELOG.md` by hand, add a `## [agency-<new-version>] - Y
 
 ## Cross-Repo Integration
 
-Add to any company repo's `.claude/settings.json`:
+New repos are cut from `InfiniteRoomLabs/template-repo`, which already carries this file. For an existing repo, `.claude/settings.json` (committed via the `.gitignore` allowlist `.claude/*`, `!.claude/.gitignore`, `!.claude/settings.json`) is:
 
 ```json
 {
   "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": { "source": "github", "repo": "anthropics/claude-plugins-official" }
+    },
     "infinite-room-labs": {
-      "source": {
-        "source": "github",
-        "repo": "InfiniteRoomLabs/agent-ops"
-      }
+      "source": { "source": "github", "repo": "InfiniteRoomLabs/agent-ops" }
     }
-  }
+  },
+  "enabledPlugins": {
+    "agency@infinite-room-labs": true,
+    "superpowers@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true
+  },
+  "enabledMcpjsonServers": ["likec4"]
 }
 ```
+
+This is the canonical default plugin set. `agency` is the only plugin this marketplace ships (`core@infinite-room-labs` never existed); `superpowers` comes from the official marketplace (obra's `superpowers-marketplace` is superseded). `enabledMcpjsonServers` names the project `.mcp.json` servers a fresh clone may start without a prompt; prefer it over `enableAllProjectMcpServers`.
