@@ -5,6 +5,17 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.25.0] - 2026-09-07
+
+### Added
+- **`skills/likec4-dsl/`** -- the LikeC4 DSL/CLI skill, promoted from a local `~/.agents/skills` copy so every repo that enables `agency` gets it (template-repo v2 ships a LikeC4 workspace and expects it). Adds a tag-color note: tag `color` takes hex/rgb only, element `style { color }` takes the semantic tokens.
+- **`commands/arch-sync.md`** -- `/arch-sync`: end-of-phase reconciliation of `docs/architecture/*.c4` with the code (heuristic gap report, confirmed edits, `mise run arch:gen`, stage). The gate proves the model is well-formed; this is the step that asks whether it is true.
+
+### Changed
+- **`skills/project-onboard/`** -- rewritten as a router: new repos are cut from `InfiniteRoomLabs/template-repo` and follow its README checklist; existing repos apply the delta by copying from the template; both end in `/new-goal-loop`. Drops the stale scaffolding blobs that blanket-ignored `.claude/` (reversed in infra 2026-08-27).
+- **`skills/new-goal-loop/`** -- the design spec now requires an **Architecture** section listing the LikeC4 elements and relationships a project adds, changes, or removes, by FQN.
+- **`CLAUDE.md`** Cross-Repo Integration now carries the canonical default plugin set (`agency`, `superpowers@claude-plugins-official`, `claude-md-management@claude-plugins-official`) plus `enabledMcpjsonServers`, and notes that `core@infinite-room-labs` never existed.
+
 ## [agency-1.24.2] - 2026-09-04
 
 ### Changed

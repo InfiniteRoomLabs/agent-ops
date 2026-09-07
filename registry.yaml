@@ -515,6 +515,8 @@ skills:
     description: Use when the user wants to unload a currently active agent persona and return to the default orchestrator.
   - name: incident-response
     description: "Run an incident response workflow -- triage, communicate, and write postmortem. Trigger with 'we have an incident', 'production is down', an alert that needs severity assessment, a status update mid-incident, or when writing a blameless postmortem after resolution."
+  - name: likec4-dsl
+    description: "Use when working with .c4/.likec4 files or LikeC4 CLI/config questions where exact DSL/CLI syntax is required -- model/views/specification/deployment/dynamic views, predicates, validate/export/codegen flags, project config."
   - name: load-agent
     description: "Use when the user wants to load an agent-ops agent as the primary session persona."
   - name: market-scan
@@ -534,7 +536,7 @@ skills:
   - name: persona-forge
     description: "Use when role-shaped work (analysis, review, writing, architecture, negotiation) needs a purpose-built persona: generate candidates, antagonistically attack them, evolve to one optimal persona, then adopt it"
   - name: project-onboard
-    description: Use when setting up a new repository or project with Infinite Room Labs conventions and marketplace integration
+    description: "Use when setting up a new repository or bringing an existing one up to Infinite Room Labs conventions -- routes new repos to the template-repo cut-and-fill flow, applies the harness/toolchain delta to existing ones, and hands off to /new-goal-loop."
   - name: prompt-refiner
     description: "Use when the user asks to refine, improve, restructure, or clarify a prompt for Claude Code."
   - name: public-readiness
@@ -559,6 +561,8 @@ skills:
     description: "Write or fix doc comments in TypeScript using TSDoc conventions. Use when adding JSDoc/docblocks to .ts files, cleaning up AI-generated or wordy comments, documenting interfaces/types/functions, or when a comment uses @property or {Type} annotations that should be TSDoc instead."
 
 commands:
+  - name: arch-sync
+    description: "Use at the end of a phase or after a structural refactor to reconcile the LikeC4 model in docs/architecture/ with the code, regenerate the committed diagrams, and stage the result."
   - name: end-agent-session
     description: Unload the current agent persona and return to the default orchestrator
   - name: find-agent
