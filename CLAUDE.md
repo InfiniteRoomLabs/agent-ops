@@ -27,7 +27,7 @@ agents/                            # 156+ agent definitions organized by divisio
   spatial-computing/               # XR, visionOS, Metal, immersive specialists
   game-development/                # Unity, Unreal, Godot, Roblox, narrative design
   specialized/                     # Cross-cutting: compliance, blockchain, data, MCP
-skills/                            # 26 user-invocable workflows
+skills/                            # 28 user-invocable workflows
   nexus/                           # Full multi-agent orchestration (replaces devops-team)
   nexus-sprint/                    # 2-6 week feature/MVP builds
   nexus-micro/                     # 1-5 day tasks with pre-built runbooks
@@ -39,6 +39,8 @@ skills/                            # 26 user-invocable workflows
   release-prep/                    # Release cycle management
   dep-audit/                       # Dependency auditing
   market-scan/                     # Market research
+  web-ui-automation-survey/        # Read-only live-app survey -> automation report
+  web-ui-automation-components/    # Survey report -> typed Puppeteer components
   architecture/ code-review/ debug/ deploy-checklist/ documentation/
   incident-response/ standup/ system-design/ tech-debt/ testing-strategy/
                                    # Engineering pack (vendored from Anthropic's

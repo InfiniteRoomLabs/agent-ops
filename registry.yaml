@@ -559,6 +559,10 @@ skills:
     description: "Ingest the user's pre-agent terminal context by capturing tmux pane scrollback with tdump. Use when the user says 'catch up on what I was doing', 'look at my terminal', or references shell work from before the agent session started. Includes the Claude Code TUI repaint caveat: agent conversations never land in tmux scrollback."
   - name: tsdoc
     description: "Write or fix doc comments in TypeScript using TSDoc conventions. Use when adding JSDoc/docblocks to .ts files, cleaning up AI-generated or wordy comments, documenting interfaces/types/functions, or when a comment uses @property or {Type} annotations that should be TSDoc instead."
+  - name: web-ui-automation-components
+    description: "Use when asked to turn a web UI automation survey report into Puppeteer code: builds strictly typed, drop-in TypeScript models, components and page objects from the report, as source files only, with no project or framework around them."
+  - name: web-ui-automation-survey
+    description: "Use when asked to click through, map or document a web app's UI so it can be automated or tested: explores the live app read-only and writes an exhaustive Page -> Component -> Element survey report with selectors, routines and user stories."
 
 commands:
   - name: arch-sync
