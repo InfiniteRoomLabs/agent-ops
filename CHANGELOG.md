@@ -5,6 +5,12 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.26.0] - 2026-10-02
+
+### Added
+- **`skills/web-ui-automation-survey/`** -- explores a live, signed-in web app strictly read-only through the browser tool and writes an exhaustive Page -> Component -> Element survey report (`{app}-automation-survey.md`): platform facts, component trees with selectors, routines (`R-{AREA}-{VERB}`), user stories, route table, API surface, and a coverage matrix with Verified / Inferred / Not exercised / Not verified evidence labels. Ships an in-page helper block (`window.__sv`) for DOM dumps, network shape capture, and bundle grep that masks URLs, secrets, and ids; identifiers are kept in scratch and grepped out of the report before delivery.
+- **`skills/web-ui-automation-components/`** -- turns that survey report into a drop-in folder of strictly typed TypeScript Puppeteer components, models, and page objects (no project scaffolding). Includes the shared `core/` files (base `Component`, typed errors, `poll`), a writes-off-by-default `sideEffects` guard, and the pre-delivery checks: dual `tsc` type-check, selector syntax check, fixture smoke run, and optional live selector counts.
+
 ## [agency-1.25.0] - 2026-09-07
 
 ### Added
