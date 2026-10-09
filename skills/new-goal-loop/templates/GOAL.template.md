@@ -63,6 +63,7 @@ The phases the user signed off. This is the ceiling: the loop runs these and sto
 | Phase | Branch | Implementer -> Reviewers | Effort | Notes |
 |---|---|---|---|---|
 | **<n> <name>** | `phase-<n>/<slug>` | <impl> -> <reviewer> | <trivial|low|med|high> | <scope; attended?> |
+| **<last> History scrub** | `phase-<last>/history-scrub` | opus -> fable | low | **Attended.** Always the final row. `public-readiness` over tree + full history + commit messages; `git filter-repo --replace-text` with the redaction term list; force-push EVERY remote (internal mirrors included); re-clone. Precondition for any visibility flip. |
 
 **Batch option:** <phases that may run together in one attended run, if any>.
 

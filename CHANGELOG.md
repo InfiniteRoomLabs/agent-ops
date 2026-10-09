@@ -5,6 +5,13 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.27.0] - 2026-10-09
+
+### Changed
+- **`skills/new-goal-loop/`** -- the roadmap always ends with an attended **history scrub** phase: `public-readiness` over the working tree, full history, and commit messages, then `git filter-repo --replace-text` driven by the configured redaction term list, a force-push to every remote (internal mirrors included), and a re-clone. `GOAL.template.md` ships the row; `SKILL.md` Part 2 states the rule beside "Phase 0 is always scaffold" and asks for the project's secret-shaped identifiers to be added to the term list before the first commit.
+- **`skills/new-goal-loop/templates/{CLAUDE-sections.template,security}.md`** -- public-repo hygiene is unconditional (every remote is public-bound) instead of `<If public:>`; the security lane must name leaks already in history so the lead records them for the scrub phase.
+- **`skills/new-goal-loop/templates/seed-lessons.md`** -- two new seed lessons: the docs that describe a scrub leak the thing they scrubbed, and lane reports quote what they flag.
+
 ## [agency-1.26.0] - 2026-10-02
 
 ### Added
