@@ -5,6 +5,15 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.28.0] - 2026-10-27
+
+### Added
+- **`skills/manual-test/`** -- the org format for regression tests that cannot run in the automated suite (a live, audited system, a real remote, a human eye): `<testdir>/manual/MT-<nnn>-<slug>.md`, one tool call or manual action per step with a `jq -e` or exact-shape expected result, a declared live read budget (no retries, no polling), `<placeholder>`s resolved from the gitignored `mise.local.toml`, and an append-only logfmt `.results` log beside it. Procedures for writing, running, and retiring a test; every manual test names what blocks its automation (standard S5), and the active count is the debt the org drives to zero.
+- **`TESTING.md`** -- `## Manual tests` points new entries at the skill's format; M1 migrates at its next change.
+
+### Changed
+- **`skills/release-prep/`** -- second Iron Law (no release with a failed, blocked, stale, or unrun manual test); new Step 4a runs every active `MT-*.md` through the `manual-test` skill after the bump and gates the release on a `result=PASS|SKIP` line for the version in the shell; Step 5 stages the `.results` files; two anti-patterns (no re-run to turn a FAIL into a PASS, no manual test in the automated gate); Step 7 reports the active manual-test count.
+
 ## [agency-1.27.0] - 2026-10-09
 
 ### Changed

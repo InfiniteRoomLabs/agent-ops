@@ -15,6 +15,8 @@ Guide a repository through a complete release cycle: version bump, CHANGELOG upd
 
 **NO RELEASE WITHOUT CHANGELOG UPDATE.** If the CHANGELOG has not been updated for this version, stop and update it before proceeding.
 
+**NO RELEASE WITH A FAILED, BLOCKED, STALE, OR UNRUN MANUAL TEST.** If the repo has `test/manual/` or `tests/manual/`, every `MT-*.md` there (not `retired/`) must end its `.results` file with a `result=PASS` (or a Step 4a `result=SKIP`) line carrying the version being released, before Step 5. An empty `.results` file is an unrun test and stops the release. Format and run procedure: the `manual-test` skill.
+
 ## Prerequisite: Release Readiness Certificate
 
 Before starting the release cycle, check for a **Release Readiness Certificate** from Reality Checker. This certificate confirms the version has passed final quality validation.
@@ -113,12 +115,29 @@ multi-file cases:
 
 Use the Edit tool for precise replacements. Do NOT rewrite entire files.
 
+## Step 4a: Run the Manual Tests
+
+Set `testdir` once: `test` if `test/manual/` exists, `tests` if `tests/manual/` exists. If neither exists, say "no manual tests" in one line and continue. Otherwise, after the bump:
+
+1. Docs-only release check: if `git diff --name-only $(git describe --tags --abbrev=0)..HEAD -- src/ package.json pnpm-lock.yaml | wc -l` prints `0` (adjust the pathspec to the repo's source root and every manifest and lockfile it tracks; a dependency bump is a product change), the live tests prove nothing new. Append `ts=<now> test=MT-<nnn> repo=<repo> result=SKIP version=X.Y.Z build=<sha> runner=claude-code:<model id> live=0 failed=- note="no source or dependency change since <last tag>"` to each active test's `.results` and go to step 4. Otherwise continue.
+2. Rebuild or reload the system under test as the scripts' preconditions say (for an MCP server: the build command, then the `/mcp` reconnect the script asks for). Build output is never committed. A script with a manual step ends your turn there; the run resumes in the next message.
+3. For each `MT-*.md` in `$testdir/manual/` (not `retired/`), in id order, run the `manual-test` skill's run procedure once. It resolves placeholders, enforces the budget, runs the steps, and appends one line.
+4. Gate, visible in the shell, not trusted from the skill's summary (replace `X.Y.Z` with the Step 4 version):
+
+    ```
+    n=0; total=$(ls "$testdir"/manual/MT-*.md | wc -l); for t in "$testdir"/manual/MT-*.md; do r="${t%.md}.results"; printf '%s: ' "$t"; { tail -n1 "$r" 2>/dev/null || echo MISSING; } | grep -E 'result=(PASS|SKIP) .*version=X\.Y\.Z' && n=$((n+1)); done; echo "$n of $total gated"; [ "$n" -eq "$total" ]
+    ```
+
+   One matching line per active test, counted, with the filename printed beside it; the final test must succeed. A `FAIL`, a `BLOCKED`, an older version, a `MISSING` file, or an empty `.results` (prints the filename and nothing after it: an unrun test) stops the release here: do not commit, do not tag. A FAIL has already opened `docs/bugs/<date>-<slug>.md` (or the repo's bug intake); the release waits for the fix, a new CHANGELOG line (back to Step 3), and a fresh run. A BLOCKED is cleared between runs as the script's budget line says (an MFA code is entered by the human outside any run) and that one test is run again, which is a new line, never an edit.
+5. The `.results` files are staged in Step 5.
+
 ## Step 5: Commit and Tag
 
 Stage the changed files and create a release commit:
 
 ```
 git add CHANGELOG.md {manifest files}
+[ -d test/manual ] && git add test/manual/*.results; [ -d tests/manual ] && git add tests/manual/*.results
 git commit -m "release: vX.Y.Z"
 ```
 
@@ -153,6 +172,7 @@ Also remind:
 - Push the tag: `git push origin vX.Y.Z`
 - Push the commit: `git push`
 - Update any documentation sites if applicable
+- Manual tests still active: N (`ls $testdir/manual/MT-*.md | wc -l`), the number the org drives to zero
 
 ## Anti-Patterns
 
@@ -160,3 +180,5 @@ Also remind:
 - Do NOT create a tag if the working directory is dirty (unstaged changes exist).
 - Do NOT skip the CHANGELOG step even if the user says "just tag it."
 - Do NOT use `npm version` or `cargo release` -- handle versioning manually for full control.
+- Do NOT run a manual test a second time to turn a FAIL into a PASS. One run per test per version; a second run is a second audited read and a second results line, and both stay in the record.
+- Do NOT put a manual test into the automated gate (`check.sh`, pytest, vitest). Live systems stay out of the suite; Step 4a is where they run.

@@ -519,6 +519,8 @@ skills:
     description: "Use when working with .c4/.likec4 files or LikeC4 CLI/config questions where exact DSL/CLI syntax is required -- model/views/specification/deployment/dynamic views, predicates, validate/export/codegen flags, project config."
   - name: load-agent
     description: "Use when the user wants to load an agent-ops agent as the primary session persona."
+  - name: manual-test
+    description: "Use when a fix can only be verified against a live system, a real remote, or by a human eye: write the MT-*.md script and its .results log, run it at release (release-prep Step 4a), or retire it once automated."
   - name: market-scan
     description: "Use when analyzing a market segment, identifying competitors, or evaluating business opportunities"
   - name: new-agent
@@ -573,6 +575,8 @@ commands:
     description: "Use when searching for agents, skills, or commands by tag or keyword across all divisions"
   - name: load-agent
     description: "Load an agent-ops agent as the primary session persona"
+  - name: manual-test
+    description: "Write, run, or retire a manual regression test (MT-*.md plus a logfmt .results log, gated at release)"
   - name: publish-package
     description: "Use when publishing a package to a registry (npm, packagist, PyPI, crates.io)"
   - name: trend-watch
