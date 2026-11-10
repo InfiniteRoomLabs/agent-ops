@@ -350,7 +350,7 @@ class TestRemoveCommand:
         self, git_repo: Path, audit: list[dict]
     ) -> None:
         """The real WorktreeRemove payload is read via `worktree_path` and
-        audited; uncommitted work in the worktree is reported."""
+        audited; a worktree with uncommitted work is reported and kept."""
         import json
 
         from typer.testing import CliRunner
@@ -372,11 +372,14 @@ class TestRemoveCommand:
             input=json.dumps(claude_code_remove_payload(wt, git_repo)),
         )
 
-        assert result.exit_code == 0, result.output
+        # Uncommitted work: the worktree is kept (exit 1) and the audit says so.
+        assert result.exit_code == 1, result.output
+        assert wt.is_dir()
         assert len(audit) == 1
         assert audit[0]["event"] == "worktree_removed"
         assert audit[0]["path"] == str(wt)
         assert audit[0]["had_uncommitted"] is True
+        assert audit[0]["removed"] is False
 
     def test_remove_without_worktree_path_exits_zero_with_warning(
         self, git_repo: Path, audit: list[dict]
@@ -398,3 +401,92 @@ class TestRemoveCommand:
         assert result.exception is None, repr(result.exception)
         assert "`worktree_path`" in result.stderr
         assert audit == []
+
+
+class TestCleanup:
+    """WorktreeRemove deletes safe worktrees; SubagentStop cleans its own."""
+
+    @pytest.fixture(autouse=True)
+    def _hermetic(self, monkeypatch: pytest.MonkeyPatch, git_repo: Path):
+        import worktree_lifecycle as wl
+
+        monkeypatch.setattr(wl, "_write_audit", lambda event: None)
+        monkeypatch.setattr(
+            wl, "resolve_typed", lambda model, namespace, **kw: wl.WorktreeConfig()
+        )
+        monkeypatch.chdir(git_repo)
+
+    def _make(self, git_repo: Path, name: str) -> Path:
+        wt = git_repo / ".worktrees" / name
+        subprocess.run(
+            ["git", "worktree", "add", str(wt)],
+            check=True, capture_output=True, cwd=git_repo,
+        )
+        return wt
+
+    def _branches(self, git_repo: Path) -> str:
+        return subprocess.run(
+            ["git", "branch", "--list"], capture_output=True, text=True, cwd=git_repo
+        ).stdout
+
+    def _commit(self, wt: Path) -> None:
+        (wt / "new.txt").write_text("x\n")
+        subprocess.run(["git", "add", "."], check=True, capture_output=True, cwd=wt)
+        subprocess.run(
+            ["git", "commit", "-m", "work"], check=True, capture_output=True, cwd=wt
+        )
+
+    def _run(self, cmd: str, payload: dict):
+        import json
+
+        from typer.testing import CliRunner
+
+        import worktree_lifecycle as wl
+
+        return CliRunner().invoke(wl.app, [cmd], input=json.dumps(payload))
+
+    def test_remove_deletes_clean_worktree_and_branch(self, git_repo: Path) -> None:
+        wt = self._make(git_repo, "clean-wt")
+        result = self._run("remove", {"worktree_path": str(wt)})
+        assert result.exit_code == 0, result.output
+        assert not wt.exists()
+        assert "clean-wt" not in self._branches(git_repo)
+
+    def test_remove_keeps_worktree_with_untracked_file(self, git_repo: Path) -> None:
+        wt = self._make(git_repo, "dirty-wt")
+        (wt / "scratch.txt").write_text("wip\n")
+        result = self._run("remove", {"worktree_path": str(wt)})
+        assert result.exit_code != 0
+        assert wt.is_dir()
+
+    def test_remove_keeps_worktree_with_unmerged_commit(self, git_repo: Path) -> None:
+        wt = self._make(git_repo, "ahead-wt")
+        self._commit(wt)
+        result = self._run("remove", {"worktree_path": str(wt)})
+        assert result.exit_code != 0
+        assert wt.is_dir()
+        assert "ahead-wt" in self._branches(git_repo)
+
+    def test_subagent_stop_removes_clean_worktree(self, git_repo: Path) -> None:
+        wt = self._make(git_repo, "agent-abc123")
+        payload = {
+            "hook_event_name": "SubagentStop",
+            "agent_id": "abc123",
+            "agent_type": "Explore",
+            "stop_hook_active": False,
+        }
+        result = self._run("subagent-stop", payload)
+        assert result.exit_code == 0 and result.stdout == ""
+        assert not wt.exists()
+        assert "agent-abc123" not in self._branches(git_repo)
+
+    def test_subagent_stop_keeps_worktree_with_commit(self, git_repo: Path) -> None:
+        wt = self._make(git_repo, "agent-def456")
+        self._commit(wt)
+        result = self._run("subagent-stop", {"agent_id": "def456"})
+        assert result.exit_code == 0 and result.stdout == ""
+        assert wt.is_dir()
+
+    def test_subagent_stop_without_worktree_is_silent(self, git_repo: Path) -> None:
+        result = self._run("subagent-stop", {"agent_id": "nope"})
+        assert result.exit_code == 0 and result.stdout == ""
