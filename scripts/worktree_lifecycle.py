@@ -9,6 +9,7 @@ WorktreeCreate REPLACES default git worktree creation. The hook calls
 Usage:
   Create:  echo '{"name":"feat","branch":"feat-x"}' | uv run worktree_lifecycle.py create
   Remove:  echo '{"worktree_path":"/tmp/wt"}' | uv run worktree_lifecycle.py remove
+  SubagentStop:  echo '{"agent_id":"abc123"}' | uv run worktree_lifecycle.py subagent-stop
 """
 
 from __future__ import annotations
@@ -60,6 +61,10 @@ class CreatePayload(BaseModel):
 
 class RemovePayload(BaseModel):
     worktree_path: str
+
+
+class SubagentStopPayload(BaseModel):
+    agent_id: str = ""
 
 
 # ---------------------------------------------------------------------------
@@ -131,6 +136,64 @@ def check_worktree_env_files(worktree: Path) -> list[str]:
                 f"Ensure it is not committed."
             )
     return warnings
+
+
+# ---------------------------------------------------------------------------
+# Safe removal
+# ---------------------------------------------------------------------------
+
+
+def _git(cwd: Path, *args: str) -> subprocess.CompletedProcess:
+    return subprocess.run(["git", *args], capture_output=True, text=True, cwd=str(cwd))
+
+
+def _main_repo_root(cwd: Path) -> Path:
+    """Root of the main checkout, even when ``cwd`` is inside a linked worktree."""
+    r = _git(cwd, "rev-parse", "--path-format=absolute", "--git-common-dir")
+    common = r.stdout.strip()
+    if r.returncode != 0 or not common:
+        return get_repo_root(cwd)
+    return Path(common).parent
+
+
+def _remove_worktree_if_safe(repo_root: Path, wt_path: Path) -> tuple[bool, str]:
+    """Remove a hook-created worktree (and its same-named branch) only if no work is lost.
+
+    Safe = registered worktree of this repo directly under ``<repo_root>/.worktrees/``,
+    clean ``git status`` (untracked files count), and no commit reachable from HEAD
+    that is missing from every other local branch and remote-tracking ref.
+    """
+    wt = wt_path.resolve()
+    if wt.parent != (repo_root / ".worktrees").resolve():
+        return False, "not directly under .worktrees/"
+    listed = _git(repo_root, "worktree", "list", "--porcelain").stdout.splitlines()
+    registered = {Path(line[9:]).resolve() for line in listed if line.startswith("worktree ")}
+    if wt not in registered:
+        return False, "not a registered worktree of this repo"
+
+    status = _git(wt, "status", "--porcelain")
+    if status.returncode != 0 or status.stdout.strip():
+        return False, "uncommitted or untracked changes"
+
+    branch = _git(wt, "symbolic-ref", "--short", "-q", "HEAD").stdout.strip()
+    # Commits reachable from HEAD but from no other local branch or remote-tracking
+    # ref. `--exclude=<own branch>` (matched relative to refs/heads/) hides this
+    # worktree's own branch from the following --branches glob; an empty result
+    # means deleting the branch loses nothing.
+    cmd = ["rev-list", "-n1", "HEAD", "--not"]
+    if branch:
+        cmd.append(f"--exclude={branch}")
+    cmd += ["--branches", "--remotes"]
+    unique = _git(wt, *cmd)
+    if unique.returncode != 0 or unique.stdout.strip():
+        return False, "HEAD has commits not on any other branch"
+
+    rm = _git(repo_root, "worktree", "remove", str(wt))
+    if rm.returncode != 0:
+        return False, f"git worktree remove failed: {rm.stderr.strip()}"
+    if branch and branch == wt.name:
+        _git(repo_root, "branch", "-d", branch)  # refuses if unmerged; leave it then
+    return True, "removed"
 
 
 # ---------------------------------------------------------------------------
@@ -211,9 +274,11 @@ def create() -> None:
 
 @app.command()
 def remove() -> None:
-    """WorktreeRemove hook. Reads JSON from stdin, checks uncommitted work, logs audit.
+    """WorktreeRemove hook. Reads JSON from stdin, deletes the worktree if safe, logs audit.
 
-    Exit 0 always (debug-only visibility).
+    Claude Code treats exit 0 as "removed" and never deletes a hook-created
+    worktree itself, so this deletes it. Exit 1 when the directory is kept
+    (unsaved work), which makes Claude Code keep the worktree too.
     """
     payload = RemovePayload.model_validate_json(sys.stdin.read())
     config = resolve_typed(WorktreeConfig, "worktree")
@@ -239,6 +304,10 @@ def remove() -> None:
                 err=True,
             )
 
+    removed, reason = _remove_worktree_if_safe(_main_repo_root(Path.cwd()), wt_path)
+    if not removed and not wt_path.exists():
+        removed, reason = True, "already gone"
+
     # Audit
     _write_audit(
         {
@@ -246,10 +315,49 @@ def remove() -> None:
             "path": str(wt_path),
             "had_uncommitted": uncommitted,
             "uncommitted_details": uncommitted_details if uncommitted else None,
+            "removed": removed,
+            "reason": reason,
         }
     )
 
-    # Always exit 0 -- removal is debug-only visibility
+    if removed:
+        raise typer.Exit(0)
+    typer.echo(f"Keeping worktree {wt_path}: {reason}", err=True)
+    raise typer.Exit(1)
+
+
+@app.command("subagent-stop")
+def subagent_stop() -> None:
+    """SubagentStop hook. Removes the finished subagent's clean worktree.
+
+    Claude Code keeps hook-created subagent worktrees and skips WorktreeRemove for
+    them. The worktree is named ``agent-<agent_id>`` (id used as-is if it already
+    carries the prefix). Only that one is touched. Always exits 0, no stdout.
+    """
+    try:
+        agent_id = SubagentStopPayload.model_validate_json(sys.stdin.read()).agent_id
+    except ValueError:
+        raise typer.Exit(0)
+    if not agent_id:
+        raise typer.Exit(0)
+    name = agent_id if agent_id.startswith("agent-") else f"agent-{agent_id}"
+    if "/" in name or ".." in name:
+        raise typer.Exit(0)
+
+    repo_root = _main_repo_root(Path.cwd())
+    wt_path = repo_root / ".worktrees" / name
+    if not wt_path.exists():
+        raise typer.Exit(0)
+
+    removed, reason = _remove_worktree_if_safe(repo_root, wt_path)
+    _write_audit(
+        {
+            "event": "subagent_worktree_cleanup",
+            "path": str(wt_path),
+            "removed": removed,
+            "reason": reason,
+        }
+    )
     raise typer.Exit(0)
 
 

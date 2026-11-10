@@ -5,6 +5,12 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [agency-1.28.2] - 2026-11-10
+
+### Fixed
+- **`scripts/worktree_lifecycle.py`** -- the `WorktreeRemove` hook now deletes the worktree (Claude Code treats exit 0 as "removed" and never deletes a hook-created worktree or its branch), plus the branch when it is named after the directory; it refuses and exits 1 when the worktree has uncommitted or untracked files or commits that exist on no other local branch or remote-tracking ref, so unsaved work is kept.
+- **`hooks/hooks.json`** -- new `SubagentStop` hook (`worktree_lifecycle.py subagent-stop`) cleans up the finished subagent's own `.worktrees/agent-<agent_id>` worktree under the same safety rule, because Claude Code skips `WorktreeRemove` for subagent worktrees; it always exits 0 with no stdout and never touches other agents' worktrees.
+
 ## [agency-1.28.1] - 2026-11-09
 
 ### Fixed
