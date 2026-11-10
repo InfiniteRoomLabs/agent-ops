@@ -7,7 +7,7 @@ WorktreeCreate REPLACES default git worktree creation. The hook calls
 ``git worktree add`` itself and prints the absolute path to stdout.
 
 Usage:
-  Create:  echo '{"worktree_name":"feat","branch":"feat-x"}' | uv run worktree_lifecycle.py create
+  Create:  echo '{"name":"feat","branch":"feat-x"}' | uv run worktree_lifecycle.py create
   Remove:  echo '{"worktree_path":"/tmp/wt"}' | uv run worktree_lifecycle.py remove
 """
 
@@ -26,7 +26,7 @@ from _shared.paths import get_audit_dir  # noqa: E402
 from _shared.frontmatter_config import resolve_typed  # noqa: E402
 
 import typer
-from pydantic import BaseModel
+from pydantic import AliasChoices, BaseModel, Field
 
 app = typer.Typer(
     help="Worktree lifecycle hooks for Claude Code.",
@@ -49,7 +49,8 @@ class WorktreeConfig(BaseModel):
 
 
 class CreatePayload(BaseModel):
-    worktree_name: str
+    # Claude Code sends the slug as `name`; `worktree_name` is kept as an alias.
+    worktree_name: str = Field(validation_alias=AliasChoices("name", "worktree_name"))
     # Optional: a branchless payload creates the worktree from HEAD (git
     # names the new branch after the worktree directory). The create command
     # already guards `if payload.branch:` -- requiring it here just crashed

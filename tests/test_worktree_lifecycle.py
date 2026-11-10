@@ -205,3 +205,28 @@ class TestCreateCommand:
         )
         assert result.exit_code == 0, result.output
         assert (git_repo / ".worktrees" / "branchless-wt").is_dir()
+
+    def test_create_accepts_documented_payload(
+        self, git_repo: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The payload Claude Code documents: common fields plus `name`."""
+        import json
+
+        from typer.testing import CliRunner
+
+        import worktree_lifecycle as wl
+
+        monkeypatch.chdir(git_repo)
+        payload = {
+            "session_id": "abc123",
+            "transcript_path": "/tmp/t.jsonl",
+            "cwd": str(git_repo),
+            "hook_event_name": "WorktreeCreate",
+            "name": "agent-0123abcd",
+        }
+
+        result = CliRunner().invoke(wl.app, ["create"], input=json.dumps(payload))
+        assert result.exit_code == 0, result.output
+        wt = git_repo / ".worktrees" / "agent-0123abcd"
+        assert wt.is_dir()
+        assert result.stdout.strip() == str(wt.resolve())
