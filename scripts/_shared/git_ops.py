@@ -105,15 +105,18 @@ _GIT_C_RE = re.compile(
 )
 
 
-# Git Bash / MSYS spell drive paths `/c/Users/...` (Cygwin: `/cygdrive/c/...`).
-_MSYS_DRIVE_RE = re.compile(r"^/(?:cygdrive/)?([A-Za-z])(?=/|$)")
+# Git Bash spells drive paths `/c/Users/...` (`/C/...` works too). It does NOT
+# resolve Cygwin's `/cygdrive/c/...` ("No such file or directory"), so neither
+# do the guards: a translation the shell does not share would judge a repo the
+# command never reaches.
+_MSYS_DRIVE_RE = re.compile(r"^/([A-Za-z])(?=/|$)")
 
 
 def msys_to_windows(path: str, *, windows: bool | None = None) -> str:
-    """Translate a Git Bash drive path (``/c/x``, ``/cygdrive/c/x``) to
-    ``C:/x`` when running on Windows, where Python cannot resolve the MSYS
-    form; return every other path unchanged. ``windows`` defaults to the
-    current platform (injectable for tests)."""
+    """Translate a Git Bash drive path (``/c/x``) to ``C:/x`` when running on
+    Windows, where Python cannot resolve the MSYS form; return every other
+    path unchanged. ``windows`` defaults to the current platform (injectable
+    for tests)."""
     if windows is None:
         windows = os.name == "nt"
     m = _MSYS_DRIVE_RE.match(path) if windows else None
@@ -145,8 +148,32 @@ def _apply_path_if_dir(base: Path, raw: str) -> Path:
     return target if target.is_dir() else base
 
 
+def _dedupe(paths: list[Path]) -> list[Path]:
+    out: list[Path] = []
+    for p in paths:
+        if p not in out:
+            out.append(p)
+    return out
+
+
+# Between a `cd` hop and the git command, these make the hop optional: `;` /
+# newline (git runs even if the cd failed), `||` (git runs only if it failed)
+# and a background `&` (the chain holding the cd runs in a subshell). `&&` is
+# safe, and so is a later pipeline; a pipe right after the cd is checked
+# separately. Redirections such as `2>&1` and `&>file` are not separators.
+_OPTIONAL_JOIN_RE = re.compile(r"[;\n]|\|\||&")
+_AMP_REDIRECT_RE = re.compile(r"\d*[<>]&\d*-?|&>>?")
+
+
 def effective_cwd(command: str, payload_cwd: str | Path | None = None) -> Path:
-    """Resolve the directory a git invocation inside `command` actually runs in.
+    """The directory a git invocation inside `command` most likely runs in:
+    the first of ``candidate_cwds``."""
+    return candidate_cwds(command, payload_cwd)[0]
+
+
+def candidate_cwds(command: str, payload_cwd: str | Path | None = None) -> list[Path]:
+    """Every directory a git invocation inside `command` may run in, most
+    likely first.
 
     Hook processes inherit the session cwd, but the agent's command may hop
     repos first (`cd /other/repo && git commit ...`) or use `git -C <path>`.
@@ -157,13 +184,19 @@ def effective_cwd(command: str, payload_cwd: str | Path | None = None) -> Path:
     Resolution: start from `payload_cwd` (the hook payload's `cwd` field, i.e.
     where the shell command will run), apply each `cd <path>` that appears
     before the first git invocation in order (relative paths chain), then apply
-    a `git -C <path>` override if present. Heredoc bodies are stripped first so
-    quoted text cannot inject phantom `cd`s. Limitations (accepted): `cd` with
-    no argument, `cd -`, and shell variables that are not plain $VAR/${VAR}
-    expansions are ignored; a `cd` AFTER the git invocation is not applied only
-    when git appears first. A hop whose target is not an existing directory
-    (e.g. `P=~/x; cd $P` -- `$P` is assigned inside the command, not in the
-    hook's env) is ignored rather than poisoning the cwd.
+    a `git -C <path>` override if present. A hop is CERTAIN only when it runs
+    unconditionally in the main shell and only `&&` separates it from the git
+    command (git then runs only if the cd succeeded). Any other hop may not
+    take effect -- a failed `cd X; git ...` still runs git, in the old cwd --
+    so the pre-hop directories stay candidates and callers judge them all.
+
+    Heredoc bodies are stripped first so quoted text cannot inject phantom
+    `cd`s. Limitations (accepted): `cd` with no argument, `cd -`, and shell
+    variables that are not plain $VAR/${VAR} expansions are ignored; a `cd`
+    AFTER the git invocation is not applied only when git appears first. A hop
+    whose target is not an existing directory (e.g. `P=~/x; cd $P` -- `$P` is
+    assigned inside the command, not in the hook's env) is ignored rather than
+    poisoning the cwd.
     """
     base = Path(payload_cwd) if payload_cwd else Path.cwd()
     text = _HEREDOC_RE.sub(" ", command)
@@ -187,7 +220,18 @@ def effective_cwd(command: str, payload_cwd: str | Path | None = None) -> Path:
     )
     cutoff = git_token.start() if git_token else len(text)
 
-    cur = base
+    def _certain(m: re.Match[str]) -> bool:
+        lead = text[m.start(0):m.start(1)].strip()  # separator before `cd`
+        if lead not in ("", "&&", ";"):
+            return False  # after `||` or `|` the cd may be skipped or subshelled
+        between = _AMP_REDIRECT_RE.sub(" ", masked[m.end():cutoff])
+        between = between.replace("&&", "  ")
+        if _OPTIONAL_JOIN_RE.search(between):
+            return False
+        # A pipe right after the cd puts the cd itself in a subshell.
+        return not between.lstrip(" \t").startswith("|")
+
+    candidates = [base]
     for m in _CD_RE.finditer(text):
         if not _structural(m.start(1), "cd"):
             continue  # 'cd' was inside a quoted span
@@ -196,15 +240,18 @@ def effective_cwd(command: str, payload_cwd: str | Path | None = None) -> Path:
         raw = m.group(2)
         if _unquote(raw) == "-":
             continue  # previous-dir bounce: unknowable here, keep current
-        cur = _apply_path_if_dir(cur, raw)
+        moved = [_apply_path_if_dir(c, raw) for c in candidates]
+        candidates = _dedupe(moved if _certain(m) else moved + candidates)
 
     c_match = next(
         (m for m in _GIT_C_RE.finditer(text) if _structural(m.start(1), "git")),
         None,
     )
     if c_match:
-        cur = _apply_path_if_dir(cur, c_match.group(2))
-    return cur
+        candidates = _dedupe(
+            [_apply_path_if_dir(c, c_match.group(2)) for c in candidates]
+        )
+    return candidates
 
 
 def get_repo_root(cwd: str | Path | None = None) -> Path:
@@ -229,12 +276,24 @@ def get_repo_root(cwd: str | Path | None = None) -> Path:
 def resolve_repo_root(command: str, payload_cwd: str | Path | None = None) -> Path:
     """The repo a git invocation in `command` actually targets.
 
-    This is THE entry point for hooks: payload cwd (empty string = absent)
-    -> effective_cwd (apply `cd` hops / `git -C`) -> repo toplevel. Without
-    it, a cross-repo command (`cd /other/repo && git commit`) gets judged
-    against the session repo's branch and index.
+    Payload cwd (empty string = absent) -> effective_cwd (apply `cd` hops /
+    `git -C`) -> repo toplevel. Without it, a cross-repo command
+    (`cd /other/repo && git commit`) gets judged against the session repo's
+    branch and index. Guards that BLOCK should use ``resolve_repo_roots``.
     """
     return get_repo_root(effective_cwd(command, payload_cwd or None))
+
+
+def resolve_repo_roots(command: str, payload_cwd: str | Path | None = None) -> list[Path]:
+    """Every repo a git invocation in `command` may target, most likely first.
+
+    THE entry point for blocking hooks: judge each root and let the stricter
+    result win, so an optional hop (`cd X; git commit`) cannot steer the
+    guard to X while the commit lands in the session repo.
+    """
+    return _dedupe(
+        [get_repo_root(c) for c in candidate_cwds(command, payload_cwd or None)]
+    )
 
 
 def get_staged_files(cwd: str | Path | None = None) -> list[str]:

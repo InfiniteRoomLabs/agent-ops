@@ -25,7 +25,7 @@ from _shared.git_ops import (  # noqa: E402
     STAGING_SEPARATION_MESSAGE,
     get_current_branch,
     get_latest_tag,
-    resolve_repo_root,
+    resolve_repo_roots,
     runs_git_command,
     stages_at_commit_time,
 )
@@ -423,9 +423,18 @@ def hook() -> None:
     if not is_commit and not is_tag_cmd:
         raise typer.Exit(0)
 
-    # Resolve the repo the git command actually targets (payload cwd + any
-    # `cd <path> &&` hops or `git -C <path>`), not the hook process cwd.
-    project_dir = resolve_repo_root(cmd, payload.cwd)
+    # Resolve the repos the git command may target (payload cwd + any `cd
+    # <path>` hops or `git -C <path>`), not the hook process cwd. An optional
+    # hop (`cd X; git ...`) yields several; each is judged and the stricter
+    # result wins.
+    for project_dir in resolve_repo_roots(cmd, payload.cwd):
+        _judge_repo(cmd, project_dir, is_commit=is_commit, is_tag_cmd=is_tag_cmd)
+
+    raise typer.Exit(0)
+
+
+def _judge_repo(cmd: str, project_dir: Path, *, is_commit: bool, is_tag_cmd: bool) -> None:
+    """Judge `cmd` against one candidate repo; exits 2 when it must be blocked."""
     config = load_config(project_dir)
     branch = get_current_branch(project_dir)
 
@@ -484,7 +493,8 @@ def hook() -> None:
         # Claude Code reads stderr from PreToolUse hooks.
         typer.echo(result.message, err=True)
 
-    raise typer.Exit(2 if not result.allowed else 0)
+    if not result.allowed:
+        raise typer.Exit(2)
 
 
 if __name__ == "__main__":

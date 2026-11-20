@@ -22,7 +22,7 @@ from _shared.changelog import get_latest_changelog_version, has_content_under_he
 from _shared.hook_payload import BashHookPayload  # noqa: E402
 from _shared.git_ops import (  # noqa: E402
     get_latest_tag,
-    resolve_repo_root,
+    resolve_repo_roots,
     shell_command_skeleton,
 )
 
@@ -275,7 +275,18 @@ def hook() -> None:
         )
         raise typer.Exit(0)
 
-    project_dir = resolve_repo_root(cmd, payload.cwd)
+    # An optional hop (`cd X; gh pr merge`) leaves it unknown which repo the
+    # merge ran in. Tagging is an action, not a check: tag neither.
+    roots = resolve_repo_roots(cmd, payload.cwd)
+    if len(roots) > 1:
+        typer.echo(
+            "[auto-tag] skip: the merged repo is ambiguous (the command may run in "
+            + " or ".join(str(r) for r in roots)
+            + "); join a cd to the merge with && or tag by hand",
+            err=True,
+        )
+        raise typer.Exit(0)
+    project_dir = roots[0]
     result = evaluate_auto_tag(project_dir)
 
     if not result.should_tag:

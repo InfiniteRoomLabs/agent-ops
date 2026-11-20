@@ -27,7 +27,7 @@ import typer
 sys.path.insert(0, str(Path(__file__).parent))
 from _shared.git_ops import (  # noqa: E402
     get_staged_files,
-    resolve_repo_root,
+    resolve_repo_roots,
     runs_git_command,
 )
 from _shared.hook_payload import BashHookPayload  # noqa: E402
@@ -142,13 +142,14 @@ def hook() -> None:
     if not runs_git_command(payload.tool_input.command, "commit"):
         raise typer.Exit(0)
 
-    # Judge the repo the command targets, not the hook process cwd.
-    root = resolve_repo_root(payload.tool_input.command, payload.cwd)
-
-    allowed, message = evaluate(staged_added_scripts(root), make_present(root))
-    if not allowed:
-        typer.echo(message, err=True)
-        raise typer.Exit(2)
+    # Judge every repo the command may target, not the hook process cwd; the
+    # stricter result wins (an optional `cd X; git commit` hop may leave git
+    # in the session repo).
+    for root in resolve_repo_roots(payload.tool_input.command, payload.cwd):
+        allowed, message = evaluate(staged_added_scripts(root), make_present(root))
+        if not allowed:
+            typer.echo(message, err=True)
+            raise typer.Exit(2)
 
     raise typer.Exit(0)
 

@@ -359,6 +359,52 @@ def test_hook_judges_git_bash_cd_target_repo(git_repo: Path, tmp_path: Path) -> 
     assert not (git_repo / "CHANGELOG.md").exists()
 
 
+def _run_hook_in(session: Path, command: str) -> subprocess.CompletedProcess[str]:
+    payload = json.dumps(
+        {"tool_name": "Bash", "tool_input": {"command": command}, "cwd": str(session)}
+    )
+    return subprocess.run(
+        ["uv", "run", str(_SCRIPTS / "changelog-guard.py"), "hook"],
+        input=payload,
+        capture_output=True,
+        text=True,
+        cwd=session,
+    )
+
+
+def _feature_repo(tmp_path: Path) -> Path:
+    other = tmp_path / "other-repo"
+    other.mkdir()
+    subprocess.run(
+        ["git", "-C", str(other), "init", "-b", "feature/x"],
+        check=True, capture_output=True,
+    )
+    return other
+
+
+def test_hook_semicolon_hop_also_judges_session_repo(
+    git_repo: Path, tmp_path: Path
+) -> None:
+    """`cd X; git commit`: if the cd fails, the commit still runs -- in the
+    session repo. Both repos are judged and the stricter result wins, so the
+    session repo on 'main' without a CHANGELOG blocks."""
+    other = _feature_repo(tmp_path)
+    result = _run_hook_in(git_repo, f'cd {other}; git commit -m "docs: x"')
+    assert result.returncode == 2, result.stderr
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Git Bash drive paths exist only on Windows")
+def test_hook_does_not_follow_cygdrive_hop(git_repo: Path, tmp_path: Path) -> None:
+    """Git Bash cannot `cd /cygdrive/c/...`; the commit after `;` runs in the
+    session repo, so that is the repo the guard must judge."""
+    other = _feature_repo(tmp_path)
+    drive, rest = other.as_posix().split(":", 1)
+    result = _run_hook_in(
+        git_repo, f'cd /cygdrive/{drive.lower()}{rest}; git commit -m "docs: x"'
+    )
+    assert result.returncode == 2, result.stderr
+
+
 def test_hook_blocks_self_staging_commit_on_main(git_repo: Path) -> None:
     """`git commit -am` stages at commit time -- the index the guard inspects
     is stale, so it must be rejected on protected branches like a combined

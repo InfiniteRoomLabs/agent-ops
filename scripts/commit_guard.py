@@ -27,7 +27,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from _shared.git_ops import (  # noqa: E402
     get_repo_root,
     get_staged_files,
-    resolve_repo_root,
+    resolve_repo_roots,
     runs_git_command,
 )
 from _shared.hook_payload import BashHookPayload  # noqa: E402
@@ -339,18 +339,16 @@ def post() -> None:
     if not runs_git_command(payload.tool_input.command, "add"):
         raise typer.Exit(0)
 
-    root = resolve_repo_root(payload.tool_input.command, payload.cwd)
-    staged = get_staged_files(root)
-    if not staged:
-        raise typer.Exit(0)
-
-    violations = find_violations(staged, root)
-    for filepath, pat in violations:
-        msg = pat.message or (
-            f"'{filepath}' is a typically gitignored path ({pat.ecosystem}). "
-            f"Consider adding '{pat.pattern}' to .gitignore and unstaging."
-        )
-        typer.echo(f"[commit-guard] WARNING: {msg}", err=True)
+    for root in resolve_repo_roots(payload.tool_input.command, payload.cwd):
+        staged = get_staged_files(root)
+        if not staged:
+            continue
+        for filepath, pat in find_violations(staged, root):
+            msg = pat.message or (
+                f"'{filepath}' is a typically gitignored path ({pat.ecosystem}). "
+                f"Consider adding '{pat.pattern}' to .gitignore and unstaging."
+            )
+            typer.echo(f"[commit-guard] WARNING: {msg}", err=True)
 
     raise typer.Exit(0)
 
@@ -366,16 +364,20 @@ def pre() -> None:
     if not runs_git_command(payload.tool_input.command, "commit"):
         raise typer.Exit(0)
 
-    root = resolve_repo_root(payload.tool_input.command, payload.cwd)
-    staged = get_staged_files(root)
-    if not staged:
+    # Every repo the commit may run in is judged; the stricter result wins
+    # (an optional `cd X; git commit` hop may leave git in the session repo).
+    roots = resolve_repo_roots(payload.tool_input.command, payload.cwd)
+    lines: list[str] = []
+    for root in roots:
+        staged = get_staged_files(root)
+        where = f"{root}: " if len(roots) > 1 else ""
+        lines.extend(
+            f"  - {where}{fp} ({pat.ecosystem}: {pat.pattern})"
+            for fp, pat in find_violations(staged, root)
+        )
+    if not lines:
         raise typer.Exit(0)
 
-    violations = find_violations(staged, root)
-    if not violations:
-        raise typer.Exit(0)
-
-    lines = [f"  - {fp} ({pat.ecosystem}: {pat.pattern})" for fp, pat in violations]
     typer.echo(
         "BLOCKED: Commit includes paths that should be gitignored:\n"
         + "\n".join(lines)

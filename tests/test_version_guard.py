@@ -507,3 +507,29 @@ def test_hook_handles_heredoc_release_commit(repo_with_manifest: Path) -> None:
     # release commit triggers Tier 1 checks
     # Manifest is 1.0.0, tag is 1.0.0 -- should block (not newer)
     assert result.exit_code == 2
+
+
+def test_hook_semicolon_hop_also_judges_session_repo(
+    git_repo: Path, tmp_path: Path
+) -> None:
+    """`cd X; <stage> && git commit`: if the cd fails the commit runs in the
+    session repo on 'main', where staging at commit time is blocked. The
+    feature-branch cd target alone would allow it; the stricter result wins."""
+    from typer.testing import CliRunner
+
+    from version_guard import app
+
+    other = tmp_path / "other-repo"
+    other.mkdir()
+    sp.run(["git", "-C", str(other), "init", "-b", "feature/x"], check=True, capture_output=True)
+    stage = "git " + "add"
+    command = f'cd {other}; {stage} . && git commit -m "wip"'
+    result = CliRunner().invoke(
+        app,
+        ["hook"],
+        input=json.dumps(
+            {"tool_name": "Bash", "tool_input": {"command": command}, "cwd": str(git_repo)}
+        ),
+    )
+    assert result.exit_code == 2
+    assert "separate Bash calls" in result.output

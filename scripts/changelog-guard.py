@@ -29,7 +29,7 @@ from _shared.git_ops import (  # noqa: E402
     get_current_branch,
     get_repo_root,
     get_staged_files,
-    resolve_repo_root,
+    resolve_repo_roots,
     runs_git_command,
     stages_at_commit_time,
 )
@@ -291,35 +291,38 @@ def hook() -> None:
     payload = BashHookPayload.model_validate_json(sys.stdin.read())
     command = payload.tool_input.command
 
+    # Every repo the git command may run in is judged; the stricter result
+    # wins (an optional `cd X; git ...` hop may leave git in the session repo).
+    roots = resolve_repo_roots(command, payload.cwd)
+
     # Push guard: require a tracked CHANGELOG before pushing to a protected branch.
     if runs_git_command(command, "push"):
-        root = resolve_repo_root(command, payload.cwd)
-        branch = get_current_branch(root)
-        allowed, message = evaluate_push(command, branch, root)
-        if not allowed:
-            typer.echo(message, err=True)
-            raise typer.Exit(2)
+        for root in roots:
+            branch = get_current_branch(root)
+            allowed, message = evaluate_push(command, branch, root)
+            if not allowed:
+                typer.echo(message, err=True)
+                raise typer.Exit(2)
         raise typer.Exit(0)
 
     if not runs_git_command(command, "commit"):
         raise typer.Exit(0)
 
-    root = resolve_repo_root(command, payload.cwd)
-    branch = get_current_branch(root)
-    if not PROTECTED_BRANCHES.match(branch):
-        raise typer.Exit(0)  # no CHANGELOG requirement -> no staging rules either
+    for root in roots:
+        branch = get_current_branch(root)
+        if not PROTECTED_BRANCHES.match(branch):
+            continue  # no CHANGELOG requirement -> no staging rules either
 
-    # Reject commands where the staged index the hook inspects is not the
-    # index the commit will record. Staging must be a separate step.
-    if stages_at_commit_time(command):
-        typer.echo(STAGING_SEPARATION_MESSAGE.format(guard="changelog"), err=True)
-        raise typer.Exit(2)
+        # Reject commands where the staged index the hook inspects is not the
+        # index the commit will record. Staging must be a separate step.
+        if stages_at_commit_time(command):
+            typer.echo(STAGING_SEPARATION_MESSAGE.format(guard="changelog"), err=True)
+            raise typer.Exit(2)
 
-    allowed, message = evaluate(branch, root)
-
-    if not allowed:
-        typer.echo(message, err=True)
-        raise typer.Exit(2)
+        allowed, message = evaluate(branch, root)
+        if not allowed:
+            typer.echo(message, err=True)
+            raise typer.Exit(2)
 
     raise typer.Exit(0)
 

@@ -237,3 +237,31 @@ def test_determine_release_ref_points_at_remote_default_head(tmp_path: Path) -> 
 def test_determine_release_ref_none_without_remote(git_repo: Path) -> None:
     """No origin remote -> fetch fails -> None (caller logs and skips)."""
     assert determine_release_ref(git_repo) is None
+
+
+def test_hook_skips_when_the_merged_repo_is_ambiguous(
+    git_repo: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """`cd X; gh pr merge`: the merge ran in X or, if the cd failed, in the
+    session repo. Tagging is an action, so the cautious choice is to tag
+    neither and say why."""
+    from typer.testing import CliRunner
+
+    other = tmp_path / "other-repo"
+    other.mkdir()
+    subprocess.run(["git", "-C", str(other), "init"], check=True, capture_output=True)
+
+    def _must_not_evaluate(*_a: object, **_kw: object) -> None:
+        raise AssertionError("auto-tag evaluated a repo despite the ambiguity")
+
+    monkeypatch.setattr(_mod, "evaluate_auto_tag", _must_not_evaluate)
+    payload = {
+        "tool_name": "Bash",
+        "tool_input": {"command": f"cd {other}; gh pr merge 7 --squash"},
+        "tool_response": {"success": True},
+        "cwd": str(git_repo),
+    }
+    result = CliRunner().invoke(_mod.app, ["hook"], input=json.dumps(payload))
+
+    assert result.exit_code == 0, repr(result.exception)
+    assert "ambiguous" in result.output

@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from _shared.git_ops import (
+    candidate_cwds,
     effective_cwd,
     get_current_branch,
     get_latest_tag,
@@ -16,6 +17,7 @@ from _shared.git_ops import (
     is_self_staging_commit,
     msys_to_windows,
     resolve_repo_root,
+    resolve_repo_roots,
     runs_git_command,
     shell_command_skeleton,
 )
@@ -33,8 +35,16 @@ def test_msys_drive_path_translated_on_windows() -> None:
     assert msys_to_windows("/c/Users/alice/repo", windows=True) == "C:/Users/alice/repo"
 
 
-def test_cygdrive_path_translated_on_windows() -> None:
-    assert msys_to_windows("/cygdrive/d/work", windows=True) == "D:/work"
+def test_cygdrive_path_untouched_on_windows() -> None:
+    """Git Bash cannot `cd /cygdrive/c` (no such directory), so the guards
+    must not resolve it either -- a translation the shell does not share
+    would judge a repo the command never reaches."""
+    assert msys_to_windows("/cygdrive/d/work", windows=True) == "/cygdrive/d/work"
+
+
+def test_uppercase_drive_translated_on_windows() -> None:
+    """Git Bash resolves `/C/x` like `/c/x`."""
+    assert msys_to_windows("/C/work", windows=True) == "C:/work"
 
 
 def test_bare_drive_translated_on_windows() -> None:
@@ -83,6 +93,119 @@ def test_effective_cwd_git_bash_dash_c(tmp_path: Path) -> None:
     target.mkdir()
     cmd = f"git -C {_git_bash_form(target)} commit -m x"
     assert effective_cwd(cmd, "C:/elsewhere") == target
+
+
+# -- Candidate directories: a hop that may not take effect keeps the old cwd ---
+
+
+@pytest.fixture()
+def two_dirs(tmp_path: Path) -> tuple[Path, Path]:
+    base = tmp_path / "session"
+    target = tmp_path / "other"
+    base.mkdir()
+    target.mkdir()
+    return base, target
+
+
+def test_candidates_and_hop_is_certain(two_dirs) -> None:
+    """`cd X && git ...`: git runs only if the cd succeeded."""
+    base, target = two_dirs
+    assert candidate_cwds(f"cd {target} && {_COMMIT} -m x", base) == [target]
+
+
+def test_candidates_semicolon_hop_keeps_pre_hop_dir(two_dirs) -> None:
+    """`cd X; git ...`: if the cd fails, git still runs, in the old cwd."""
+    base, target = two_dirs
+    assert candidate_cwds(f"cd {target}; {_COMMIT} -m x", base) == [target, base]
+
+
+def test_candidates_newline_hop_keeps_pre_hop_dir(two_dirs) -> None:
+    base, target = two_dirs
+    assert candidate_cwds(f"cd {target}\n{_COMMIT} -m x", base) == [target, base]
+
+
+def test_candidates_or_hop_keeps_pre_hop_dir(two_dirs) -> None:
+    """`cd X || git ...` runs git only when the cd FAILED."""
+    base, target = two_dirs
+    assert base in candidate_cwds(f"cd {target} || {_COMMIT} -m x", base)
+
+
+def test_candidates_background_hop_keeps_pre_hop_dir(two_dirs) -> None:
+    """`cd X & git ...`: the cd runs in a background subshell."""
+    base, target = two_dirs
+    assert base in candidate_cwds(f"cd {target} & {_COMMIT} -m x", base)
+
+
+def test_candidates_hop_after_pipe_keeps_pre_hop_dir(two_dirs) -> None:
+    """`true | cd X && git ...`: the cd runs in the pipeline's subshell."""
+    base, target = two_dirs
+    assert base in candidate_cwds(f"true | cd {target} && {_COMMIT} -m x", base)
+
+
+def test_candidates_hop_after_or_keeps_pre_hop_dir(two_dirs) -> None:
+    """`true || cd X && git ...`: the cd is skipped when `true` succeeds."""
+    base, target = two_dirs
+    assert base in candidate_cwds(f"true || cd {target} && {_COMMIT} -m x", base)
+
+
+def test_candidates_hop_before_a_semicolon_is_optional_too(two_dirs) -> None:
+    """`cd X && cd sub; git ...` parses as `(cd X && cd sub); git ...`: git
+    runs in the session dir if `cd X` fails, in X if `cd sub` fails."""
+    base, target = two_dirs
+    (target / "sub").mkdir()
+    cmd = f"cd {target} && cd sub; {_COMMIT} -m x"
+    found = candidate_cwds(cmd, base)
+    assert found[0] == target / "sub"
+    assert set(found) == {target / "sub", target, base}
+
+
+def test_candidates_redirect_between_hop_and_git_stays_certain(two_dirs) -> None:
+    """`2>&1` is a redirection, not a background `&`."""
+    base, target = two_dirs
+    cmd = f"cd {target} && npm test 2>&1 && {_COMMIT} -m x"
+    assert candidate_cwds(cmd, base) == [target]
+
+
+def test_candidates_later_pipe_stays_certain(two_dirs) -> None:
+    """A pipeline after the hop does not put the cd in a subshell."""
+    base, target = two_dirs
+    cmd = f"cd {target} && make | tee log && {_COMMIT} -m x"
+    assert candidate_cwds(cmd, base) == [target]
+
+
+def test_candidates_cd_piped_keeps_pre_hop_dir(two_dirs) -> None:
+    """`cd X | cat && git ...`: the cd itself runs in the pipe's subshell."""
+    base, target = two_dirs
+    assert base in candidate_cwds(f"cd {target} | cat && {_COMMIT} -m x", base)
+
+
+def test_candidates_and_chain_stays_certain(two_dirs) -> None:
+    base, target = two_dirs
+    (target / "sub").mkdir()
+    cmd = f"cd {target} && cd sub && {_COMMIT} -m x"
+    assert candidate_cwds(cmd, base) == [target / "sub"]
+
+
+def test_candidates_git_dash_c_applies_to_every_candidate(two_dirs) -> None:
+    base, target = two_dirs
+    (base / "sub").mkdir()
+    (target / "sub").mkdir()
+    cmd = f"cd {target}; git -C sub commit -m x"
+    assert candidate_cwds(cmd, base) == [target / "sub", base / "sub"]
+
+
+def test_candidates_first_is_effective_cwd(two_dirs) -> None:
+    base, target = two_dirs
+    cmd = f"cd {target}; {_COMMIT} -m x"
+    assert candidate_cwds(cmd, base)[0] == effective_cwd(cmd, base)
+
+
+def test_resolve_repo_roots_dedupes_same_repo(git_repo: Path) -> None:
+    """Both candidates inside one repo -> one root to judge."""
+    sub = git_repo / "src"
+    sub.mkdir()
+    cmd = f"cd src; {_COMMIT} -m x"
+    assert resolve_repo_roots(cmd, git_repo) == [get_repo_root(git_repo)]
 
 
 def test_get_current_branch(git_repo: Path) -> None:

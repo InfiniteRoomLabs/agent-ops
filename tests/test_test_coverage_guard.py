@@ -100,3 +100,38 @@ def test_evaluate_mixed_only_blocks_on_script() -> None:
     assert allowed is False
     assert "tests/test_no_test.py" in msg
     assert "tests/test_has_test.py" not in msg
+
+
+# -- hook: optional cd hops judge the session repo too -----------------------
+
+
+def test_hook_semicolon_hop_also_judges_session_repo(git_repo: Path, tmp_path: Path) -> None:
+    """`cd X; git commit`: if the cd fails the commit records the SESSION
+    repo's index, which adds an untested script. Both repos are judged and
+    the stricter result wins."""
+    import json
+    import subprocess
+
+    from typer.testing import CliRunner
+
+    (git_repo / "tests").mkdir()
+    (git_repo / "scripts").mkdir()
+    (git_repo / "scripts" / "new_guard.py").write_text("print('x')\n")
+    subprocess.run(
+        ["git", "-C", str(git_repo), "add", "scripts/new_guard.py"],
+        check=True,
+        capture_output=True,
+    )
+    other = tmp_path / "other-repo"
+    other.mkdir()
+    subprocess.run(["git", "-C", str(other), "init"], check=True, capture_output=True)
+
+    payload = {
+        "tool_name": "Bash",
+        "tool_input": {"command": f'cd {other}; git commit -m "x"'},
+        "cwd": str(git_repo),
+    }
+    result = CliRunner().invoke(tcg.app, ["hook"], input=json.dumps(payload))
+
+    assert result.exit_code == 2
+    assert "tests/test_new_guard.py" in result.output
