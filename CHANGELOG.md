@@ -5,7 +5,7 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [agency-1.25.1] - 2026-11-20
+## [agency-1.26.0] - 2026-11-20
 
 ### Fixed
 - **`scripts/worktree_lifecycle.py`** -- the WorktreeCreate hook no longer crashes every worktree-isolated agent launch. Claude Code sends the worktree name as `name` (for a subagent, `agent-<id>`), alongside the common hook fields; the hook's payload model required a `worktree_name` field that the hook input never had, so pydantic raised `ValidationError: worktree_name Field required`, no worktree was created, and the agent launch failed. `create` now reads `name`, and both `create` and `remove` parse stdin through `parse_payload()`: a payload that is not JSON or lacks the field gets a one-line stderr message listing the keys that did arrive (create exits 1, remove still exits 0) instead of a traceback. WorktreeRemove's `worktree_path` already matched. Regression tests in `tests/test_worktree_lifecycle.py` drive both commands with the payload shape Claude Code sends.
