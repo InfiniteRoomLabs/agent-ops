@@ -5,9 +5,12 @@
 
 Design (reworked 2026-06-11 against the official ConfigChange spec):
 
-  - The ConfigChange payload is a METADATA ENVELOPE (config_source,
-    changed_keys, file_path) -- it does NOT carry the new settings content.
-    The hook reads the new content fresh from ``file_path``.
+  - The ConfigChange payload is a METADATA ENVELOPE: the common hook fields
+    plus ``source`` (user_settings / project_settings / local_settings /
+    policy_settings / skills) and an optional ``file_path``. It does NOT
+    carry the new settings content or the changed keys. The hook reads the
+    new content fresh from ``file_path``, or from the source's own settings
+    file when ``file_path`` is absent.
   - Snapshots are kept PER SOURCE (user_settings / project_settings /
     local_settings) so a local-settings change is never diffed against a
     project-settings baseline.
@@ -70,8 +73,10 @@ class EnforcementConfig(BaseModel):
 
 
 class ConfigChangePayload(BaseModel):
-    config_source: str = ""
-    changed_keys: list[str] = Field(default_factory=list)
+    # Field names as Claude Code sends them. (Until 1.25.1 this model read
+    # `config_source` / `changed_keys`, which the hook input never had, so
+    # every change fell through to the unjudged branch.)
+    source: str = ""
     file_path: str = ""
     cwd: str = ""
 
@@ -202,13 +207,18 @@ def evaluate_change(
     block -- Claude Code reverts the file, so the baseline stays true).
     Raises on unreadable/invalid settings content (caller fails closed).
     """
-    changed = Path(payload.file_path)
+    if payload.file_path:
+        changed = Path(payload.file_path)
+    else:
+        # `file_path` is optional in the envelope: judge the file this
+        # source lives in rather than an empty document.
+        changed = SOURCE_FILES[payload.source](project_dir(payload.cwd or None))
     raw = changed.read_text(encoding="utf-8") if changed.is_file() else "{}"
     after = json.loads(raw)
     if not isinstance(after, dict):
-        raise TypeError(f"settings content is not a JSON object: {payload.file_path}")
+        raise TypeError(f"settings content is not a JSON object: {changed}")
 
-    snap = snapshot_path(cache_dir, payload.config_source)
+    snap = snapshot_path(cache_dir, payload.source)
     before = json.loads(snap.read_text(encoding="utf-8")) if snap.is_file() else {}
 
     reasons = detect_tamper(
@@ -242,7 +252,7 @@ def hook() -> None:
         payload = ConfigChangePayload.model_validate_json(sys.stdin.read())
         cache_dir = get_audit_dir(project_dir(payload.cwd))
 
-        if payload.config_source not in SOURCE_FILES:
+        if payload.source not in SOURCE_FILES:
             # policy_settings (unblockable), skills (not JSON settings),
             # or a future source we don't model: audit and allow.
             write_audit_entry(
@@ -250,9 +260,8 @@ def hook() -> None:
                 "config-changes",
                 {
                     "event": "config_change_unjudged",
-                    "config_source": payload.config_source,
+                    "config_source": payload.source,
                     "file_path": payload.file_path,
-                    "changed_keys": payload.changed_keys,
                 },
             )
             return
@@ -266,9 +275,8 @@ def hook() -> None:
                 "config-changes",
                 {
                     "event": "config_change_blocked",
-                    "config_source": payload.config_source,
+                    "config_source": payload.source,
                     "file_path": payload.file_path,
-                    "changed_keys": payload.changed_keys,
                     "reason": reason,
                 },
             )

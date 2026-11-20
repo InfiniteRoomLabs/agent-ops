@@ -207,3 +207,166 @@ def test_idle_malformed_payload_falls_back_to_process_cwd(
 
     result = runner.invoke(_mod.app, ["idle"], input="this is not json")
     assert result.exit_code == 0
+
+
+# ---------------------------------------------------------------------------
+# Encoding check scoped to the files the teammate itself edited
+# ---------------------------------------------------------------------------
+
+_SESSION = "00000000-0000-4000-8000-000000000000"
+_AGENT = "aworker-0123456789abcdef"
+
+
+def _tool_use(name: str, **tool_input: str) -> str:
+    """One assistant transcript record holding a single tool call, shaped
+    like Claude Code's (2.1.329) transcript lines."""
+    return json.dumps(
+        {
+            "type": "assistant",
+            "agentId": _AGENT,
+            "sessionId": _SESSION,
+            "isSidechain": True,
+            "message": {
+                "role": "assistant",
+                "type": "message",
+                "content": [
+                    {"type": "tool_use", "id": "toolu_1", "name": name, "input": tool_input}
+                ],
+            },
+        }
+    )
+
+
+def _teammate_session(tmp_path: Path, *records: str) -> Path:
+    """Session transcript plus the teammate's own transcript where Claude Code
+    keeps it: <session transcript minus .jsonl>/subagents/agent-<id>.jsonl.
+    Returns the session transcript path (what the payload carries)."""
+    project = tmp_path / "projects" / "slug"
+    project.mkdir(parents=True)
+    session = project / f"{_SESSION}.jsonl"
+    session.write_text("", encoding="utf-8")
+    sub = project / _SESSION / "subagents"
+    sub.mkdir(parents=True)
+    (sub / f"agent-{_AGENT}.jsonl").write_text(
+        "\n".join(records) + "\n", encoding="utf-8"
+    )
+    return session
+
+
+def _teammate_idle(cwd: Path, transcript: Path, agent_id: str = _AGENT) -> str:
+    """TeammateIdle stdin as Claude Code sends it: the common fields (with the
+    SESSION transcript_path and the teammate's agent_id) plus teammate_name
+    and team_name."""
+    return json.dumps(
+        {
+            "session_id": _SESSION,
+            "transcript_path": str(transcript),
+            "cwd": str(cwd),
+            "permission_mode": "auto",
+            "agent_id": agent_id,
+            "agent_type": "worker",
+            "hook_event_name": "TeammateIdle",
+            "teammate_name": "worker",
+            "team_name": "session-00000000",
+        }
+    )
+
+
+def test_files_edited_in_transcript_lists_write_tools_only(tmp_path: Path) -> None:
+    transcript = tmp_path / "agent.jsonl"
+    transcript.write_text(
+        "\n".join(
+            [
+                _tool_use("Read", file_path="path/to/read.md"),
+                _tool_use("Edit", file_path="path/to/a.md", old_string="x", new_string="y"),
+                "not json",
+                _tool_use("Write", file_path="path/to/b.md", content="z"),
+                _tool_use("NotebookEdit", notebook_path="path/to/c.ipynb", new_source="s"),
+                _tool_use("Edit", file_path="path/to/a.md", old_string="y", new_string="w"),
+            ]
+        ),
+        encoding="utf-8",
+    )
+    assert _mod.files_edited_in_transcript(transcript) == [
+        Path("path/to/a.md"),
+        Path("path/to/b.md"),
+        Path("path/to/c.ipynb"),
+    ]
+
+
+def test_idle_ignores_violations_in_files_the_teammate_did_not_edit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The session tree holds someone else's untracked .md with U+2026; the
+    teammate edited only a clean file. Blocking it would loop forever, since
+    the teammate must not touch that file. Observed live 2026-11-20."""
+    tree = tmp_path / "session-repo"
+    _init_repo(tree)
+    (tree / "docs").mkdir()
+    (tree / "docs" / "notes.md").write_text("Later" + chr(0x2026) + "\n", encoding="utf-8")
+    mine = tmp_path / "elsewhere" / "README.md"
+    mine.parent.mkdir()
+    mine.write_text("plain\n", encoding="utf-8")
+    transcript = _teammate_session(tmp_path, _tool_use("Write", file_path=str(mine)))
+    _patch_config(monkeypatch, [])
+
+    result = runner.invoke(_mod.app, ["idle"], input=_teammate_idle(tree, transcript))
+
+    assert result.exit_code == 0, result.output
+
+
+def test_idle_flags_violations_in_files_the_teammate_edited_outside_cwd(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A teammate working in another repo is judged on what it wrote there."""
+    tree = tmp_path / "session-repo"
+    _init_repo(tree)
+    mine = tmp_path / "other-repo" / "CHANGES.md"
+    mine.parent.mkdir()
+    mine.write_text(chr(0x201C) + "quoted" + chr(0x201D) + "\n", encoding="utf-8")
+    transcript = _teammate_session(tmp_path, _tool_use("Edit", file_path=str(mine)))
+    _patch_config(monkeypatch, [])
+
+    result = runner.invoke(_mod.app, ["idle"], input=_teammate_idle(tree, transcript))
+
+    assert result.exit_code == 2
+    assert "CHANGES.md" in result.output
+
+
+def test_idle_without_teammate_transcript_judges_the_tree(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """If the teammate's transcript cannot be found, fall back to the old
+    behaviour: every changed .md in the payload cwd's tree."""
+    tree = tmp_path / "session-repo"
+    _init_repo(tree)
+    (tree / "notes.md").write_text("Later" + chr(0x2026) + "\n", encoding="utf-8")
+    transcript = _teammate_session(tmp_path)
+    _patch_config(monkeypatch, [])
+
+    result = runner.invoke(
+        _mod.app,
+        ["idle"],
+        input=_teammate_idle(tree, transcript, agent_id="anobody-ffffffffffffffff"),
+    )
+
+    assert result.exit_code == 2
+    assert "notes.md" in result.output
+
+
+def test_security_checks_still_cover_the_whole_tree(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Only the retry-able encoding check is narrowed: a .env anywhere in the
+    tree still hard-stops, because Bash-created files never appear in the
+    transcript's Edit/Write calls."""
+    tree = tmp_path / "session-repo"
+    _init_repo(tree)
+    (tree / ".env").write_text("SECRET=x\n", encoding="utf-8")
+    transcript = _teammate_session(tmp_path)
+    _patch_config(monkeypatch, [])
+
+    result = runner.invoke(_mod.app, ["idle"], input=_teammate_idle(tree, transcript))
+
+    assert result.exit_code == 0
+    assert json.loads(result.stdout)["continue"] is False

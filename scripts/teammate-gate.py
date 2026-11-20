@@ -6,6 +6,13 @@
 Discovers changed files via ``git status --porcelain`` and runs encoding,
 env-file, and agent-directory checks.
 
+The encoding check (the only one that makes a teammate retry) is scoped to
+the files the teammate itself wrote, read from its own transcript, so a
+teammate is never sent back to fix files it did not touch -- possibly ones
+it must not touch, which loops forever. The security checks keep judging
+the whole changed tree. Without a locatable transcript, the encoding check
+falls back to the whole changed tree too.
+
 Exit behavior:
   - Clean:             exit 0, no output
   - Fixable violations (encoding): exit 2 + message on stderr (teammate retries)
@@ -154,22 +161,75 @@ CHECK_REGISTRY: dict[str, type] = {
 }
 
 
-def _payload_cwd() -> Path:
-    """Read the hook's stdin JSON payload and return its ``cwd``.
+def _read_payload() -> dict:
+    """The hook's stdin JSON payload; ``{}`` when missing or malformed."""
+    try:
+        payload = json.loads(sys.stdin.read())
+    except Exception:
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
+def _payload_cwd(payload: dict) -> Path:
+    """The payload's ``cwd``, else the process cwd.
 
     Teammates run in worktrees: validating the PROCESS cwd inspects the wrong
     tree (security checks silently bypassed, or a clean teammate blocked for
-    other people's files). Missing/malformed payloads fall back to the
-    process cwd.
+    other people's files).
     """
-    try:
-        payload = json.loads(sys.stdin.read())
-        raw = payload.get("cwd", "") if isinstance(payload, dict) else ""
-        if raw:
-            return Path(raw)
-    except Exception:
-        pass
-    return Path.cwd()
+    raw = payload.get("cwd", "")
+    return Path(raw) if isinstance(raw, str) and raw else Path.cwd()
+
+
+# Tools whose calls write a file; NotebookEdit names it `notebook_path`.
+WRITE_TOOLS = {"Edit", "MultiEdit", "Write", "NotebookEdit"}
+
+
+def teammate_transcript(payload: dict) -> Path | None:
+    """The teammate's own transcript, or None when it cannot be located.
+
+    The payload's ``transcript_path`` is the SESSION's transcript even when
+    the hook fires for a teammate; ``agent_id`` names the teammate. Claude
+    Code (2.1.329) keeps the teammate's transcript at
+    ``<session transcript without .jsonl>/subagents/agent-<agent_id>.jsonl``.
+    That layout is observed, not documented, hence the None fallback.
+    """
+    session = payload.get("transcript_path")
+    agent_id = payload.get("agent_id")
+    if not (isinstance(session, str) and session and isinstance(agent_id, str) and agent_id):
+        return None
+    path = Path(session).with_suffix("") / "subagents" / f"agent-{agent_id}.jsonl"
+    return path if path.is_file() else None
+
+
+def files_edited_in_transcript(transcript: Path) -> list[Path]:
+    """Files the agent wrote with Edit/Write/NotebookEdit, first-seen order,
+    without duplicates. Unparseable lines are skipped."""
+    seen: dict[str, None] = {}
+    with transcript.open(encoding="utf-8", errors="replace") as fh:
+        for line in fh:
+            try:
+                record = json.loads(line)
+            except ValueError:
+                continue
+            message = record.get("message") if isinstance(record, dict) else None
+            content = message.get("content") if isinstance(message, dict) else None
+            if not isinstance(content, list):
+                continue
+            for block in content:
+                if not (
+                    isinstance(block, dict)
+                    and block.get("type") == "tool_use"
+                    and block.get("name") in WRITE_TOOLS
+                ):
+                    continue
+                tool_input = block.get("input")
+                if not isinstance(tool_input, dict):
+                    continue
+                path = tool_input.get("file_path") or tool_input.get("notebook_path")
+                if isinstance(path, str) and path:
+                    seen.setdefault(path, None)
+    return [Path(p) for p in seen]
 
 
 def _get_changed_files(cwd: Path | None = None) -> list[Path]:
@@ -201,28 +261,37 @@ def _get_changed_files(cwd: Path | None = None) -> list[Path]:
     return files
 
 
-def _validate(cwd: Path) -> None:
-    """Run all configured checks against the tree at ``cwd`` and exit."""
+def _validate(payload: dict) -> None:
+    """Run all configured checks for the teammate described by ``payload``
+    (against the tree at its ``cwd``) and exit."""
+    cwd = _payload_cwd(payload)
     config = resolve_typed(EnforcementConfig, "enforcement", cwd=cwd)
 
     if not config.teammate_validation:
         raise typer.Exit(0)
 
     rel_files = _get_changed_files(cwd)
-    if not rel_files:
-        raise typer.Exit(0)
 
     # Absolute paths for checks that read file contents / report locations;
     # repo-relative paths for the agent-dir check so directory components of
     # the worktree's own location can never false-match AGENT_DIRS.
     abs_files = [cwd / f for f in rel_files]
 
+    # The encoding check judges what the teammate wrote, wherever it wrote
+    # it; the whole changed tree only when its transcript is not available.
+    transcript = teammate_transcript(payload)
+    encoding_files = (
+        abs_files
+        if transcript is None
+        else [f for f in files_edited_in_transcript(transcript) if f.is_file()]
+    )
+    targets = {"agent_dirs": rel_files, "encoding": encoding_files}
+
     all_violations: list[dict] = []
     for check_name in config.teammate_checks:
         check_fn = CHECK_REGISTRY.get(check_name)
         if check_fn is not None:
-            target = rel_files if check_name == "agent_dirs" else abs_files
-            all_violations.extend(check_fn(target))
+            all_violations.extend(check_fn(targets.get(check_name, abs_files)))
 
     if not all_violations:
         raise typer.Exit(0)
@@ -260,13 +329,13 @@ def _validate(cwd: Path) -> None:
 @app.command()
 def idle() -> None:
     """TeammateIdle hook entry point. Reads JSON payload from stdin."""
-    _validate(_payload_cwd())
+    _validate(_read_payload())
 
 
 @app.command()
 def completed() -> None:
     """TaskCompleted hook entry point. Reads JSON payload from stdin."""
-    _validate(_payload_cwd())
+    _validate(_read_payload())
 
 
 if __name__ == "__main__":

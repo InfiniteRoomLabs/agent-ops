@@ -6,18 +6,25 @@
 WorktreeCreate REPLACES default git worktree creation. The hook calls
 ``git worktree add`` itself and prints the absolute path to stdout.
 
+Claude Code sends the common hook fields (``session_id``, ``transcript_path``,
+``cwd``, ...) plus ``hook_event_name`` and, for WorktreeCreate, ``name`` (a
+subagent launched with worktree isolation sends ``agent-<id>``); for
+WorktreeRemove, ``worktree_path``.
+
 Usage:
-  Create:  echo '{"worktree_name":"feat","branch":"feat-x"}' | uv run worktree_lifecycle.py create
+  Create:  echo '{"name":"feat","branch":"feat-x"}' | uv run worktree_lifecycle.py create
   Remove:  echo '{"worktree_path":"/tmp/wt"}' | uv run worktree_lifecycle.py remove
 """
 
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import subprocess
 import sys
 from pathlib import Path
+from typing import TypeVar
 
 sys.path.insert(0, str(Path(__file__).parent))
 from _shared.audit import write_audit_entry  # noqa: E402
@@ -26,7 +33,7 @@ from _shared.paths import get_audit_dir  # noqa: E402
 from _shared.frontmatter_config import resolve_typed  # noqa: E402
 
 import typer
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 app = typer.Typer(
     help="Worktree lifecycle hooks for Claude Code.",
@@ -49,16 +56,48 @@ class WorktreeConfig(BaseModel):
 
 
 class CreatePayload(BaseModel):
-    worktree_name: str
-    # Optional: a branchless payload creates the worktree from HEAD (git
-    # names the new branch after the worktree directory). The create command
-    # already guards `if payload.branch:` -- requiring it here just crashed
-    # worktree creation on branchless payloads.
+    # The worktree name. Claude Code sends it as `name`; the earlier
+    # `worktree_name` field never existed in the hook input.
+    name: str
+    # Not sent by Claude Code; accepted for manual runs. A branchless payload
+    # creates the worktree from HEAD (git names the new branch after the
+    # worktree directory).
     branch: str = ""
 
 
 class RemovePayload(BaseModel):
     worktree_path: str
+
+
+_Payload = TypeVar("_Payload", bound=BaseModel)
+
+
+def parse_payload(
+    raw: str, model: type[_Payload], required: str
+) -> tuple[_Payload | None, str]:
+    """Parse hook stdin JSON into ``model``, requiring a non-empty ``required`` field.
+
+    Returns ``(payload, "")``, or ``(None, reason)`` when stdin is not a JSON
+    object, lacks ``required``, or does not fit ``model``. The reason lists the
+    keys that did arrive, so a future change to the hook input can be
+    diagnosed from the hook's error message alone.
+    """
+    try:
+        data = json.loads(raw)
+    except ValueError as exc:
+        return None, f"stdin is not valid JSON ({exc})"
+    if not isinstance(data, dict):
+        return None, f"stdin is a JSON {type(data).__name__}, not an object"
+    if not data.get(required):
+        keys = ", ".join(sorted(data)) or "none"
+        return None, f"payload has no `{required}` field (received keys: {keys})"
+    try:
+        return model.model_validate(data), ""
+    except ValidationError as exc:
+        problems = "; ".join(
+            f"`{'.'.join(map(str, err['loc']))}`: {err['msg']}" for err in exc.errors()
+        )
+        return None, f"payload does not match the expected shape ({problems})"
 
 
 # ---------------------------------------------------------------------------
@@ -102,6 +141,11 @@ def copy_git_hooks(*, main_repo: Path, worktree: Path) -> list[str]:
     copied: list[str] = []
     for hook_file in main_hooks_dir.iterdir():
         if not hook_file.is_file():
+            continue
+        # Git never runs `*.sample` hooks. They must be skipped by name: git's
+        # templates install them executable, and on Windows os.access(X_OK)
+        # is true for every file.
+        if hook_file.suffix == ".sample":
             continue
         if not os.access(hook_file, os.X_OK):
             continue
@@ -155,7 +199,10 @@ def create() -> None:
     Prints the absolute worktree path to stdout on success.
     Exit 0 = success, non-zero = failure.
     """
-    payload = CreatePayload.model_validate_json(sys.stdin.read())
+    payload, reason = parse_payload(sys.stdin.read(), CreatePayload, "name")
+    if payload is None:
+        typer.echo(f"WorktreeCreate hook: {reason}; no worktree created.", err=True)
+        raise typer.Exit(1)
     config = resolve_typed(WorktreeConfig, "worktree")
 
     # Determine worktree path: sibling .worktrees/ directory at the REPO
@@ -165,7 +212,7 @@ def create() -> None:
     repo_root = get_repo_root(Path.cwd())
     wt_base = repo_root / ".worktrees"
     wt_base.mkdir(parents=True, exist_ok=True)
-    wt_path = wt_base / payload.worktree_name
+    wt_path = wt_base / payload.name
 
     # Run git worktree add
     cmd = ["git", "worktree", "add", str(wt_path)]
@@ -195,7 +242,7 @@ def create() -> None:
     _write_audit(
         {
             "event": "worktree_created",
-            "worktree_name": payload.worktree_name,
+            "worktree_name": payload.name,
             "branch": payload.branch,
             "path": str(wt_path),
             "hooks_copied": copied,
@@ -214,7 +261,10 @@ def remove() -> None:
 
     Exit 0 always (debug-only visibility).
     """
-    payload = RemovePayload.model_validate_json(sys.stdin.read())
+    payload, reason = parse_payload(sys.stdin.read(), RemovePayload, "worktree_path")
+    if payload is None:
+        typer.echo(f"WARNING: WorktreeRemove hook: {reason}; nothing audited.", err=True)
+        raise typer.Exit(0)
     config = resolve_typed(WorktreeConfig, "worktree")
     wt_path = Path(payload.worktree_path)
 

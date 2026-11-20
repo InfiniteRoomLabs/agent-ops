@@ -105,6 +105,23 @@ _GIT_C_RE = re.compile(
 )
 
 
+# Git Bash / MSYS spell drive paths `/c/Users/...` (Cygwin: `/cygdrive/c/...`).
+_MSYS_DRIVE_RE = re.compile(r"^/(?:cygdrive/)?([A-Za-z])(?=/|$)")
+
+
+def msys_to_windows(path: str, *, windows: bool | None = None) -> str:
+    """Translate a Git Bash drive path (``/c/x``, ``/cygdrive/c/x``) to
+    ``C:/x`` when running on Windows, where Python cannot resolve the MSYS
+    form; return every other path unchanged. ``windows`` defaults to the
+    current platform (injectable for tests)."""
+    if windows is None:
+        windows = os.name == "nt"
+    m = _MSYS_DRIVE_RE.match(path) if windows else None
+    if not m:
+        return path
+    return f"{m.group(1).upper()}:/{path[m.end():].lstrip('/')}"
+
+
 def _unquote(token: str) -> str:
     token = token.strip()
     if len(token) >= 2 and token[0] == token[-1] and token[0] in "'\"":
@@ -114,7 +131,7 @@ def _unquote(token: str) -> str:
 
 
 def _apply_path(base: Path, raw: str) -> Path:
-    target = os.path.expandvars(_unquote(raw))
+    target = msys_to_windows(os.path.expandvars(_unquote(raw)))
     p = Path(target).expanduser()
     if not p.is_absolute():
         p = base / p

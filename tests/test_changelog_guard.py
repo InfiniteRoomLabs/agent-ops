@@ -3,10 +3,14 @@
 from __future__ import annotations
 
 import importlib.util
+import json
+import os
 import subprocess
 import sys
 from pathlib import Path
 from typing import Any
+
+import pytest
 
 _SCRIPTS = Path(__file__).resolve().parent.parent / "scripts"
 if str(_SCRIPTS) not in sys.path:
@@ -297,10 +301,12 @@ def test_hook_judges_cd_target_repo_not_session_repo(
         ["git", "-C", str(other), "init", "-b", "feature/x"],
         check=True, capture_output=True,
     )
-    payload = (
-        '{"tool_name":"Bash","tool_input":{"command":'
-        f'"cd {other} && git commit -m \\"docs: cross-repo\\""}},'
-        f'"cwd":"{git_repo}"}}'
+    payload = json.dumps(
+        {
+            "tool_name": "Bash",
+            "tool_input": {"command": f'cd {other} && git commit -m "docs: cross-repo"'},
+            "cwd": str(git_repo),
+        }
     )
     result = subprocess.run(
         ["uv", "run", str(_SCRIPTS / "changelog-guard.py"), "hook"],
@@ -317,14 +323,52 @@ def test_hook_judges_cd_target_repo_not_session_repo(
     )
 
 
+@pytest.mark.skipif(os.name != "nt", reason="Git Bash drive paths exist only on Windows")
+def test_hook_judges_git_bash_cd_target_repo(git_repo: Path, tmp_path: Path) -> None:
+    """Git Bash spells C:\\x as /c/x. A `cd /c/...` hop into a feature-branch
+    repo must be judged there, not against the session repo on 'main'.
+    Observed live 2026-11-20: such a commit was blocked as if on the session
+    repo's protected branch."""
+    other = tmp_path / "other-repo"
+    other.mkdir()
+    subprocess.run(
+        ["git", "-C", str(other), "init", "-b", "feature/x"],
+        check=True, capture_output=True,
+    )
+    drive, rest = other.as_posix().split(":", 1)
+    git_bash_path = f"/{drive.lower()}{rest}"
+    payload = json.dumps(
+        {
+            "tool_name": "Bash",
+            "tool_input": {
+                "command": f'cd {git_bash_path} && git commit -m "docs: cross-repo"'
+            },
+            "cwd": str(git_repo),
+        }
+    )
+    result = subprocess.run(
+        ["uv", "run", str(_SCRIPTS / "changelog-guard.py"), "hook"],
+        input=payload,
+        capture_output=True,
+        text=True,
+        cwd=git_repo,
+    )
+    assert result.returncode == 0, (
+        f"guard judged the session repo instead of the cd target: {result.stderr}"
+    )
+    assert not (git_repo / "CHANGELOG.md").exists()
+
+
 def test_hook_blocks_self_staging_commit_on_main(git_repo: Path) -> None:
     """`git commit -am` stages at commit time -- the index the guard inspects
     is stale, so it must be rejected on protected branches like a combined
     add+commit."""
-    payload = (
-        '{"tool_name":"Bash","tool_input":{"command":'
-        f'"git commit -am \\"docs: sneaky self-stage\\""}},'
-        f'"cwd":"{git_repo}"}}'
+    payload = json.dumps(
+        {
+            "tool_name": "Bash",
+            "tool_input": {"command": 'git commit -am "docs: sneaky self-stage"'},
+            "cwd": str(git_repo),
+        }
     )
     result = subprocess.run(
         ["uv", "run", str(_SCRIPTS / "changelog-guard.py"), "hook"],
@@ -344,10 +388,12 @@ def test_hook_allows_combined_add_commit_on_feature_branch(git_repo: Path) -> No
         ["git", "checkout", "-b", "feature/free"], check=True, capture_output=True
     )
     add_verb = "git " + "add"
-    payload = (
-        '{"tool_name":"Bash","tool_input":{"command":'
-        f'"{add_verb} . && git commit -m \\"wip\\""}},'
-        f'"cwd":"{git_repo}"}}'
+    payload = json.dumps(
+        {
+            "tool_name": "Bash",
+            "tool_input": {"command": f'{add_verb} . && git commit -m "wip"'},
+            "cwd": str(git_repo),
+        }
     )
     result = subprocess.run(
         ["uv", "run", str(_SCRIPTS / "changelog-guard.py"), "hook"],

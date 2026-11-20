@@ -5,6 +5,8 @@ import os
 import subprocess
 from pathlib import Path
 
+import pytest
+
 from _shared.git_ops import (
     effective_cwd,
     get_current_branch,
@@ -12,6 +14,7 @@ from _shared.git_ops import (
     get_repo_root,
     is_combined_add_commit,
     is_self_staging_commit,
+    msys_to_windows,
     resolve_repo_root,
     runs_git_command,
     shell_command_skeleton,
@@ -21,6 +24,65 @@ from _shared.git_ops import (
 # otherwise trip the active add+commit guard on.
 _ADD = "git " + "add"
 _COMMIT = "git " + "commit"
+
+
+# -- Git Bash drive paths ------------------------------------------------------
+
+
+def test_msys_drive_path_translated_on_windows() -> None:
+    assert msys_to_windows("/c/Users/alice/repo", windows=True) == "C:/Users/alice/repo"
+
+
+def test_cygdrive_path_translated_on_windows() -> None:
+    assert msys_to_windows("/cygdrive/d/work", windows=True) == "D:/work"
+
+
+def test_bare_drive_translated_on_windows() -> None:
+    assert msys_to_windows("/c", windows=True) == "C:/"
+
+
+def test_msys_path_untouched_off_windows() -> None:
+    """On Linux/macOS `/c/x` is an ordinary absolute path."""
+    assert msys_to_windows("/c/Users/alice", windows=False) == "/c/Users/alice"
+
+
+def test_non_drive_paths_untouched_on_windows() -> None:
+    for path in ("/home/alice", "/cx/y", "C:/already", "relative/dir", "~/repo"):
+        assert msys_to_windows(path, windows=True) == path
+
+
+def _git_bash_form(path: Path) -> str:
+    drive, rest = path.as_posix().split(":", 1)
+    return f"/{drive.lower()}{rest}"
+
+
+_WINDOWS_ONLY = pytest.mark.skipif(
+    os.name != "nt", reason="Git Bash drive paths exist only on Windows"
+)
+
+
+@_WINDOWS_ONLY
+def test_effective_cwd_git_bash_cd(tmp_path: Path) -> None:
+    target = tmp_path / "other"
+    target.mkdir()
+    cmd = f"cd {_git_bash_form(target)} && {_COMMIT} -m x"
+    assert effective_cwd(cmd, "C:/elsewhere") == target
+
+
+@_WINDOWS_ONLY
+def test_effective_cwd_git_bash_cd_quoted(tmp_path: Path) -> None:
+    target = tmp_path / "my repo"
+    target.mkdir()
+    cmd = f"cd '{_git_bash_form(target)}' && {_COMMIT} -m x"
+    assert effective_cwd(cmd, "C:/elsewhere") == target
+
+
+@_WINDOWS_ONLY
+def test_effective_cwd_git_bash_dash_c(tmp_path: Path) -> None:
+    target = tmp_path / "other"
+    target.mkdir()
+    cmd = f"git -C {_git_bash_form(target)} commit -m x"
+    assert effective_cwd(cmd, "C:/elsewhere") == target
 
 
 def test_get_current_branch(git_repo: Path) -> None:

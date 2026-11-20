@@ -1,6 +1,6 @@
 [project]
 name = "agent-ops"
-version = "1.25.0"
+version = "1.25.1"
 description = "Dev environment for agent-ops scripts/tests. Scripts run via uv with PEP 723 inline deps; this file exists only so the editor LSP can resolve imports."
 requires-python = ">=3.12"
 dependencies = [
@@ -15,6 +15,13 @@ dev = [
     "pytest>=8",
     "types-pyyaml>=6",
 ]
+
+[tool.uv]
+# The committed uv.lock was resolved with a 7-day release cooldown. Declared
+# here so every machine resolves the same way: without it, uv on a machine
+# whose global config lacks the setting discards the lock ("removal of global
+# exclude newer") and re-locks to the newest releases on every `uv run`.
+exclude-newer = "7 days"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

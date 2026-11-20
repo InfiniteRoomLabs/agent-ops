@@ -169,7 +169,7 @@ class TestBlockedKeyAdditions:
 
 
 def _payload(file_path: Path, source: str = "project_settings") -> ConfigChangePayload:
-    return ConfigChangePayload(config_source=source, file_path=str(file_path))
+    return ConfigChangePayload(source=source, file_path=str(file_path))
 
 
 @pytest.fixture()
@@ -249,3 +249,124 @@ class TestEvaluateChange:
         settings.write_text("{not json")
         with pytest.raises(json.JSONDecodeError):
             evaluate_change(_payload(settings), EnforcementConfig(), cache)
+
+
+# ---------------------------------------------------------------------------
+# hook entry point, driven with the envelope Claude Code really sends
+# ---------------------------------------------------------------------------
+
+
+def claude_code_config_change(
+    source: str, cwd: Path, file_path: Path | None = None
+) -> dict:
+    """ConfigChange stdin exactly as Claude Code sends it.
+
+    The common hook fields plus ``hook_event_name``, ``source`` (one of
+    user_settings, project_settings, local_settings, policy_settings, skills)
+    and an optional ``file_path``. There is no ``config_source`` and no
+    ``changed_keys``. Schema per the Claude Code hooks reference and the
+    2.1.329 input schema.
+    """
+    payload = {
+        "session_id": "00000000-0000-4000-8000-000000000000",
+        "transcript_path": str(cwd / "session.jsonl"),
+        "cwd": str(cwd),
+        "permission_mode": "default",
+        "hook_event_name": "ConfigChange",
+        "source": source,
+    }
+    if file_path is not None:
+        payload["file_path"] = str(file_path)
+    return payload
+
+
+class TestHookEntryPoint:
+    """The `hook` command judges the change named by the real envelope."""
+
+    @pytest.fixture()
+    def project(self, tmp_path: Path, monkeypatch):
+        """A project with a protected project-settings baseline, a hermetic
+        cache dir and audit capture."""
+        mod = sys.modules["config_tamper_guard"]
+        monkeypatch.delenv("CLAUDE_PROJECT_DIR", raising=False)
+        cache = tmp_path / "cache"
+        cache.mkdir()
+        audit: list[dict] = []
+        monkeypatch.setattr(mod, "get_audit_dir", lambda *a, **kw: cache)
+        monkeypatch.setattr(
+            mod, "write_audit_entry", lambda _dir, _name, entry: audit.append(entry)
+        )
+        monkeypatch.setattr(
+            mod, "resolve_typed", lambda **kw: EnforcementConfig()
+        )
+        settings = tmp_path / ".claude" / "settings.json"
+        settings.parent.mkdir()
+        baseline = {"hooks": {"PreToolUse": [{"matcher": "Bash"}]}}
+        settings.write_text(json.dumps(baseline))
+        snapshot_path(cache, "project_settings").write_text(json.dumps(baseline))
+        return tmp_path, settings, cache, audit
+
+    @staticmethod
+    def _run(payload: dict):
+        from typer.testing import CliRunner
+
+        mod = sys.modules["config_tamper_guard"]
+        return CliRunner().invoke(mod.app, ["hook"], input=json.dumps(payload))
+
+    def test_blocks_gutted_hooks(self, project) -> None:
+        """Removing a protected hook is blocked when Claude Code reports it."""
+        cwd, settings, _, audit = project
+        settings.write_text(json.dumps({"hooks": {}}))
+
+        result = self._run(claude_code_config_change("project_settings", cwd, settings))
+
+        assert result.exit_code == 0, result.output
+        decision = json.loads(result.stdout)
+        assert decision["decision"] == "block"
+        assert "PreToolUse" in decision["reason"]
+        assert audit[-1]["event"] == "config_change_blocked"
+        assert audit[-1]["config_source"] == "project_settings"
+
+    def test_allows_additions(self, project) -> None:
+        cwd, settings, cache, _ = project
+        grown = {"hooks": {"PreToolUse": [{"matcher": "Bash"}], "Stop": []}}
+        settings.write_text(json.dumps(grown))
+
+        result = self._run(claude_code_config_change("project_settings", cwd, settings))
+
+        assert result.exit_code == 0, result.output
+        assert result.stdout.strip() == ""
+        snap = json.loads(snapshot_path(cache, "project_settings").read_text())
+        assert snap == grown
+
+    def test_missing_file_path_judges_the_sources_own_file(self, project) -> None:
+        """`file_path` is optional in the envelope: fall back to where that
+        source lives instead of judging an empty document."""
+        cwd, settings, _, _ = project
+        settings.write_text(json.dumps({"hooks": {}}))
+
+        result = self._run(claude_code_config_change("project_settings", cwd))
+
+        assert result.exit_code == 0, result.output
+        assert json.loads(result.stdout)["decision"] == "block"
+
+    def test_missing_file_path_unchanged_file_allowed(self, project) -> None:
+        """Without the fallback an absent `file_path` read as '{}' and
+        blocked every change as a removal."""
+        cwd, _, _, _ = project
+
+        result = self._run(claude_code_config_change("project_settings", cwd))
+
+        assert result.exit_code == 0, result.output
+        assert result.stdout.strip() == ""
+
+    def test_skills_source_audited_not_judged(self, project) -> None:
+        cwd, _, _, audit = project
+        skill = cwd / ".claude" / "skills" / "x" / "SKILL.md"
+
+        result = self._run(claude_code_config_change("skills", cwd, skill))
+
+        assert result.exit_code == 0, result.output
+        assert result.stdout.strip() == ""
+        assert audit[-1]["event"] == "config_change_unjudged"
+        assert audit[-1]["config_source"] == "skills"

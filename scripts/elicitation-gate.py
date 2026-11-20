@@ -4,7 +4,13 @@
 """Gate for Elicitation and ElicitationResult hooks.
 
 Audit-logs all MCP elicitation events and optionally blocks requests
-whose serialized parameters match configured regex patterns.
+whose serialized request fields match configured regex patterns.
+
+Claude Code sends, besides the common hook fields:
+  Elicitation:        mcp_server_name, message, and optionally mode
+                      ("form" | "url"), url, elicitation_id, requested_schema
+  ElicitationResult:  mcp_server_name, action ("accept" | "decline" |
+                      "cancel"), and optionally elicitation_id, mode, content
 
 Blocking uses hookSpecificOutput with action: "decline" on stdout (exit 0),
 NOT exit 2.
@@ -47,23 +53,25 @@ class McpConfig(BaseModel):
 # -- Core functions --
 
 
-def check_elicitation(
-    *,
-    server_name: str,
-    request_type: str,
-    parameters: dict,
-    block_patterns: list[str],
-) -> dict:
+# The Elicitation fields block patterns are searched in: what is being asked
+# and by whom. Session plumbing (cwd, transcript_path, ...) and the opaque
+# elicitation_id are left out so a pattern cannot match them by accident.
+MATCH_FIELDS = ("mcp_server_name", "message", "mode", "url", "requested_schema")
+
+
+def elicitation_request(payload: dict) -> dict:
+    """The request fields of an Elicitation payload that patterns see."""
+    return {key: payload[key] for key in MATCH_FIELDS if key in payload}
+
+
+def check_elicitation(*, request: dict, block_patterns: list[str]) -> dict:
     """Check whether an elicitation request should be blocked.
 
     Returns {"blocked": bool, "matched_pattern": str}.
-    Serializes the request as a JSON string, checks each pattern via
-    re.search.  Skips invalid regex patterns silently.
+    Serializes ``request`` (see ``elicitation_request``) as sorted JSON and
+    checks each pattern via re.search. Skips invalid regex patterns silently.
     """
-    serialized = json.dumps(
-        {"server_name": server_name, "request_type": request_type, "parameters": parameters},
-        sort_keys=True,
-    )
+    serialized = json.dumps(request, sort_keys=True)
 
     for pattern in block_patterns:
         try:
@@ -128,9 +136,8 @@ def request() -> None:
             _emit_decline()
         raise typer.Exit(0)
 
-    server_name = payload.get("server_name", "")
-    request_type = payload.get("request_type", "")
-    parameters = payload.get("parameters", {})
+    server_name = payload.get("mcp_server_name", "")
+    request = elicitation_request(payload)
 
     cfg = resolve_typed(McpConfig, "mcp")
 
@@ -141,18 +148,16 @@ def request() -> None:
             event_type="elicitation_request",
             server_name=server_name,
             details={
-                "request_type": request_type,
-                "parameters": parameters,
+                "message": payload.get("message", ""),
+                "mode": payload.get("mode", ""),
+                "url": payload.get("url", ""),
+                "elicitation_id": payload.get("elicitation_id", ""),
+                "requested_schema": payload.get("requested_schema", {}),
             },
         )
 
     # Check block patterns
-    result = check_elicitation(
-        server_name=server_name,
-        request_type=request_type,
-        parameters=parameters,
-        block_patterns=cfg.block_patterns,
-    )
+    result = check_elicitation(request=request, block_patterns=cfg.block_patterns)
 
     if result["blocked"]:
         # Audit the block
@@ -163,7 +168,7 @@ def request() -> None:
                 server_name=server_name,
                 details={
                     "matched_pattern": result["matched_pattern"],
-                    "request_type": request_type,
+                    "elicitation_id": payload.get("elicitation_id", ""),
                 },
             )
 
@@ -184,17 +189,24 @@ def result() -> None:
         # Audit-only path: nothing to audit if we can't parse. Exit cleanly.
         raise typer.Exit(0)
 
-    server_name = payload.get("server_name", "")
-    result_data = payload.get("result", {})
+    server_name = payload.get("mcp_server_name", "")
+    content = payload.get("content")
 
     cfg = resolve_typed(McpConfig, "mcp")
 
     if cfg.audit_elicitations:
+        # Record the user's decision and which fields they submitted, never
+        # the submitted values: a form can carry secrets the user typed.
         write_elicitation_audit(
             audit_dir=get_audit_dir(),
             event_type="elicitation_result",
             server_name=server_name,
-            details={"result": result_data},
+            details={
+                "action": payload.get("action", ""),
+                "elicitation_id": payload.get("elicitation_id", ""),
+                "mode": payload.get("mode", ""),
+                "content_fields": sorted(content) if isinstance(content, dict) else [],
+            },
         )
 
     raise typer.Exit(0)

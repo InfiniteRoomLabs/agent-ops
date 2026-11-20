@@ -11,6 +11,36 @@ from typing import Generator
 import pytest
 
 
+def claude_code_create_payload(name: str, cwd: Path) -> dict:
+    """WorktreeCreate stdin exactly as Claude Code sends it.
+
+    The common hook fields plus ``hook_event_name`` and ``name`` -- there is no
+    ``worktree_name`` and no ``branch``. Schema per the Claude Code hooks
+    reference and the 2.1.329 input schema; a subagent launch names the
+    worktree ``agent-<id>``.
+    """
+    return {
+        "session_id": "00000000-0000-4000-8000-000000000000",
+        "transcript_path": str(cwd / "session.jsonl"),
+        "cwd": str(cwd),
+        "permission_mode": "default",
+        "hook_event_name": "WorktreeCreate",
+        "name": name,
+    }
+
+
+def claude_code_remove_payload(worktree_path: Path, cwd: Path) -> dict:
+    """WorktreeRemove stdin exactly as Claude Code sends it."""
+    return {
+        "session_id": "00000000-0000-4000-8000-000000000000",
+        "transcript_path": str(cwd / "session.jsonl"),
+        "cwd": str(cwd),
+        "permission_mode": "default",
+        "hook_event_name": "WorktreeRemove",
+        "worktree_path": str(worktree_path),
+    }
+
+
 @pytest.fixture()
 def git_repo(tmp_path: Path) -> Generator[Path, None, None]:
     """Git repo with an executable pre-commit hook."""
@@ -80,15 +110,17 @@ class TestCopyHooksToWorktree:
         assert hook_in_wt.exists(), f"Expected hook at {hook_in_wt}"
         assert os.access(hook_in_wt, os.X_OK), "Hook should be executable"
 
+    @pytest.mark.skipif(
+        os.name == "nt", reason="Windows has no exec bit; Git for Windows runs any hook file"
+    )
     def test_copy_hooks_skips_non_executable(self, git_repo: Path) -> None:
         """Non-executable files in hooks/ should not be copied."""
         from worktree_lifecycle import copy_git_hooks
 
-        # Add a non-executable file to hooks dir (e.g. a .sample file)
-        sample = git_repo / ".git" / "hooks" / "pre-commit.sample"
-        sample.write_text("#!/bin/sh\n# sample\n")
-        # Ensure it is NOT executable
-        sample.chmod(stat.S_IRUSR | stat.S_IWUSR)
+        # A real hook name, but NOT executable, so git would not run it
+        disabled = git_repo / ".git" / "hooks" / "post-checkout"
+        disabled.write_text("#!/bin/sh\n# disabled\n")
+        disabled.chmod(stat.S_IRUSR | stat.S_IWUSR)
 
         wt_path = git_repo / "worktrees" / "test-wt2"
         subprocess.run(
@@ -100,9 +132,31 @@ class TestCopyHooksToWorktree:
 
         copied = copy_git_hooks(main_repo=git_repo, worktree=wt_path)
 
-        # pre-commit should be copied, pre-commit.sample should not
         assert "pre-commit" in copied
-        assert "pre-commit.sample" not in copied
+        assert "post-checkout" not in copied
+
+    def test_copy_hooks_skips_sample_hooks(self, git_repo: Path) -> None:
+        """Git never runs `*.sample` hooks, so they are not propagated even
+        when executable (git's templates ship them 0755 on Linux, and on
+        Windows every file passes the exec check)."""
+        from worktree_lifecycle import copy_git_hooks
+
+        sample = git_repo / ".git" / "hooks" / "pre-push.sample"
+        sample.write_text("#!/bin/sh\n# sample\n")
+        sample.chmod(sample.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+
+        wt_path = git_repo / "worktrees" / "test-wt3"
+        subprocess.run(
+            ["git", "worktree", "add", str(wt_path), "-b", "test-branch3"],
+            check=True,
+            capture_output=True,
+            cwd=str(git_repo),
+        )
+
+        copied = copy_git_hooks(main_repo=git_repo, worktree=wt_path)
+
+        assert "pre-commit" in copied
+        assert not [name for name in copied if name.endswith(".sample")], copied
 
 
 class TestCheckEnvFiles:
@@ -176,7 +230,7 @@ class TestCreateCommand:
         result = CliRunner().invoke(
             wl.app,
             ["create"],
-            input=json.dumps({"worktree_name": "feat-wt", "branch": "feat-x"}),
+            input=json.dumps({"name": "feat-wt", "branch": "feat-x"}),
         )
         assert result.exit_code == 0, result.output
 
@@ -201,7 +255,146 @@ class TestCreateCommand:
         result = CliRunner().invoke(
             wl.app,
             ["create"],
-            input=json.dumps({"worktree_name": "branchless-wt"}),
+            input=json.dumps({"name": "branchless-wt"}),
         )
         assert result.exit_code == 0, result.output
         assert (git_repo / ".worktrees" / "branchless-wt").is_dir()
+
+    def test_create_accepts_claude_code_payload(
+        self, git_repo: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The payload Claude Code really sends (`name`, no `worktree_name`)
+        creates <repo root>/.worktrees/<name> and prints its absolute path
+        as the last stdout line, which is what the harness reads."""
+        import json
+
+        from typer.testing import CliRunner
+
+        import worktree_lifecycle as wl
+
+        monkeypatch.chdir(git_repo)
+        name = "agent-a8daf1c9a79ee5133"
+
+        result = CliRunner().invoke(
+            wl.app,
+            ["create"],
+            input=json.dumps(claude_code_create_payload(name, git_repo)),
+        )
+        assert result.exit_code == 0, result.output
+
+        wt = git_repo / ".worktrees" / name
+        assert wt.is_dir()
+        last_line = result.stdout.strip().splitlines()[-1]
+        assert last_line == str(wt.resolve())
+
+    def test_create_without_name_fails_with_clear_message(
+        self, git_repo: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A payload with no `name` must exit non-zero with a readable stderr
+        message naming the missing field -- not a pydantic traceback."""
+        import json
+
+        from typer.testing import CliRunner
+
+        import worktree_lifecycle as wl
+
+        monkeypatch.chdir(git_repo)
+        payload = claude_code_create_payload("unused", git_repo)
+        del payload["name"]
+
+        result = CliRunner().invoke(wl.app, ["create"], input=json.dumps(payload))
+
+        assert result.exit_code == 1
+        # A handled exit, not an escaped ValidationError
+        assert isinstance(result.exception, SystemExit), repr(result.exception)
+        assert "`name`" in result.stderr
+        assert result.stdout.strip() == ""
+        assert not (git_repo / ".worktrees").exists()
+
+    def test_create_rejects_malformed_json_cleanly(
+        self, git_repo: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Non-JSON stdin exits 1 with a message, not a traceback."""
+        from typer.testing import CliRunner
+
+        import worktree_lifecycle as wl
+
+        monkeypatch.chdir(git_repo)
+
+        result = CliRunner().invoke(wl.app, ["create"], input="not json")
+
+        assert result.exit_code == 1
+        assert isinstance(result.exception, SystemExit), repr(result.exception)
+        assert "WorktreeCreate" in result.stderr
+        assert result.stdout.strip() == ""
+
+
+class TestRemoveCommand:
+    """Tests for the WorktreeRemove hook entry point."""
+
+    @pytest.fixture()
+    def audit(self, monkeypatch: pytest.MonkeyPatch) -> list[dict]:
+        """Capture audit events instead of writing to the real home dir."""
+        import worktree_lifecycle as wl
+
+        events: list[dict] = []
+        monkeypatch.setattr(wl, "_write_audit", events.append)
+        monkeypatch.setattr(
+            wl,
+            "resolve_typed",
+            lambda model, namespace, **kw: wl.WorktreeConfig(),
+        )
+        return events
+
+    def test_remove_accepts_claude_code_payload(
+        self, git_repo: Path, audit: list[dict]
+    ) -> None:
+        """The real WorktreeRemove payload is read via `worktree_path` and
+        audited; uncommitted work in the worktree is reported."""
+        import json
+
+        from typer.testing import CliRunner
+
+        import worktree_lifecycle as wl
+
+        wt = git_repo / ".worktrees" / "agent-a8daf1c9a79ee5133"
+        subprocess.run(
+            ["git", "worktree", "add", str(wt)],
+            check=True,
+            capture_output=True,
+            cwd=str(git_repo),
+        )
+        (wt / "scratch.txt").write_text("uncommitted\n")
+
+        result = CliRunner().invoke(
+            wl.app,
+            ["remove"],
+            input=json.dumps(claude_code_remove_payload(wt, git_repo)),
+        )
+
+        assert result.exit_code == 0, result.output
+        assert len(audit) == 1
+        assert audit[0]["event"] == "worktree_removed"
+        assert audit[0]["path"] == str(wt)
+        assert audit[0]["had_uncommitted"] is True
+
+    def test_remove_without_worktree_path_exits_zero_with_warning(
+        self, git_repo: Path, audit: list[dict]
+    ) -> None:
+        """Removal is debug-only visibility: a payload missing `worktree_path`
+        warns on stderr and exits 0 instead of raising."""
+        import json
+
+        from typer.testing import CliRunner
+
+        import worktree_lifecycle as wl
+
+        payload = claude_code_remove_payload(git_repo, git_repo)
+        del payload["worktree_path"]
+
+        result = CliRunner().invoke(wl.app, ["remove"], input=json.dumps(payload))
+
+        assert result.exit_code == 0
+        assert result.exception is None, repr(result.exception)
+        assert "`worktree_path`" in result.stderr
+        assert audit == []
