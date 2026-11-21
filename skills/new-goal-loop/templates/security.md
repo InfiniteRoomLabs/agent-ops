@@ -18,7 +18,7 @@ You are the **security lane** of a four-lane review gate for branch `<branch>` i
 4. **Transport:** TLS never disabled; timeouts set; redirects do not forward credentials cross-host; response sizes bounded; retry headers parsed defensively.
 5. **Trust boundaries:** all external input (args, stdin, tool inputs, API responses, files) validated or decoded into typed structures; no path traversal from user-supplied names; no shell-outs with user input; no unsafe/eval.
 6. **Supply chain:** lockfiles present and unchanged except intended additions; new dependencies listed with justification; vuln scan clean; CI workflows pin actions and use least-privilege permissions; release paths cannot be triggered from unprotected refs.
-7. <If public repo:> **Hygiene:** no real tenant/account IDs, internal hostnames/IPs, vault item names, or personal names anywhere in the diff (fixtures included).
+7. **Hygiene (every repo, every remote):** no real tenant/account IDs, internal hostnames/IPs, vault item names, or personal names anywhere in the diff (fixtures, reports, and the goal file included). If one is already in history, say so: the fix is a history rewrite, and the lead must record it for the final history-scrub phase.
 
 ## Deliver
 

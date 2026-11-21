@@ -209,14 +209,26 @@ class TestEdgeCases:
         result = resolve_frontmatter(cwd=project, home_override=tmp_path)
         assert result == {}
 
-    def test_skip_unreadable_files(self, tmp_path: Path) -> None:
+    def test_skip_unreadable_files(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         from _shared.frontmatter_config import resolve_frontmatter
 
         global_dir = tmp_path / ".claude"
         global_dir.mkdir()
         unreadable = global_dir / "CLAUDE.md"
         unreadable.write_text("---\nfoo: bar\n---\n# Global\n")
-        unreadable.chmod(0o000)
+
+        # Simulate the read failure instead of chmod 0o000: root (CI containers,
+        # cloud sessions) ignores file permissions and would read it anyway.
+        real_read_text = Path.read_text
+
+        def read_text(self: Path, *args: object, **kwargs: object) -> str:
+            if self == unreadable:
+                raise PermissionError(13, "Permission denied", str(self))
+            return real_read_text(self, *args, **kwargs)  # type: ignore[arg-type]
+
+        monkeypatch.setattr(Path, "read_text", read_text)
 
         project = tmp_path / "project"
         project.mkdir()
@@ -227,6 +239,3 @@ class TestEdgeCases:
         result = resolve_frontmatter(cwd=project, home_override=tmp_path)
         # Should skip the unreadable global file and still return project data
         assert result == {"baz": "qux"}
-
-        # Restore permissions for cleanup
-        unreadable.chmod(0o644)

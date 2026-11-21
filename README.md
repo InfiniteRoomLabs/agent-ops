@@ -279,7 +279,7 @@ Activate a shipped output style per session or per project, such as an ADHD-frie
 
 ## Skills
 
-26 skills you invoke with a slash command. Each is a focused workflow.
+28 skills you invoke with a slash command. Each is a focused workflow.
 
 **Engineering and delivery**
 
@@ -297,6 +297,8 @@ Activate a shipped output style per session or per project, such as an ADHD-frie
 | `/deploy-checklist` | Verify readiness before shipping |
 | `/release-prep` | Run a version bump, CHANGELOG, tag, and release |
 | `/incident-response` | Triage, communicate, and write a postmortem |
+| `/web-ui-automation-survey` | Map a live web app read-only into a Page → Component → Element automation report |
+| `/web-ui-automation-components` | Turn that survey report into typed Puppeteer components and page objects |
 
 **Repository, research, and meta**
 

@@ -96,6 +96,8 @@ End-to-end checks that aren't automated yet. Run them by hand against throwaway 
 `/dev/shm` (tmpfs). Promote an entry to a pytest case once the blocker named below is
 gone.
 
+New manual tests use the `manual-test` skill's format (`tests/manual/MT-<nnn>-<slug>.md` plus a `.results` log); M1 below predates it and migrates at the next change to the guards.
+
 ### M1 - changelog-guard push protection (real repo + remote)
 
 **Purpose:** confirm the `hook` entrypoint blocks a real push to a protected branch when

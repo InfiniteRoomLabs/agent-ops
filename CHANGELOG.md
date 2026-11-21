@@ -5,10 +5,10 @@ All notable changes to the agent-ops marketplace will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [agency-1.26.0] - 2026-11-20
+## [agency-1.29.0] - 2026-11-20
 
 ### Fixed
-- **`scripts/worktree_lifecycle.py`** -- the WorktreeCreate hook no longer crashes every worktree-isolated agent launch. Claude Code sends the worktree name as `name` (for a subagent, `agent-<id>`), alongside the common hook fields; the hook's payload model required a `worktree_name` field that the hook input never had, so pydantic raised `ValidationError: worktree_name Field required`, no worktree was created, and the agent launch failed. `create` now reads `name`, and both `create` and `remove` parse stdin through `parse_payload()`: a payload that is not JSON or lacks the field gets a one-line stderr message listing the keys that did arrive (create exits 1, remove still exits 0) instead of a traceback. WorktreeRemove's `worktree_path` already matched. Regression tests in `tests/test_worktree_lifecycle.py` drive both commands with the payload shape Claude Code sends.
+- **`scripts/worktree_lifecycle.py`** -- the WorktreeCreate and WorktreeRemove hooks fail with a message instead of a traceback. 1.28.1 made `create` read the worktree name from `name`, which is what Claude Code sends; the same bug was fixed a second time on another machine before that release was pulled there, and the two fixes are merged here. Both `create` and `remove` now parse stdin through `parse_payload()`: a payload that is not JSON or lacks the field gets a one-line stderr message listing the keys that did arrive (create exits 1, remove still exits 0). The `worktree_name` alias that 1.28.1 kept is dropped: the hook input never had that field. WorktreeRemove's `worktree_path` already matched. Regression tests in `tests/test_worktree_lifecycle.py` drive both commands with the payload shape Claude Code sends.
 - **`scripts/config-tamper-guard.py` judges changes again (it never had).** The ConfigChange envelope carries `source` and an optional `file_path`; the payload model read `config_source` and `changed_keys`, which the hook input never had, so `config_source` was always empty and every change fell through to the audit-only `config_change_unjudged` branch (179 events across 10 projects in the local audit logs, none judged). It now reads `source`, judges user/project/local settings as designed (removing or modifying anything under `hooks` or `permissions.deny`, or turning `disableAllHooks` on, is blocked; additions pass; unreadable or non-object settings fail closed), and, when `file_path` is absent, reads the source's own settings file instead of an empty document that would have blocked every change. Audit entries keep the `config_source` key and drop `changed_keys`. Tests drive the `hook` command with the real envelope.
 - **`scripts/elicitation-gate.py` reads the real Elicitation fields.** It read `server_name`, `request_type`, `parameters` and `result`; Claude Code sends `mcp_server_name`, `message`, `mode`, `url`, `elicitation_id`, `requested_schema` and, for the result, `action` and `content`. Configured `mcp.block_patterns` matched only empty values and never fired. Patterns are now searched in the request's server name, message, mode, url and requested schema (not in session fields such as `cwd`). The request audit records those fields; the result audit records the action and the names of the submitted fields, never their values. With no patterns configured (the default) nothing is declined, as before.
 - **`scripts/worktree_lifecycle.py` no longer propagates `*.sample` hooks.** Git never runs them, but they passed the exec check (git's templates install them 0755, and on Windows `os.access(X_OK)` is true for every file), so every new worktree got git's inert sample hooks copied in.
@@ -20,6 +20,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **`pyproject.toml` declares `[tool.uv] exclude-newer = "7 days"`.** `uv.lock` was resolved with that cooldown from a global uv setting on another machine; uv on a machine without it discards the lock ("removal of global exclude newer") and re-locks every dependency to its newest release on any `uv run`. With the setting in the repo, the committed lock is current everywhere.
+
+## [agency-1.28.1] - 2026-11-09
+
+### Fixed
+- **`scripts/worktree_lifecycle.py`** -- the `WorktreeCreate` hook crashed on every real payload because `CreatePayload` required `worktree_name`, while Claude Code sends the worktree slug as `name`; the model now reads `name` (with `worktree_name` kept as an alias) and the new test feeds the documented payload shape.
+
+## [agency-1.28.0] - 2026-10-27
+
+### Added
+- **`skills/manual-test/`** -- the org format for regression tests that cannot run in the automated suite (a live, audited system, a real remote, a human eye): `<testdir>/manual/MT-<nnn>-<slug>.md`, one tool call or manual action per step with a `jq -e` or exact-shape expected result, a declared live read budget (no retries, no polling), `<placeholder>`s resolved from the gitignored `mise.local.toml`, and an append-only logfmt `.results` log beside it. Procedures for writing, running, and retiring a test; every manual test names what blocks its automation (standard S5), and the active count is the debt the org drives to zero.
+- **`TESTING.md`** -- `## Manual tests` points new entries at the skill's format; M1 migrates at its next change.
+
+### Changed
+- **`skills/release-prep/`** -- second Iron Law (no release with a failed, blocked, stale, or unrun manual test); new Step 4a runs every active `MT-*.md` through the `manual-test` skill after the bump and gates the release on a `result=PASS|SKIP` line for the version in the shell; Step 5 stages the `.results` files; two anti-patterns (no re-run to turn a FAIL into a PASS, no manual test in the automated gate); Step 7 reports the active manual-test count.
+
+## [agency-1.27.0] - 2026-10-09
+
+### Changed
+- **`skills/new-goal-loop/`** -- the roadmap always ends with an attended **history scrub** phase: `public-readiness` over the working tree, full history, and commit messages, then `git filter-repo --replace-text` driven by the configured redaction term list, a force-push to every remote (internal mirrors included), and a re-clone. `GOAL.template.md` ships the row; `SKILL.md` Part 2 states the rule beside "Phase 0 is always scaffold" and asks for the project's secret-shaped identifiers to be added to the term list before the first commit.
+- **`skills/new-goal-loop/templates/{CLAUDE-sections.template,security}.md`** -- public-repo hygiene is unconditional (every remote is public-bound) instead of `<If public:>`; the security lane must name leaks already in history so the lead records them for the scrub phase.
+- **`skills/new-goal-loop/templates/seed-lessons.md`** -- two new seed lessons: the docs that describe a scrub leak the thing they scrubbed, and lane reports quote what they flag.
+
+## [agency-1.26.0] - 2026-10-02
+
+### Added
+- **`skills/web-ui-automation-survey/`** -- explores a live, signed-in web app strictly read-only through the browser tool and writes an exhaustive Page -> Component -> Element survey report (`{app}-automation-survey.md`): platform facts, component trees with selectors, routines (`R-{AREA}-{VERB}`), user stories, route table, API surface, and a coverage matrix with Verified / Inferred / Not exercised / Not verified evidence labels. Ships an in-page helper block (`window.__sv`) for DOM dumps, network shape capture, and bundle grep that masks URLs, secrets, and ids; identifiers are kept in scratch and grepped out of the report before delivery.
+- **`skills/web-ui-automation-components/`** -- turns that survey report into a drop-in folder of strictly typed TypeScript Puppeteer components, models, and page objects (no project scaffolding). Includes the shared `core/` files (base `Component`, typed errors, `poll`), a writes-off-by-default `sideEffects` guard, and the pre-delivery checks: dual `tsc` type-check, selector syntax check, fixture smoke run, and optional live selector counts.
 
 ## [agency-1.25.0] - 2026-09-07
 

@@ -17,7 +17,7 @@ Keep the repo's own intro/toolchain/key-locations content; these are the treadmi
 - **Inferred vs confirmed:** facts about the oracle are CONFIRMED / INFERRED / TODO. When reality disagrees with the spec, reality wins -- add a `> **STATE AS OF YYYY-MM-DD**` callout in the affected spec section in the same commit.
 - **Commits:** conventional, imperative, scoped. **Stage and commit in separate tool calls** (version guard); never `-a`/`-am`, never `--no-verify`. On `main`, `CHANGELOG.md` must be staged (changelog guard -- a Claude hook, not a git hook). Co-author trailer per harness rules.
 - **Changelogs:** Keep a Changelog, `[Unreleased]` on top<; per-module changelogs if multiple release artifacts>.
-- <If public:> **Public-repo hygiene on every commit:** no vault item names, internal IPs/domains, real tenant/account IDs, tokens, or personal correspondents. Fixtures synthetic. Secret wiring (`fnox.toml` etc.) gitignored.
+- **Public-repo hygiene on every commit, whatever the remote:** no vault item names, internal IPs/domains, real tenant/account IDs, tokens, or personal correspondents. Fixtures synthetic. Secret wiring (`fnox.toml` etc.) gitignored. A leak found in history is fixed by `git filter-repo` and a force-push to every remote, never by a working-tree edit; the roadmap's final phase is the history scrub. Never write a secret-shaped value into a goal, report, or commit message -- say "the real <thing>".
 - **Docs are ASCII-only and never hard-wrapped.**
 
 ## If you break something
